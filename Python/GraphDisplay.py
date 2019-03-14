@@ -12,12 +12,13 @@ import os
 
 ARRAY_CHAR_SEPARATOR = '-'
 LIST_CHAR_SEPARATOR = '|'
+PARENT_FOLDER = os.path.dirname(os.getcwd())#parent folder
+DEFAULT_DIR_GRAPHS = os.path.join(PARENT_FOLDER,"Graphes")
 
 
 #%%,
 def launchC(n, D, filename):
-    direc = os.path.dirname(os.getcwd())#parent folder
-    direc = os.path.join(direc, "Algorithmes_C/Librairies/lib.so")
+    direc = os.path.join(PARENT_FOLDER, "Algorithmes_C/Librairies/lib.so")
     
     lib = ctypes.CDLL(direc)
     
@@ -54,6 +55,7 @@ def readTree(filename):
     return out
         
 def createDirectedGraph(n,D, filename) :
+    filename = os.path.join(DEFAULT_DIR_GRAPHS,filename)
     launchC(n,D,filename)#launch C function
     array = readTree(filename)
     out=[]
