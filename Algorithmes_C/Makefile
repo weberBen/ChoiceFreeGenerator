@@ -19,7 +19,7 @@ Python.o : Python.c
 main.o : main.c 
 	gcc ${GCC_FLAGS} -c main.c
 
-main : main.o Array.o GraphGenerator.o Tools.o Python.o
+main : main.o Array.o GraphGenerator.o Tools.o Python.o 
 	gcc ${GCC_FLAGS} -o $(EXEC) main.o Array.o GraphGenerator.o Tools.o Python.o -lm
 
 lib : Array.c GraphGenerator.c Tools.c Python.c
@@ -33,4 +33,4 @@ open :
 	geany *c *h
 
 clean:
-	rm -f *.o $(EXEC) *.exe $(LIB_FOLDER)/*so
+	rm -f *.o $(EXEC) *.exe
