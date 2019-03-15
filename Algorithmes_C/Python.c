@@ -11,7 +11,6 @@ void py_createTree(unsigned int n, unsigned int D, char * filename)
 	freeList(tree, n);
 }
 
-
 void py_createStronglyConnectedGraph(unsigned int n, unsigned int D, char * filename)
 {
 	pArray * tree = buildTree(n, D);

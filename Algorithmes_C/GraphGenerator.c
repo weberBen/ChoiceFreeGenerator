@@ -189,12 +189,11 @@ void stronglyConnectedGraph(pArray * tree, unsigned int n)
 	
 	connect(0, tree, color, arrival_time, path_time, time);
 	//since all the node are connected to the root, we just have one call as the initialization
-	
 }
 
 void connect(unsigned int u, pArray * tree, enum colorTag color[], int arrival_time[], 
 			 int path_time[], unsigned int time)
-{
+{tree[0]=NULL;
 	//update configuration
 	color[u] = GRAY;
 	arrival_time[u] = time; time++;//first meet of the node

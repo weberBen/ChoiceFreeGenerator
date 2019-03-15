@@ -22,7 +22,7 @@ def launchC(n, D, filename):
     
     lib = ctypes.CDLL(direc)
     
-    #lib.py_createStronglyConnectedGraph(ctypes.c_uint(n), ctypes.c_uint(D), filename.encode('utf-8'))
+    lib.py_createStronglyConnectedGraph(ctypes.c_uint(n), ctypes.c_uint(D), filename.encode('utf-8'))
 
 #%%,
 

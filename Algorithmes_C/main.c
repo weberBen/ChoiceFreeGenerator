@@ -9,9 +9,9 @@
 int main()
 {
 	srand(time(NULL));
-	unsigned int n = 10;
+	unsigned int n = 50;
 	
-	pArray * tree = buildTree(n, 3);
+	pArray * tree = buildTree(n, 5);
 	displayList(tree, n);
 	
 	stronglyConnectedGraph(tree, n);
@@ -24,7 +24,7 @@ int main()
 	freeList(tree, n);
 	
 	printf("\n--------------------------\n");
-	py_createStronglyConnectedGraph(10, 5, "test.txt");
+	py_createStronglyConnectedGraph(50, 5, "test.txt");
 	
 	return 0;
 }
