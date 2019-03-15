@@ -18,11 +18,17 @@ DEFAULT_DIR_GRAPHS = os.path.join(PARENT_FOLDER,"Graphes")
 
 #%%,
 def launchC(n, D, filename):
-    direc = os.path.join(PARENT_FOLDER, "Algorithmes_C/Librairies/lib.so")
+    #direc = os.path.join(PARENT_FOLDER, "Algorithmes_C/Librairies/lib.so")
+    #lib = ctypes.CDLL(direc)
+    #lib.py_createStronglyConnectedGraph(ctypes.c_uint(n), ctypes.c_uint(D), filename.encode('utf-8'))
     
-    lib = ctypes.CDLL(direc)
-    
-    lib.py_createStronglyConnectedGraph(ctypes.c_uint(n), ctypes.c_uint(D), filename.encode('utf-8'))
+    #use external gcc compilator because the one implement in pyhton makes something wrong
+    direc = os.path.join(PARENT_FOLDER, "Algorithmes_C")
+    function = "py_createStronglyConnectedGraph"
+    args = str(n)+" "+str(D)+" " +filename
+    string = os.path.join(direc, "main")+" -f "+ function +" "+args
+    os.system(string)
+    #./main -f py_createTree 10 5 "testo.txt"
 
 #%%,
 
@@ -73,7 +79,7 @@ import matplotlib.pyplot as plt
 #plt.figure(1,figsize=(8,8)) 
 
 G = nx.DiGraph()
-G.add_edges_from(createDirectedGraph(10,5,"er.txt"))
+G.add_edges_from(createDirectedGraph(20,5,"er.txt"))
 
 # Need to create a layout when doing
 # separate calls to draw nodes and edges

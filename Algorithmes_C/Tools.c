@@ -68,6 +68,9 @@ void displayArray(pArray p)
  **********************************************************************/
 unsigned int getNumberOfDigit(int num)
 {
+	if(num==0)
+		return 1;
+	
 	return floor(log10(abs(num))) + 1;
 }
 
@@ -101,6 +104,7 @@ unsigned int arrayToString(char ** output, pArray p)
 	{
 		data = cursor->data;
 		digit = getNumberOfDigit(data);//number of digits in the current data number
+		
 		count+= digit;
 		if(cursor->next!=NULL)//if there is an other element
 		{
@@ -121,6 +125,7 @@ unsigned int arrayToString(char ** output, pArray p)
 	
 	unsigned int i,k;
 	char digits[max_digits+1];//+1 for the end char '\0'
+	
 	
 	i = 0;//index of the current element in the array of char
 	while(p)

@@ -14,4 +14,6 @@ unsigned int listToString(char ** output, pArray a[], unsigned int n);
 
 int listToFile(char * filename, pArray a[], unsigned int n);
 
+unsigned int getNumberOfDigit(int num);
+
 #endif 

@@ -6,8 +6,9 @@
 #include "Tools.h"
 #include "Python.h"
 
+#include "Server.h"
 
-int main(int argc, char ** argv)
+/*int main(int argc, char ** argv)
 {
     if(startPyFunctions(argc, argv)==0)
     {
@@ -16,22 +17,34 @@ int main(int argc, char ** argv)
 	
 	//test functions
 	srand(time(NULL));
-	/*unsigned int n = 10;
+	unsigned int n = 100;
 	
-	pArray * tree = buildTree(n, 5);
-	displayList(tree, n);
+	pArray * tree = buildTree(n, 8);
+	//displayList(tree, n);
 	
 	stronglyConnectedGraph(tree, n);
 	
-	printf("\n--------------------------\n");
-	displayList(tree, n);
+	//printf("\n--------------------------\n");
+	//displayList(tree, n);
+	char * s;
+	listToString(&s,tree, n);//convert the tree into a string
+	fprintf(stderr, "abre=%s\n", s);
 	
+	//listToFile("test.txt", tree, n);
+	freeList(tree, n);
+	free(s);
 	
-	listToFile("test.txt", tree, n);
-	freeList(tree, n);*/
-	
-	printf("\n--------------------------\n");
-	py_createStronglyConnectedGraph(10, 5, "testo.txt");
+	return 0;
+}*/
+
+int main()
+{
+	int PORT = 2400;
+    int BUFFSIZE = 12;
+    
+	py_establishCommunication(PORT, BUFFSIZE);
 	
 	return 0;
 }
+
+

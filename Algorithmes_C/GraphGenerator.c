@@ -4,6 +4,16 @@
 
 #include "GraphGenerator.h"
 
+
+void freeGraph(graph * g)
+{
+	if(g==NULL)
+		return;
+		
+	freeList(g->data, g->size);
+	free(g);
+}
+
 /**********************************************************************
  * 
  * 						TREE FUNCTIONS

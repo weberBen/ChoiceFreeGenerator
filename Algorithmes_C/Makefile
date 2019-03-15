@@ -16,11 +16,14 @@ Tools.o : Tools.c
 Python.o : Python.c
 	gcc ${GCC_FLAGS} -c Python.c
 
+Server.o : Server.c
+	gcc ${GCC_FLAGS} -c Server.c
+
 main.o : main.c 
 	gcc ${GCC_FLAGS} -c main.c
 
-main : main.o Array.o GraphGenerator.o Tools.o Python.o 
-	gcc ${GCC_FLAGS} -o $(EXEC) main.o Array.o GraphGenerator.o Tools.o Python.o -lm
+main : main.o Array.o GraphGenerator.o Tools.o Python.o Server.o
+	gcc ${GCC_FLAGS} -o $(EXEC) main.o Array.o GraphGenerator.o Tools.o Python.o Server.o -lm
 
 lib : Array.c GraphGenerator.c Tools.c Python.c
 	gcc -Wall -fPIC -c GraphGenerator.c
