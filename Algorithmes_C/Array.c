@@ -23,6 +23,19 @@ pArray add(pArray l, unsigned int data)
     return node;
 }
 
+unsigned int lengthArray(pArray p)
+{
+	unsigned int count =0;
+	
+	while(p)
+	{
+		count++;
+		p = p->next;
+	}
+	
+	return count;
+}
+
 void initializeArray(pArray a[], unsigned int n)
 {
 	unsigned int i;

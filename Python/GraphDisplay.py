@@ -22,7 +22,7 @@ def launchC(n, D, filename):
     
     lib = ctypes.CDLL(direc)
     
-    lib.py_createTree(ctypes.c_uint(n), ctypes.c_uint(D), filename.encode('utf-8'))
+    #lib.py_createStronglyConnectedGraph(ctypes.c_uint(n), ctypes.c_uint(D), filename.encode('utf-8'))
 
 #%%,
 
@@ -62,8 +62,7 @@ def createDirectedGraph(n,D, filename) :
     
     for i in range(len(array)):
         for j in range(len(array[i])):
-            if(array[i][j]!=0):
-                out.append((i, array[i][j]))
+            out.append((i, array[i][j]))
     
     return out
     
@@ -74,7 +73,7 @@ import matplotlib.pyplot as plt
 #plt.figure(1,figsize=(8,8)) 
 
 G = nx.DiGraph()
-G.add_edges_from(createDirectedGraph(100,10,"er.txt"))
+G.add_edges_from(createDirectedGraph(10,5,"er.txt"))
 
 # Need to create a layout when doing
 # separate calls to draw nodes and edges

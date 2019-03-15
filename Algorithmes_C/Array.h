@@ -12,6 +12,8 @@ typedef struct Array
 pArray createNode(unsigned int data);
 pArray add(pArray l, unsigned int data);
 
+unsigned int lengthArray(pArray p);
+
 void initializeArray(pArray a[], unsigned int n);
 
 void freeArray(pArray p);

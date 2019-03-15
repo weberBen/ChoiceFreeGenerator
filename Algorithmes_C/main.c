@@ -4,24 +4,27 @@
 
 #include "GraphGenerator.h"
 #include "Tools.h"
-
+#include "Python.h"
 
 int main()
 {
-	//srand(time(NULL));
-	unsigned int n = 20;
+	srand(time(NULL));
+	unsigned int n = 10;
 	
-	pArray * tree = buildTree(n, 5);
+	pArray * tree = buildTree(n, 3);
 	displayList(tree, n);
 	
-	char * txt;
-	unsigned int m = listToString(&txt, tree, n);
-	printf("res=%s\nsize=%u\n", txt, m);
-	free(txt);
+	stronglyConnectedGraph(tree, n);
+	
+	printf("\n--------------------------\n");
+	displayList(tree, n);
+	
 	
 	listToFile("test.txt", tree, n);
-	
 	freeList(tree, n);
+	
+	printf("\n--------------------------\n");
+	py_createStronglyConnectedGraph(10, 5, "test.txt");
 	
 	return 0;
 }
