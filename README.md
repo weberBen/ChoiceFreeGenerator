@@ -4,6 +4,7 @@
 # Sommaire
 - [Description](#description)
 - [Interface](#Interface)
+  - [Commands](#Commands)
 
 
 # Description <a name="Description"/>
@@ -18,7 +19,7 @@ All the functions about generating and modifying graph are written in C. But all
 
 <img src="Annexes/Images/Py_interface.png" width="60%"  align="middle">
 
-  ## Command to use python interface
+  ## Commands to use python interface <a name="Commands"/>
 The module *SocketCommunication* contains all the needed classes and functions to communicated with the server side. We can underline :
 
   - *Task* (class) that store all the values for request. Each request start with a specific task that help the server to know which result needed to be send back
@@ -40,18 +41,14 @@ The module *GraphDisplay* takes the formated response of the server and convert 
   
 An example of the uses of the functions :
 ``` 
-import *SocketCommunication* as sc
- 
- srv = sc.Server()
- ParseGraph
- toNetworkxGraph
- plotGraph
- createStronglyConnectedGraph
- 
-import *SocketCommunication* as sc
+import SocketCommunication as sc
+
 res = createStringlyConnectedGraph(n=7,D=3, nodeSize=200, widthArraw=1.5)
 f=res[0]
+graph = res[1]
+networkx_graph = res[2]
 f.show()
 ```
- ## About the tasks value :
+
+ ### About the tasks value :
 ...later
