@@ -1,6 +1,9 @@
 GCC_FLAGS=-Wall -g 
 EXEC= main
+EXEC_Py = py_main
 LIB_FOLDER = Librairies
+PY_LIB = py_lib.so
+LOCATION = /home/benjamin/Projets/FreeChoiceGenerator/Algorithmes_C
 
 all: $(EXEC)
 
@@ -22,18 +25,17 @@ Server.o : Server.c
 main.o : main.c 
 	gcc ${GCC_FLAGS} -c main.c
 
-main : main.o Array.o GraphGenerator.o Tools.o Python.o Server.o
+main : main.o Array.o GraphGenerator.o Tools.o Python.o Server.o py_main
 	gcc ${GCC_FLAGS} -o $(EXEC) main.o Array.o GraphGenerator.o Tools.o Python.o Server.o -lm
 
-lib : Array.c GraphGenerator.c Tools.c Python.c
-	gcc -Wall -fPIC -c GraphGenerator.c
-	gcc -Wall -fPIC -c Array.c
-	gcc -Wall -fPIC -c Tools.c
-	gcc -Wall -fPIC -c Python.c
-	gcc -shared -o $(LIB_FOLDER)/lib.so GraphGenerator.o Array.o Tools.o Python.o
+PythonMain.o : PythonMain.c 
+	gcc ${GCC_FLAGS} -c PythonMain.c
+
+py_main : PythonMain.o Array.o GraphGenerator.o Tools.o Python.o Server.o
+	gcc ${GCC_FLAGS} -o $(EXEC_Py) PythonMain.o Array.o GraphGenerator.o Tools.o Python.o Server.o -lm
 
 open : 
 	geany *c *h
 
 clean:
-	rm -f *.o $(EXEC) *.exe
+	rm -f *.o $(EXEC) $(EXEC_Py) *.exe

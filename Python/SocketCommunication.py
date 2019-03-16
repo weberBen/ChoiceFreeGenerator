@@ -8,16 +8,22 @@ References:
 
 import socket
 import sys
-import random
 import ctypes
-import struct
+import os
+import subprocess
+from contextlib import closing
+import inspect
 
-BUFFERSIZE = 12
-f_createTree = 0
+#%%
+class Directories:
+    PARENT_FOLDER = os.path.dirname(os.getcwd())#parent folder
+    FOLDER_ALGO_C = "Algorithmes_C"
+    FODLER_C = os.path.join(PARENT_FOLDER, FOLDER_ALGO_C)
+    NAME_MAIN_SERVER_C = "py_main"
 
-""" This class defines a C-like struct """
 #%%
 class Task:
+    '''task to send to the server'''
     closeServer=-1
     f_createTree=0
     f_createStronglyConnectedGraph=1
@@ -31,49 +37,111 @@ class Request(ctypes.Structure):
                 ("n", ctypes.c_uint),
                 ("D", ctypes.c_uint)]
 
-#%%
-def getResponse(request):
-    server_addr = ('localhost', 2400)
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    txt = ""
+def createRequest(task, n=None, D=None):
+    '''create request with the correct format for the arguments'''
+    frame = inspect.currentframe()
+    args, _, _, values = inspect.getargvalues(frame)#get arguments of the function
     
-    try:
-        s.connect(server_addr)
-    except:
-        print("ERROR: Connection to %s refused" % repr(server_addr))
-        sys.exit(1)
-
-    try:
-        #send request
-        s.send(request)
+    for i in args:
+        name_args = i
+        value = values[i]
         
-        #waiting for the response
-        count = 0
-        while count==0 or txt[count-1]!='\x00':#'\0'
-            buff = s.recv(ctypes.sizeof(ctypes.c_char)*BUFFERSIZE)
-            buff = buff.decode('utf8')
-            count = count + len(buff)
-            txt= txt+buff
-            
-        txt = txt[:count-1]#response of teh server side
-            
-    finally:
-        s.close()
+        if(name_args=="task" and value is not None):
+            task = ctypes.c_int(value)
+        elif(name_args=="n" and value is not None):
+            n = ctypes.c_uint(value)
+        elif(name_args=="D" and value is not None):
+            D = ctypes.c_uint(value)
+        
+    return Request(task, n, D)
+
+#%%
+class Server:
+
+    def __init__(self, port=None, buffersize=512):
+        if(port is None):
+            self.PORT = Server.findFreePort()
+        else :
+            self.PORT = port
+        self.BUFFERSIZE = buffersize
+        self.HOSTNAME = 'localhost'
+        self.FOLDER_C = Directories.FODLER_C
+        self.NAME_MAIN_SERVER_C = Directories.NAME_MAIN_SERVER_C
+        
+        #start C server
+        self.openCServerSide();
     
-    return txt
+    @staticmethod
+    def findFreePort():
+        with closing(socket.socket(socket.AF_INET, socket.SOCK_STREAM)) as s:
+            s.bind(('', 0))
+            s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            return s.getsockname()[1]
+    
+    
+    def openCServerSide(self):
+        '''Launch the C functions that will create the socket server and 
+           answer the request of the client side'''
+        function = os.path.join(self.FOLDER_C, self.NAME_MAIN_SERVER_C)
+        args=[self.PORT,self.BUFFERSIZE]
+        
+        args=[str(arg) for arg in args]
+        
+        txt = ""
+        for arg in args:
+           txt = txt +arg 
+        txt = function +" "+ txt
+        print("Commande lance sur le terminal : "+ txt)
+        print("\tParms : Port="+str(self.PORT)+", Buffersize="+str(self.BUFFERSIZE))
+        
+        args.insert(0, function)
+        subprocess.Popen(args)
+        #Popen(['/bin/sh', '-c', args[0], args[1], ...])
+        
+    
+    def close(self):
+        '''close C socket server'''
+        request = Request(Task.closeServer)
+        response = self.getResponse(request)
+        
+        if(len(response)==0):
+            print("Fermeture du serveur reussie")
+        else :
+            print("un probleme est survenu lors de la fermeture du server")
+    
+    
+    def getResponse(self, request):
+        '''send request and retrieve the response as string'''
+        txt = ""
+        #start socket
+        server_addr = (self.HOSTNAME, self.PORT)
+        sok = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        
+        try:
+            sok.connect(server_addr)
+        except:
+            print("ERROR: Connection to %s refused" % repr(server_addr))
+            sys.exit(1)
+    
+        try:
+            #send request
+            sok.send(request)
+            
+            #waiting for the response
+            count = 0
+            while count==0 or txt[count-1]!='\x00':#'\0'
+                buff = sok.recv(ctypes.sizeof(ctypes.c_char)*self.BUFFERSIZE)
+                buff = buff.decode('utf8')
+                count = count + len(buff)
+                txt= txt+buff
+                
+            txt = txt[:count-1]#response of teh server side
+                
+        finally:
+            sok.close()
+        
+        return txt
 
-
-request = Request(Task.f_createNonVolatileTree, ctypes.c_uint(100), ctypes.c_uint(8))
-buff1 = getResponse(request)
-
-request = Request(Task.f_createStronglyConnectedGraph, ctypes.c_uint(45), ctypes.c_uint(7))
-buff4 = getResponse(request)
-
-request = Request(Task.f_stronglyConnectedOnNonVolatileGraph)
-buff2 = getResponse(request)
-
-request = Request(Task.f_createNonVolatileTree, ctypes.c_uint(10), ctypes.c_uint(3))
-buff6 = getResponse(request)
-
-request = Request(Task.closeServer, ctypes.c_uint(100), ctypes.c_uint(8))
-buff5 = getResponse(request)
+#%%
+#request = Request(Task.f_createStronglyConnectedGraph, ctypes.c_uint(100), ctypes.c_uint(8))
+#buff1 = Socket.getResponse(request)

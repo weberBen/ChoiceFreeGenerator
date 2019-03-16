@@ -10,7 +10,7 @@ int createSocket(int port)
         printf("ERROR: Socket creation failed\n");
         exit(1);
     }
-    printf("Socket created\n");
+    printf("Socket created at port :%d\n", port);
 
     bzero((char *) &server, sizeof(server));
     server.sin_family = AF_INET;

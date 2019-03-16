@@ -6,44 +6,26 @@ Created on Thu Mar 14 13:53:17 2019
 @author: benjamin
 """
 
-import ctypes
 import numpy
 import os
+import networkx as nx
+import matplotlib.pyplot as plt
 
+import SocketCommunication as sc
+
+#%%
 ARRAY_CHAR_SEPARATOR = '-'
 LIST_CHAR_SEPARATOR = '|'
-PARENT_FOLDER = os.path.dirname(os.getcwd())#parent folder
-DEFAULT_DIR_GRAPHS = os.path.join(PARENT_FOLDER,"Graphes")
 
 
 #%%,
-def launchC(n, D, filename):
-    #direc = os.path.join(PARENT_FOLDER, "Algorithmes_C/Librairies/lib.so")
-    #lib = ctypes.CDLL(direc)
-    #lib.py_createStronglyConnectedGraph(ctypes.c_uint(n), ctypes.c_uint(D), filename.encode('utf-8'))
-    
-    #use external gcc compilator because the one implement in pyhton makes something wrong
-    direc = os.path.join(PARENT_FOLDER, "Algorithmes_C")
-    function = "py_createStronglyConnectedGraph"
-    args = str(n)+" "+str(D)+" " +filename
-    string = os.path.join(direc, "main")+" -f "+ function +" "+args
-    os.system(string)
-    #./main -f py_createTree 10 5 "testo.txt"
 
-#%%,
-
-def readTree(filename):
-    out = []
+def ParseGraph(string_graph):
+    graph = []
     array = []
     s_number = ""
     
-    
-    with open(filename) as f:
-      while True:
-        c = f.read(1)
-        if not c:
-          break
-        
+    for c in string_graph:
         if(c==ARRAY_CHAR_SEPARATOR):
             if(len(s_number)!=0):
                 array.append(int(s_number))
@@ -51,41 +33,68 @@ def readTree(filename):
         elif(c==LIST_CHAR_SEPARATOR or c=='\n'):
             if(len(s_number)!=0):
                 array.append(int(s_number))
-            out.append(array)
+            graph.append(array)
             s_number = ""
             array = []
         else :
             s_number = s_number + c
     
-    print(out)
-    return out
-        
-def createDirectedGraph(n,D, filename) :
-    filename = os.path.join(DEFAULT_DIR_GRAPHS,filename)
-    launchC(n,D,filename)#launch C function
-    array = readTree(filename)
-    out=[]
-    
-    for i in range(len(array)):
-        for j in range(len(array[i])):
-            out.append((i, array[i][j]))
-    
-    return out
-    
-#%%,
-import networkx as nx
-import matplotlib.pyplot as plt
+    return graph
 
+
+def toNetworkxGraph(graph) :
+    ''' convert an standar array into the correct format for networkx graph'''
+    Xgraph=[]
+    
+    for i in range(len(graph)):
+        for j in range(len(graph[i])):
+            Xgraph.append((i, graph[i][j]))
+    
+    return Xgraph
+
+
+def plotGraph(Xgraph, nodeSize, widthArraw):
+    '''plot a netwokx graph onto a new figure'''
+    G = nx.DiGraph()
+    G.add_edges_from(Xgraph)
+    # Need to create a layout when doing
+    # separate calls to draw nodes and edges
+    pos = nx.kamada_kawai_layout(G)
+    
+    plt.ioff()#desactive interactive mode (then figure won't pop up directly after plt.figure())
+    fig = plt.figure()
+    
+    nx.draw_networkx_nodes(G, pos, node_size = nodeSize)
+    nx.draw_networkx_labels(G, pos)
+    nx.draw_networkx_edges(G, pos, width= widthArraw, arrows=True)
+    
+    plt.ion()#active interactive mode
+    return fig
+
+    
+#%%
+def createStringlyConnectedGraph(n, D, nodeSize, widthArraw):
+    ''' Python asks the C server to create the corresponding graph
+        Then the response is retrieve as string
+        The string is parse into an array
+        The array is converted into the correct format for networkx graph
+        The networkx graph is finally plot'''
+    request = sc.createRequest(task = sc.Task.f_createStronglyConnectedGraph, n=n, D=D)
+    response =  srv.getResponse(request)
+    graph = ParseGraph(response)
+    Xgraph = toNetworkxGraph(graph)
+    
+    f = plotGraph(Xgraph, nodeSize=nodeSize, widthArraw=widthArraw)
+    
+    return f#return the plot
+
+
+#%%
 #plt.figure(1,figsize=(8,8)) 
 
-G = nx.DiGraph()
-G.add_edges_from(createDirectedGraph(20,5,"er.txt"))
+srv = sc.Server()#create socket communication with C server (to fully use the C functions)
 
-# Need to create a layout when doing
-# separate calls to draw nodes and edges
-pos = nx.kamada_kawai_layout(G)
-nx.draw_networkx_nodes(G, pos, node_size = 200)
-nx.draw_networkx_labels(G, pos)
-nx.draw_networkx_edges(G, pos, width= 1.5, arrows=True)
+f = createStringlyConnectedGraph(n=10,D=3, nodeSize=200, widthArraw=1.5)
+f.show()
 
-plt.show()
+srv.close()
