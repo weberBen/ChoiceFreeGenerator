@@ -14,5 +14,5 @@ A free choice graph is a subclass of pretri net where each place has exactly one
 
 # Interface <a name="Interface"/>
 
-<img src="Annexes/Images/Py_interface.png" width="70%"  align="middle">
+<img src="Annexes/Images/Py_interface.png" width="60%"  align="middle">
 
