@@ -24,9 +24,9 @@ The module *SocketCommunication* contains all the needed classes and functions t
   - *Task* (class) that store all the values for request. Each request start with a specific task that help the server to know which result needed to be send back
   - *Request* (ctypes structure) which is the formated request to send
     - *createRequest* (function) create a new request while formating the arguments into the correct ctypes
-  For example, to create a new request use the command *request = createRequest(task = Task.f_createStronglyConnectedGraph, n=n, D=D)* with n, D specific arguments
+  For example, to create a new request use the command ```request = createRequest(task = Task.f_createStronglyConnectedGraph, n=n, D=D)``` with n, D specific arguments
   - *Server* (class) the main class that start the server at the beging and then send the needed request and return the response as string
-  For example, to start the server side use *src=Server(port=5112, buffersize=512)* or *src=Server()* to fill automatically the arguments. Port is the communication port (which can be found automatically if not precised) and buffersize is the size of the buffer use between the clent and the server to transmit data.
+  For example, to start the server side use ```src=Server(port=5112, buffersize=512)``` or ```src=Server()``` to fill automatically the arguments. Port is the communication port (which can be found automatically if not precised) and buffersize is the size of the buffer use between the clent and the server to transmit data.
   Be aware of the closing of the server : at the end of the script the server need to be closed. For that purpose use the command *srv.close()*
  
 The module *GraphDisplay* takes the formated response of the server and convert it into an usable graph. The module contains :
