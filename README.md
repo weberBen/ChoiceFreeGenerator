@@ -20,11 +20,11 @@ All the functions about generating and modifying graph are written in C. But all
 <img src="Annexes/Images/Py_interface.png" width="60%"  align="middle">
 
   ## Requires <a name="Requires"/>
-**Version** : python 3.5
+**Version** : Python 3.5
 
 **Used modules** :
-  - networkx
   - ctypes
+  - networkx
   - SNAKES [link to the description page](https://snakes.ibisc.univ-evry.fr/)
   - graphviz (pay attention that we probably will need to install it for python and for the system)
 
