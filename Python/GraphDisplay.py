@@ -26,8 +26,7 @@ def ParseGraph(string_graph):
                 sucessors_1_of_node_i sucessors_2_of_node_i...
                 ARRAY_CHAR_SEPARATOR sucessors_p_of_node_i LIST_CHAR_SEPARATOR
             For example if the string (with LIST_CHAR_SEPARATOR='|' and ARRAY_CHAR_SEPARATOR='-')
-            '1-2|3-4|5|||6|' then the list is [[1,2], [3,4], [5], [], [], [6], []]
-            Notice that for the last element of the list we do not put the list separtor
+            '1-2|3-4|5|||6||' then the list is [[1,2], [3,4], [5], [], [], [6], []]
     
         return a list of lists of successors of each node
         For example, output[0]=[successors of the node 0]'''
@@ -99,7 +98,9 @@ def createStringlyConnectedGraph(n, D, nodeSize, widthArraw):
         The networkx graph is finally plot'''
     request = sc.createRequest(task = sc.Task.f_createStronglyConnectedGraph, n=n, D=D)
     response =  srv.getResponse(request)
+    print(response)
     graph = ParseGraph(response)
+    print(graph)
     Xgraph = toNetworkxGraph(graph)
     
     f = plotGraph(Xgraph, nodeSize=nodeSize, widthArraw=widthArraw)
@@ -112,8 +113,9 @@ def createStringlyConnectedGraph(n, D, nodeSize, widthArraw):
 
 srv = sc.Server()#create socket communication with C server (to fully use the C functions)
 
-res = createStringlyConnectedGraph(n=6,D=3, nodeSize=200, widthArraw=1.5)
+res = createStringlyConnectedGraph(n=7,D=3, nodeSize=200, widthArraw=1.5)
 f=res[0]
 f.show()
 
-srv.close()
+
+#srv.close()

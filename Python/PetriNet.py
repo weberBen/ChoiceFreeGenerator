@@ -23,11 +23,7 @@ pn.draw("test.png")
 def createPetriNet(graph):
     ''' graph = list of lists of successors of each node
         For example, graph[0]=[successors of the node 0]
-        Then return a petri net where place are node of the input list and
-        transition are linked between nodes
-            For example, if the input list is [[2, 1], [0], [4, 3], [0], [5]]
-            Then  * 0, 1, 2, 3 are places
-                  * t0 is a transition from
-                     
+        Then return a petri net where place are arc and transition are node
     '''
+    
     

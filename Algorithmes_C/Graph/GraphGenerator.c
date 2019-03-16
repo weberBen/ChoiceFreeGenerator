@@ -247,8 +247,19 @@ void connect(unsigned int u, pArray * tree, enum colorTag color[], int arrival_t
 	unsigned int i;
 	int b1, b2;
 	
+	fprintf(stderr, "u=%u   |  path_time=%u  |   arrival_time=%u\n", u, path_time[u], arrival_time[u]);
 	if(path_time[u]==arrival_time[u])
 	{//if there is no child of the current node in the previous nodes (node from the root until the current one)
+		
+		if(u==0)//root
+		{ 
+			/* can only be connected to itself because 0 is the root
+			 * because the conditions on start_time and end_time make
+			 * start_time=1=end_time (and 1 is the origin of the time
+			 * which represents the root)
+			*/
+			return;
+		}
 		
 		start_time = getRandomInSegment(arrival_time[u], time-1);//between arrival_time[u] and (time-1)
 		/* get time of child of the current node */
@@ -264,16 +275,6 @@ void connect(unsigned int u, pArray * tree, enum colorTag color[], int arrival_t
 		 * and arrival_time[end_node] = node to connect the two nodes
 		*/
 		
-		if(u==0)//root
-		{ 
-			/* can only be connected to itself because 0 is the root
-			 * because the conditions on start_time and end_time make
-			 * start_time=1=end_time (and 1 is the origin of the time
-			 * which represents the root)
-			*/
-			return;
-		}
-		
 		b1=1; b2=1; //booleans
 		i = 0;
 		while(b1!=0 || b2!=0)
@@ -282,7 +283,9 @@ void connect(unsigned int u, pArray * tree, enum colorTag color[], int arrival_t
 			{
 				start_node = i;
 				b1 = 0;
-			}else if(arrival_time[i]==end_time)
+			}
+			
+			if(arrival_time[i]==end_time)
 			{
 				end_node = i;
 				b2 =0;
@@ -290,10 +293,24 @@ void connect(unsigned int u, pArray * tree, enum colorTag color[], int arrival_t
 			
 			i++;
 		}
-		
+		fprintf(stderr, "\tstart_node=%u   | end_node=%u\n", start_node, end_node);
 		//connected the two nodes (start_node to end_node)
 		tree[start_node] = add(tree[start_node], end_node);
 		path_time[u] = end_time;
 	}
 }
 
+
+/**********************************************************************
+ * 
+ * 						PETRI FUNCTIONS
+ * 
+ * 
+ * *******************************************************************/
+
+void pretriNet(pArray * strongGraph, unsigned int n)
+{
+	
+	
+	
+}

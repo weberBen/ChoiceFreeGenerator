@@ -189,11 +189,9 @@ unsigned int listToString(char ** output, pArray a[], unsigned int n)
 			j++;
 		}
 		
-		if(i!=n-1)
-		{
-			string[j] = LIST_CHAR_SEPARATOR;
-			j++;
-		}
+		string[j] = LIST_CHAR_SEPARATOR;
+		j++;
+
 	}
 	string[j] = '\0';
 	
