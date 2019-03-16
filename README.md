@@ -21,6 +21,7 @@ All the functions about generating and modifying graph are written in C. But all
 
   ## Requires <a name="Requires"/>
 **Version** : python 3.5
+
 **Used modules** :
   - networkx
   - ctypes
