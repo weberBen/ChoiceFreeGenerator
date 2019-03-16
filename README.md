@@ -25,7 +25,7 @@ All the functions about generating and modifying graph are written in C. But all
 **Used modules** :
   - ctypes
   - networkx
-  - SNAKES [link to the description page](https://snakes.ibisc.univ-evry.fr/)
+  - [SNAKES](https://snakes.ibisc.univ-evry.fr/)
   - graphviz (pay attention that we probably will need to install it for python and for the system)
 
   ## Commands to use python interface <a name="Commands"/>
