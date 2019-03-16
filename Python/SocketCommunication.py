@@ -17,9 +17,15 @@ import inspect
 #%%
 class Directories:
     PARENT_FOLDER = os.path.dirname(os.getcwd())#parent folder
+    
     FOLDER_ALGO_C = "Algorithmes_C"
+    FOLDER_GRAPH_C = "Graph"
+    FOLDER_PYTHON_C = "Py_interface"
+    NAME_MAIN_SERVER_C = "main_py"
+    
     FODLER_C = os.path.join(PARENT_FOLDER, FOLDER_ALGO_C)
-    NAME_MAIN_SERVER_C = "py_main"
+    FOLDER_C_GRAPH = os.path.join(FODLER_C, FOLDER_GRAPH_C)
+    FOLDER_C_PY = os.path.join(FODLER_C, FOLDER_PYTHON_C)
 
 #%%
 class Task:

@@ -21,6 +21,16 @@ LIST_CHAR_SEPARATOR = '|'
 #%%,
 
 def ParseGraph(string_graph):
+    ''' Input = a formated string that represente a graph (a list of list of sucessors)
+            the format is for an element i of the list is : 
+                sucessors_1_of_node_i sucessors_2_of_node_i...
+                ARRAY_CHAR_SEPARATOR sucessors_p_of_node_i LIST_CHAR_SEPARATOR
+            For example if the string (with LIST_CHAR_SEPARATOR='|' and ARRAY_CHAR_SEPARATOR='-')
+            '1-2|3-4|5|||6|' then the list is [[1,2], [3,4], [5], [], [], [6], []]
+            Notice that for the last element of the list we do not put the list separtor
+    
+        return a list of lists of successors of each node
+        For example, output[0]=[successors of the node 0]'''
     graph = []
     array = []
     s_number = ""
@@ -43,7 +53,12 @@ def ParseGraph(string_graph):
 
 
 def toNetworkxGraph(graph) :
-    ''' convert an standar array into the correct format for networkx graph'''
+    ''' convert an standar array into the correct format for networkx graph
+        graph = list of lists of successors of each node
+            For example, graph[0]=[successors of the node 0]
+        output = list of each relation between node (if one exists)
+            output = [(i,j)] where j is a child of i
+    '''
     Xgraph=[]
     
     for i in range(len(graph)):
@@ -54,7 +69,10 @@ def toNetworkxGraph(graph) :
 
 
 def plotGraph(Xgraph, nodeSize, widthArraw):
-    '''plot a netwokx graph onto a new figure'''
+    '''plot a netwokx graph onto a new figure
+       Xgraph = list of each relation between node (if one exists)
+            output = [(i,j)] where j is a child of i
+    '''
     G = nx.DiGraph()
     G.add_edges_from(Xgraph)
     # Need to create a layout when doing
@@ -86,7 +104,7 @@ def createStringlyConnectedGraph(n, D, nodeSize, widthArraw):
     
     f = plotGraph(Xgraph, nodeSize=nodeSize, widthArraw=widthArraw)
     
-    return f#return the plot
+    return f,graph, Xgraph#return the plot
 
 
 #%%
@@ -94,7 +112,8 @@ def createStringlyConnectedGraph(n, D, nodeSize, widthArraw):
 
 srv = sc.Server()#create socket communication with C server (to fully use the C functions)
 
-f = createStringlyConnectedGraph(n=10,D=3, nodeSize=200, widthArraw=1.5)
+res = createStringlyConnectedGraph(n=6,D=3, nodeSize=200, widthArraw=1.5)
+f=res[0]
 f.show()
 
 srv.close()

@@ -1,41 +1,57 @@
 GCC_FLAGS=-Wall -g 
+
+FOLDER_GRAPH = Graph
 EXEC= main
-EXEC_Py = py_main
-LIB_FOLDER = Librairies
-PY_LIB = py_lib.so
-LOCATION = /home/benjamin/Projets/FreeChoiceGenerator/Algorithmes_C
+FOLDER_PY = Py_interface
+EXEC_PY = main_py
 
-all: $(EXEC)
+OBJDIR=obj
+vpath %.c src
+vpath %.h src
 
-Array.o : Array.c
-	gcc ${GCC_FLAGS} -c Array.c
+all: $(EXEC) $(EXEC_PY)
 
-GraphGenerator.o : GraphGenerator.c
-	gcc ${GCC_FLAGS} -c GraphGenerator.c
 
-Tools.o : Tools.c
-	gcc ${GCC_FLAGS} -c Tools.c
+#Lib for generating graph
+Array.o : $(FOLDER_GRAPH)/Array.c
+	gcc ${GCC_FLAGS} -c $(FOLDER_GRAPH)/Array.c
 
-Python.o : Python.c
-	gcc ${GCC_FLAGS} -c Python.c
+GraphGenerator.o : $(FOLDER_GRAPH)/GraphGenerator.c
+	gcc ${GCC_FLAGS} -c $(FOLDER_GRAPH)/GraphGenerator.c
 
-Server.o : Server.c
-	gcc ${GCC_FLAGS} -c Server.c
+Tools.o : $(FOLDER_GRAPH)/Tools.c
+	gcc ${GCC_FLAGS} -c $(FOLDER_GRAPH)/Tools.c
 
-main.o : main.c 
-	gcc ${GCC_FLAGS} -c main.c
 
-main : main.o Array.o GraphGenerator.o Tools.o Python.o Server.o py_main
-	gcc ${GCC_FLAGS} -o $(EXEC) main.o Array.o GraphGenerator.o Tools.o Python.o Server.o -lm
+#Lib to communicate with pyhton (for graphical display)
+Server.o : $(FOLDER_PY)/Server.c
+	gcc ${GCC_FLAGS} -c $(FOLDER_PY)/Server.c
 
-PythonMain.o : PythonMain.c 
-	gcc ${GCC_FLAGS} -c PythonMain.c
+Python.o : $(FOLDER_PY)/Python.c
+	gcc ${GCC_FLAGS} -I$(FOLDER_GRAPH) -c $(FOLDER_PY)/Python.c $(FOLDER_GRAPH)/*.c
+	#-I -> specify header path (for include)
 
-py_main : PythonMain.o Array.o GraphGenerator.o Tools.o Python.o Server.o
-	gcc ${GCC_FLAGS} -o $(EXEC_Py) PythonMain.o Array.o GraphGenerator.o Tools.o Python.o Server.o -lm
 
+#executables
+	#Graph
+main.o : $(FOLDER_GRAPH)/main.c 
+	gcc ${GCC_FLAGS} -c $(FOLDER_GRAPH)/main.c 
+
+main : main.o Array.o GraphGenerator.o Tools.o
+	gcc ${GCC_FLAGS} -o $(EXEC) main.o Array.o GraphGenerator.o Tools.o  -lm
+
+	#Python
+PythonMain.o : $(FOLDER_PY)/PythonMain.c 
+	gcc ${GCC_FLAGS} -I$(FOLDER_GRAPH) -c $(FOLDER_PY)/PythonMain.c
+	#-I -> specify header path (for include)
+
+main_py : Array.o GraphGenerator.o Tools.o Python.o Server.o PythonMain.o
+	gcc ${GCC_FLAGS} -o $(EXEC_PY) PythonMain.o Python.o Server.o  Array.o GraphGenerator.o Tools.o  -lm
+
+
+#Tools option
 open : 
-	geany *c *h
+	geany $(FOLDER_GRAPH)/*c $(FOLDER_GRAPH)/*h
 
 clean:
-	rm -f *.o $(EXEC) $(EXEC_Py) *.exe
+	rm -f *.o
