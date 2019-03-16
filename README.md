@@ -18,3 +18,4 @@ All the functions about generating and modifying graph are written in C. But all
 
 <img src="Annexes/Images/Py_interface.png" width="60%"  align="middle">
 
+  - # Command to use python interface
