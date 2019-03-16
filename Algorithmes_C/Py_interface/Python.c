@@ -111,7 +111,7 @@ int py_establishCommunication(int PORT, int BUFFSIZE)
 					fprintf(stderr, "creation d'un arbre semi-permanent (nb_noeud=%u, max_enfant=%d)\n", req->n, req->D);
 					
 					//create graph that will not be discard at the end of the request
-					freeGraph(nonVolatileGraph);//free the previous one (if it exists)
+					graphFree(nonVolatileGraph);//free the previous one (if it exists)
 					nonVolatileGraph = (graph *)malloc(sizeof(nonVolatileGraph));//create new one
 					nonVolatileGraph->data =  buildTree(req->n, req->D);
 					nonVolatileGraph->size = req->n;
@@ -129,7 +129,7 @@ int py_establishCommunication(int PORT, int BUFFSIZE)
 				{
 					fprintf(stderr, "Effacement du graphe non volatil\n");
 					
-					freeGraph(nonVolatileGraph);
+					graphFree(nonVolatileGraph);
 					nonVolatileGraph = NULL;
 					
 					sendNullResponse(buff, BUFFSIZE, csock);
@@ -195,7 +195,7 @@ int py_establishCommunication(int PORT, int BUFFSIZE)
     }
     
     //close server
-    freeGraph(nonVolatileGraph);
+    graphFree(nonVolatileGraph);
 	nonVolatileGraph = NULL;
 	
     closeSocket(ssock);

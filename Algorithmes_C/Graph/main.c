@@ -9,6 +9,8 @@
 int main(int argc, char ** argv)
 {
 	//test functions
+	
+	
 	srand(time(NULL));
 	unsigned int n = 100;
 	

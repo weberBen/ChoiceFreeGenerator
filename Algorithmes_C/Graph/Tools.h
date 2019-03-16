@@ -6,8 +6,8 @@
 
 #include "Array.h"
 
-void displayList(pArray * list, unsigned int n);
-void displayArray(pArray p);
+void displayGraph(pArray * list, unsigned int n);
+void displaySimpeNodeArray(pArray p);
 
 unsigned int arrayToString(char ** output, pArray p);
 unsigned int listToString(char ** output, pArray a[], unsigned int n);

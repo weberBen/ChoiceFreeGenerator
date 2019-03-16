@@ -5,15 +5,6 @@
 #include "GraphGenerator.h"
 
 
-void freeGraph(graph * g)
-{
-	if(g==NULL)
-		return;
-		
-	freeList(g->data, g->size);
-	free(g);
-}
-
 /**********************************************************************
  * 
  * 						GRAPH FUNCTIONS
@@ -121,7 +112,7 @@ pArray * buildTree(unsigned int n, unsigned int D)
 			{
 				i--;
 			}
-			tree[i] = add(tree[i], count);
+			tree[i] = add(tree[i], uInt_t, uIntCreateNode(count));
 			
 			//update value
 			num_suc -= ((num_suc==0)?0:1);//tyhe variable is an unsigned int which cannot be negative
@@ -130,7 +121,7 @@ pArray * buildTree(unsigned int n, unsigned int D)
 		//add node as child of the current node
 		for(i=0; i<num_suc; i++)
 		{
-			tree[num_node] = add(tree[num_node], count);
+			tree[num_node] = add(tree[num_node], uInt_t, uIntCreateNode(count));
 			count++;
 		}
 		
@@ -227,7 +218,7 @@ void connect(unsigned int u, pArray * tree, enum colorTag color[], int arrival_t
     
     while(cursor)
     {
-		v = cursor->data;
+		v = uIntValue(cursor);
 		if(color[v]==WHITE)
 		{
 			connect(v, tree, color, arrival_time, path_time, time);
@@ -247,7 +238,7 @@ void connect(unsigned int u, pArray * tree, enum colorTag color[], int arrival_t
 	unsigned int i;
 	int b1, b2;
 	
-	fprintf(stderr, "u=%u   |  path_time=%u  |   arrival_time=%u\n", u, path_time[u], arrival_time[u]);
+	
 	if(path_time[u]==arrival_time[u])
 	{//if there is no child of the current node in the previous nodes (node from the root until the current one)
 		
@@ -293,9 +284,9 @@ void connect(unsigned int u, pArray * tree, enum colorTag color[], int arrival_t
 			
 			i++;
 		}
-		fprintf(stderr, "\tstart_node=%u   | end_node=%u\n", start_node, end_node);
+		
 		//connected the two nodes (start_node to end_node)
-		tree[start_node] = add(tree[start_node], end_node);
+		tree[start_node] = add(tree[start_node], uInt_t, uIntCreateNode(end_node));
 		path_time[u] = end_time;
 	}
 }

@@ -13,7 +13,7 @@
  * 
  **********************************************************************/
  
-void displayList(pArray * list, unsigned int n)
+void displayGraph(pArray * list, unsigned int n)
 {
 	//display a linked list
 	unsigned int i;
@@ -31,16 +31,16 @@ void displayList(pArray * list, unsigned int n)
 		{
 			while(cursor->next!=NULL)
 			{
-				printf("%u ,", cursor->data);
+				printf("%u ,", uIntValue(cursor));
 				cursor = cursor->next;
 			}
-			printf("%u}", cursor->data);
+			printf("%u}", uIntValue(cursor));
 		}
 		printf("\n");
 	}
 }
 
-void displayArray(pArray p)
+void displaySimpeNodeArray(pArray p)
 {
 	//display a list of linked lists
 	printf("{");
@@ -51,10 +51,10 @@ void displayArray(pArray p)
 	{
 		while(p->next!=NULL)
 		{
-			printf("%u ,", p->data);
+			printf("%u ,", uIntValue(p));
 			p = p->next;
 		}
-		printf("%u}", p->data);
+		printf("%u}", uIntValue(p));
 	}
 	printf("\n");
 }
@@ -102,7 +102,7 @@ unsigned int arrayToString(char ** output, pArray p)
 	max_digits = 0;
 	while(cursor!=NULL)
 	{
-		data = cursor->data;
+		data = uIntValue(cursor);
 		digit = getNumberOfDigit(data);//number of digits in the current data number
 		
 		count+= digit;
@@ -130,7 +130,7 @@ unsigned int arrayToString(char ** output, pArray p)
 	i = 0;//index of the current element in the array of char
 	while(p)
 	{
-		sprintf(digits, "%u", p->data);//convert the data into string
+		sprintf(digits, "%u", uIntValue(p));//convert the data into string
 		
 		k=0;
 		while(digits[k]!='\0')//copy the string value of the current data
@@ -170,7 +170,7 @@ unsigned int listToString(char ** output, pArray a[], unsigned int n)
 	}
 	size--; //remove the last separator char
 	
-	char * string = (char *)malloc(sizeof(char)*(size+1));//size +1 for the end char '\0'
+	char * string = (char *)malloc(sizeof(char)*(size+2));//size +1 for the end char '\0' and +1 for the last char separator
 	assert(string);
 	
 	char * cursor;
@@ -193,6 +193,7 @@ unsigned int listToString(char ** output, pArray a[], unsigned int n)
 		j++;
 
 	}
+	
 	string[j] = '\0';
 	
 	//free the linked string list
@@ -235,7 +236,7 @@ int listToFile(char * filename, pArray a[], unsigned int n)
 		
 		while(p)//loop through the element of the linked list of the current element (index i)
 		{
-			sprintf(digits, "%u", p->data);//convert number into string
+			sprintf(digits, "%u", uIntValue(p));//convert number into string
 			//write the number into the file
 			j = 0;
 			while(digits[j])
