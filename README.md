@@ -39,7 +39,7 @@ The module *GraphDisplay* takes the formated response of the server and convert 
   The function return a n-uplet (figure, graph, networkx graph) where figure is the figure where the networkx graph was plot
   
 An example of the uses of the functions :
-''' 
+``` 
 import *SocketCommunication* as sc
  
  srv = sc.Server()
@@ -52,4 +52,4 @@ import *SocketCommunication* as sc
 res = createStringlyConnectedGraph(n=7,D=3, nodeSize=200, widthArraw=1.5)
 f=res[0]
 f.show()
-'''
+```
