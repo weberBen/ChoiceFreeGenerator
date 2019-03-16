@@ -4,8 +4,8 @@
 # Sommaire
 - [Description](#description)
 - [Interface](#Interface)
+  - [Requires](#Requires)
   - [Commands](#Commands)
-
 
 # Description <a name="Description"/>
 
@@ -18,6 +18,14 @@ A free choice graph is a subclass of pretri net where each place has exactly one
 All the functions about generating and modifying graph are written in C. But all the display part is a script python (because python can use networkx for oriented graph and SNAKES for petri net). Thus, we had to connect C functions with python. So simplest solution for now is to create a server socket in C that collects python request, process the request and send back the result to python; ctypes was kind of unsatisfying. All the described process can be visualize on the following figure :
 
 <img src="Annexes/Images/Py_interface.png" width="60%"  align="middle">
+
+  ## Requires <a name="Requires"/>
+**Version** : python 3.5
+**Used modules** :
+  - networkx
+  - ctypes
+  - SNAKES [link to the description page](https://snakes.ibisc.univ-evry.fr/)
+  - graphviz (pay attention that we probably will need to install it for python and for the system)
 
   ## Commands to use python interface <a name="Commands"/>
 The module *SocketCommunication* contains all the needed classes and functions to communicated with the server side. We can underline :
@@ -50,5 +58,5 @@ networkx_graph = res[2]
 f.show()
 ```
 
- ### About the tasks value :
+ ### About the tasks value
 ...later
