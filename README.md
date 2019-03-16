@@ -53,3 +53,5 @@ res = createStringlyConnectedGraph(n=7,D=3, nodeSize=200, widthArraw=1.5)
 f=res[0]
 f.show()
 ```
+ ## About the tasks value :
+...later
