@@ -39,7 +39,7 @@ The module *GraphDisplay* takes the formated response of the server and convert 
   - *createStronglyConnectedGraph* (function) takes two main arguments *n* which is the desired number of nodes and *D* which is the maximun number of sucessors allowed for a node. The other arguments are for the graphical display.
   The function return a n-uplet (figure, graph, networkx graph) where figure is the figure where the networkx graph was plot
   
-An example of the uses of the functions :
+An example of the use of the functions :
 ``` 
 import SocketCommunication as sc
 
