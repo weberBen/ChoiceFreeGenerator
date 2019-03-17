@@ -52,7 +52,7 @@ An example of the use of the functions :
 ``` 
 import SocketCommunication as sc
 
-svr = sc.Server()
+srv = sc.Server()
 
 res = createStringlyConnectedGraph(n=7,D=3, nodeSize=200, widthArraw=1.5)
 f=res[0]
