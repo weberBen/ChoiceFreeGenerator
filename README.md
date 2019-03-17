@@ -52,11 +52,15 @@ An example of the use of the functions :
 ``` 
 import SocketCommunication as sc
 
+svr = sc.Server()
+
 res = createStringlyConnectedGraph(n=7,D=3, nodeSize=200, widthArraw=1.5)
 f=res[0]
 graph = res[1]
 networkx_graph = res[2]
 f.show()
+
+srv.close()
 ```
 
  ### About the tasks value
