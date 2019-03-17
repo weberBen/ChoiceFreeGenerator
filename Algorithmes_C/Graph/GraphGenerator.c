@@ -91,7 +91,7 @@ pArray * buildTree(unsigned int n, unsigned int D)
 		}
 		
 		if(num_node==count)//here num_node>=1 because we start with num_node=0 and count=1
-		{
+		{fprintf(stderr, "enter  count=%u\n", count);
 			/* In fact, when 0 appears too much time as the number of child for a following of nodes,
 			 * the the curent node can be the next node to add (which make no sens, because
 			 * that node will no be connect to the rest of the tree)
@@ -118,7 +118,7 @@ pArray * buildTree(unsigned int n, unsigned int D)
 			num_suc -= ((num_suc==0)?0:1);//tyhe variable is an unsigned int which cannot be negative
 			count++;//increase the newest node to add
 		}
-		//add node as child of the current node
+		//add node as child of the current nodedd
 		for(i=0; i<num_suc; i++)
 		{
 			tree[num_node] = add(tree[num_node], uInt_t, uIntCreateNode(count));

@@ -12,9 +12,9 @@ int main(int argc, char ** argv)
 	
 	
 	srand(time(NULL));
-	unsigned int n = 100;
+	unsigned int n = 7;
 	
-	pArray * tree = buildTree(n, 8);
+	pArray * tree = buildTree(n, 3);
 	//displayList(tree, n);
 	
 	stronglyConnectedGraph(tree, n);

@@ -141,7 +141,7 @@ void freeList(pArray a[], unsigned int n)
 		 exit(-1);
 	 }
 	
-	 pInt d = (pInt)p;
+	 pInt d = (pInt)(p->data);
 	 
 	 return d->data;
  }
@@ -195,7 +195,7 @@ void freeList(pArray a[], unsigned int n)
 		 exit(-1);
 	 }
 	 
-	 pPlace d = (pPlace)p;
+	 pPlace d = (pPlace)(p->data);
 	 return d->label;
  }
  
@@ -207,7 +207,7 @@ void freeList(pArray a[], unsigned int n)
 		 exit(-1);
 	 }
 	 
-	 pPlace d = (pPlace)p;
+	 pPlace d = (pPlace)(p->data);
 	 return d->M;
  }
  
@@ -260,7 +260,7 @@ void freeList(pArray a[], unsigned int n)
 		 exit(-1);
 	 }
 	 
-	 pTransition d = (pTransition)p;
+	 pTransition d = (pTransition)(p->data);
 	 return d->output;
  }
  
@@ -272,7 +272,7 @@ void freeList(pArray a[], unsigned int n)
 		 exit(-1);
 	 }
 	 
-	 pTransition d = (pTransition)p;
+	 pTransition d = (pTransition)(p->data);
 	 return d->input;
  }
  
@@ -284,7 +284,7 @@ void freeList(pArray a[], unsigned int n)
 		 exit(-1);
 	 }
 	 
-	 pTransition d = (pTransition)p;
+	 pTransition d = (pTransition)(p->data);
 	 return d->in_weigth;
  }
  
@@ -296,7 +296,7 @@ void freeList(pArray a[], unsigned int n)
 		 exit(-1);
 	 }
 	 
-	 pTransition d = (pTransition)p;
+	 pTransition d = (pTransition)(p->data);
 	 return d->out_weigth;
  }
  
