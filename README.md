@@ -15,7 +15,7 @@ A free choice graph is a subclass of pretri net where each place has exactly one
 
 # Interface <a name="Interface"/>
 
-All the functions about generating and modifying graph are written in C. But all the display part is a script python (because python can use networkx for oriented graph and SNAKES for petri net). Thus, we had to connect C functions with python. So simplest solution for now is to create a server socket in C that collects python request, process the request and send back the result to python; ctypes was kind of unsatisfying. All the described process can be visualize on the following figure :
+All the functions about generating and modifying graph are written in C. But all the display parts are python scripts (because python can use networkx for oriented graph and SNAKES for petri net). Thus, we had to connect C functions with python. So the simplest solution for now is to create a server socket in C that collects python request, process the request and send back the result to python; ctypes was kind of unsatisfying. All the described process can be visualize on the following figure :
 
 <img src="Annexes/Images/Py_interface.png" width="60%"  align="middle">
 
@@ -26,7 +26,7 @@ All the functions about generating and modifying graph are written in C. But all
   - ctypes
   - networkx
   - [SNAKES](https://snakes.ibisc.univ-evry.fr/)
-  - graphviz (pay attention that we probably will need to install it for python and for the system)
+  - graphviz (pay attention that you probably will need to install it for python and for the OS)
 
   ## Commands to use python interface <a name="Commands"/>
 The module *SocketCommunication* contains all the needed classes and functions to communicated with the server side. We can underline :
@@ -52,11 +52,15 @@ An example of the use of the functions :
 ``` 
 import SocketCommunication as sc
 
+srv = sc.Server()
+
 res = createStringlyConnectedGraph(n=7,D=3, nodeSize=200, widthArraw=1.5)
 f=res[0]
 graph = res[1]
 networkx_graph = res[2]
 f.show()
+
+srv.close()
 ```
 
  ### About the tasks value
