@@ -21,7 +21,7 @@ pArray add(pArray l, types type, void * data);
 
 unsigned int lengthArray(pArray p);
 
-void initializeArray(pArray a[], unsigned int n);
+void initializeList(void * a[], unsigned int n);
 
 void freeArray(pArray p);
 void freeList(pArray a[], unsigned int n);
@@ -102,7 +102,9 @@ typedef struct Petri
 } petri;
 	
 	// * associated functions * //
-pPetri petriCreateNode(pPlace node, pArray input, pArray output);
+pPetri petriCreateNode(pPlace node);
+void petriSetInput(pPetri p, pArray input);
+void petriSetOutput(pPetri p, pArray output);
 void petriFree(pPetri p);
 
 

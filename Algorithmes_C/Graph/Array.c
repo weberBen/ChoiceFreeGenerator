@@ -47,7 +47,7 @@ unsigned int lengthArray(pArray p)
 	return count;
 }
 
-void initializeArray(pArray a[], unsigned int n)
+void initializeList(void * a[], unsigned int n)
 {
 	unsigned int i;
 	
@@ -256,7 +256,7 @@ void freeList(pArray a[], unsigned int n)
  {
 	 if(p==NULL || p->data==NULL)
 	 {
-		 fprintf(stderr, "place est nul, impossible de retourner une valeur !\n");
+		 fprintf(stderr, "transition est nul, impossible de retourner une valeur !\n");
 		 exit(-1);
 	 }
 	 
@@ -268,7 +268,7 @@ void freeList(pArray a[], unsigned int n)
  {
 	 if(p==NULL || p->data==NULL)
 	 {
-		 fprintf(stderr, "place est nul, impossible de retourner une valeur !\n");
+		 fprintf(stderr, "transition est nul, impossible de retourner une valeur !\n");
 		 exit(-1);
 	 }
 	 
@@ -280,7 +280,7 @@ void freeList(pArray a[], unsigned int n)
  {
 	 if(p==NULL || p->data==NULL)
 	 {
-		 fprintf(stderr, "place est nul, impossible de retourner une valeur !\n");
+		 fprintf(stderr, "transition est nul, impossible de retourner une valeur !\n");
 		 exit(-1);
 	 }
 	 
@@ -292,7 +292,7 @@ void freeList(pArray a[], unsigned int n)
  {
 	 if(p==NULL || p->data==NULL)
 	 {
-		 fprintf(stderr, "place est nul, impossible de retourner une valeur !\n");
+		 fprintf(stderr, "transition est nul, impossible de retourner une valeur !\n");
 		 exit(-1);
 	 }
 	 
@@ -321,18 +321,31 @@ void freeList(pArray a[], unsigned int n)
  * 
  * 
  *********************************************************************/
- pPetri petriCreateNode(pPlace node, pArray input, pArray output)
+ pPetri petriCreateNode(pPlace node)
  {
 	pPetri p = (pPetri)malloc(sizeof(petri));
     assert(p);
     
     p->node = node;
-    p->input_t = input;
-    p->output_t = output;
+    p->input_t = NULL;
+    p->output_t = NULL;
 
     return p; 
  }
  
+ void petriSetInput(pPetri p, pArray input)
+ {
+	 assert(p);
+	 
+	 p->output_t = input;
+ }
+ 
+ void petriSetOutput(pPetri p, pArray output)
+ {
+	 assert(p);
+	 
+	 p->output_t = output;
+ }
  
  void petriFree(pPetri p)
  {

@@ -42,7 +42,7 @@ pArray * buildTree(unsigned int n, unsigned int D)
     
     pArray * tree = (pArray *)malloc(sizeof(array)*n);
     assert(tree);
-    initializeArray(tree, n);
+    initializeList((void *)tree, n);
 
     unsigned int i;
     unsigned int num_suc;
@@ -91,7 +91,7 @@ pArray * buildTree(unsigned int n, unsigned int D)
 		}
 		
 		if(num_node==count)//here num_node>=1 because we start with num_node=0 and count=1
-		{fprintf(stderr, "enter  count=%u\n", count);
+		{
 			/* In fact, when 0 appears too much time as the number of child for a following of nodes,
 			 * the the curent node can be the next node to add (which make no sens, because
 			 * that node will no be connect to the rest of the tree)
@@ -298,10 +298,56 @@ void connect(unsigned int u, pArray * tree, enum colorTag color[], int arrival_t
  * 
  * 
  * *******************************************************************/
-
-void pretriNet(pArray * strongGraph, unsigned int n)
+/*
+graph pretriNet(pArray * strongConnectedGraph, unsigned int n)
 {
+	pPetri * places = (pPetri *)malloc(sizeof(pPetri)*n);
+	assert(petriGraph);
+	initializeList(petriGraph);//initialize array to NULL pointer
+	
+	pArray places = NULL;
+	pArray trans = NULL;
+	pArray output_t = NULL;
+	
+	unsigned int i;
+	unsigned int node;
+	
+	for(i=0; i<n; i++)
+	{
+		pArray child = strongConnectedGraph[i];
+		
+		//add the current node as place into the list
+		places = add(places, place_t, placeCreateNode(i));
+
+		//create associated transition
+		trans = transitionCreateNode(pl, NULL);//create transition from the input (the parent node)
+		
+		//get all the output for the transition
+		while(child!=NULL)
+		{
+			node = uIntValue(child);//current child
+			//get the associated place
+			if(petriGraph[node]!=NULL)
+			{
+				/* We check if the current node was created before or no
+				 * For example if we have the relation place(0)->transition(1)->place(1)
+				 * Then for the node 0, we have to create the petri node 0 and the petri node 1
+				 * But when we will process with the node 1, the petry node had already been created
+				*/
+			/*	s_pl = placeCreateNode(node);
+			}else
+			{
+				s_pl = petriGraph[node]->node;//retrieve the node
+			}
+			
+			output_t = add(output_t, place_t, s_pl);
+			
+			child = child->next;
+		}
+		
+		petriGraph[i] = petriNode;
+		
+	}
 	
 	
-	
-}
+}*/
