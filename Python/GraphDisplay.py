@@ -21,10 +21,10 @@ LIST_CHAR_SEPARATOR = '|'
 #%%,
 
 def ParseGraph(string_graph):
-    ''' Input = a formated string that represente a graph (a list of list of sucessors)
+    ''' Input = a formatted string that represente a graph (a list of list of successors)
             the format is for an element i of the list is : 
-                sucessors_1_of_node_i sucessors_2_of_node_i...
-                ARRAY_CHAR_SEPARATOR sucessors_p_of_node_i LIST_CHAR_SEPARATOR
+                successors_1_of_node_i successors_2_of_node_i...
+                ARRAY_CHAR_SEPARATOR successors_p_of_node_i LIST_CHAR_SEPARATOR
             For example if the string (with LIST_CHAR_SEPARATOR='|' and ARRAY_CHAR_SEPARATOR='-')
             '1-2|3-4|5|||6||' then the list is [[1,2], [3,4], [5], [], [], [6], []]
     
@@ -113,9 +113,19 @@ def createStringlyConnectedGraph(n, D, nodeSize, widthArraw):
 
 srv = sc.Server()#create socket communication with C server (to fully use the C functions)
 
-res = createStringlyConnectedGraph(n=7,D=3, nodeSize=200, widthArraw=1.5)
+'''res = createStringlyConnectedGraph(n=10,D=3, nodeSize=200, widthArraw=1.5)
 f=res[0]
-f.show()
+f.show()'''
 
+'''
+request = sc.createRequest(task = sc.Task.f_createNonVolatileTree, n=10, D=3)
+response =  srv.getResponse(request)
+print(response)
+graph = ParseGraph(response)
+print(graph)
+Xgraph = toNetworkxGraph(graph)
+
+f = plotGraph(Xgraph, nodeSize=200, widthArraw=1.5)
+f.show()'''
 
 #srv.close()

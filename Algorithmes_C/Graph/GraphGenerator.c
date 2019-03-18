@@ -244,10 +244,10 @@ void connect(unsigned int u, pArray * tree, enum colorTag color[], int arrival_t
 		
 		if(u==0)//root
 		{ 
-			/* can only be connected to itself because 0 is the root
-			 * because the conditions on start_time and end_time make
-			 * start_time=1=end_time (and 1 is the origin of the time
-			 * which represents the root)
+			/* can only be connected to itself because 0 is the root, 
+			 * then the condition at the start time and the end time 
+			 * produces start_time=1=end_time 
+			 * (and 1 is the origin of the time which represents the root)
 			*/
 			return;
 		}
