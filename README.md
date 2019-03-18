@@ -9,13 +9,13 @@
 
 # Description <a name="Description"/>
 
-A free choice graph is a subclass of petri net where each place has exactly one output and transitions have one input and multiple outputs as shown on the following figure
+A free choice graph is a subclass of petri net where each place has exactly one output and transitions have one input and multiple outputs as shown in the following figure
 
 <img src="Annexes/Images/FreeChoiceDef.png" width="70%"  align="middle">
 
 # Interface <a name="Interface"/>
 
-All the functions about generating and modifying graph are written in C. But all the display parts are python scripts (because python can use networkx for oriented graph and SNAKES for petri net). Thus, we had to connect C functions with python. So the simplest solution for now is to create a server socket in C that collects python request, process the request and send back the result to python; ctypes was kind of unsatisfying. All the described process can be visualize on the following figure :
+All the functions about generating and modifying graph are written in C. But all the display parts are python scripts (because python can use networkx for oriented graph and SNAKES for petri net). Thus, we had to connect C functions with python. So the simplest solution for now is to create a server socket in C that collects python request, process the request and send back the result to python; ctypes was kind of unsatisfying. All the described process can be visualized on the following figure :
 
 <img src="Annexes/Images/Py_interface.png" width="60%"  align="middle">
 
@@ -31,21 +31,20 @@ All the functions about generating and modifying graph are written in C. But all
   ## Commands to use python interface <a name="Commands"/>
 The module *SocketCommunication* contains all the needed classes and functions to communicated with the server side. We can underline :
 
-  - *Task* (class) that store all the values for request. Each request start with a specific task that help the server to know which result needed to be send back
-  - *Request* (ctypes structure) which is the formated request to send
-    - *createRequest* (function) create a new request while formating the arguments into the correct ctypes
+  - *Task* (class) that store all the values of request. Each request starts with a specific task that help the server to know which result needed to be sent back
+  - *Request* (ctypes structure) which is the formatted request to send
+    - *createRequest* (function) create a new request while formatting the arguments into the correct ctypes
   For example, to create a new request use the command ```request = createRequest(task = Task.f_createStronglyConnectedGraph, n=n, D=D)``` with n, D specific arguments
-  - *Server* (class) the main class that start the server at the beging and then send the needed request and return the response as string
-  For example, to start the server side use ```src=Server(port=5112, buffersize=512)``` or ```src=Server()``` to fill automatically the arguments. Port is the communication port (which can be found automatically if not precised) and buffersize is the size of the buffer use between the clent and the server to transmit data.
-  Be aware of the closing of the server : at the end of the script the server need to be closed. For that purpose use the command *srv.close()*
+  - *Server* (class) the main class that starts the server at the begining and then sends the needed request and return the response as string
+  For example, to start the server side use ```src=Server(port=5112, buffersize=512)``` or ```src=Server()``` to fill automatically the arguments. Port is the communication port (which can be found automatically if not specified) and buffersize is the size of the buffer used between the clent and the server to transmit data.
+  Be aware of the closing of the server : at the end of the script the server need to be closed. For that purpose,use the command *srv.close()*
  
-The module *GraphDisplay* takes the formated response of the server and convert it into an usable graph. The module contains :
+The module *GraphDisplay* takes the formatted response of the server and convert it into a usable graph. The module contains :
   
-  - *ParseGraph* (function) that takes the formated string of the server response and converts it into an iterable object
-  The graph is send back as an array of array of child for each node. For example if the array is graph, the graph[0] = [...] contains all the sucessors of the node 0
-  - *toNetworkxGraph* (function) convert the graph (following the previous format) into an object usable by the librairy networkx
+  - *ParseGraph* (function) that takes the formatted string of the server response and converts it into an iterable object  The graph is sent back as an array of array of child for each node. For example, if the array is graphed, the graph[0] = [...] contains all the successors of the node 0
+  - *toNetworkxGraph* (function) converts the graph (following the previous format) into an object usable by the library networkx
   - *plotGraph* (function) plot into a figure a networkx graph
-  - *createStronglyConnectedGraph* (function) takes two main arguments *n* which is the desired number of nodes and *D* which is the maximun number of sucessors allowed for a node. The other arguments are for the graphical display.
+  - *createStronglyConnectedGraph* (function) takes two main arguments *n* which is the desired number of nodes and *D* which is the maximum number of successors allowed for a node. The other arguments are for the graphical display.
   The function return a n-uplet (figure, graph, networkx graph) where figure is the figure where the networkx graph was plot
   
 An example of the use of the functions :
