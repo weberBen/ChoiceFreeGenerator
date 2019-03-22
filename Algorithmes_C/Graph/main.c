@@ -4,18 +4,19 @@
 
 #include "GraphGenerator.h"
 #include "Tools.h"
-
+#include "Rand.h"
 
 int main(int argc, char ** argv)
 {
 	//test functions
 	
-	
 	srand(time(NULL));
+
+	
 	unsigned int n = 7;
 	
-	pArray * tree = buildTree(n, 3);
-	//displayList(tree, n);
+	pArray * tree = forcedTree(n, 3);
+	displayGraph(tree, n);
 	
 	stronglyConnectedGraph(tree, n);
 	
@@ -26,8 +27,9 @@ int main(int argc, char ** argv)
 	fprintf(stderr, "abre=%s\n", s);
 	
 	//listToFile("test.txt", tree, n);
-	freeList(tree, n);
 	free(s);
+	
+	freeList(tree, n);
 	
 	return 0;
 }

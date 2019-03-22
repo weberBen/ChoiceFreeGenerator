@@ -43,7 +43,7 @@ pInt uIntCreateNode(unsigned int data);
 unsigned int uIntValue(pArray p);
 void uIntFree(pInt p);
 
-
+void initializeIntArray(int list[], unsigned int n, int value);
 
 /*********************************************************************
  * 							Place Type

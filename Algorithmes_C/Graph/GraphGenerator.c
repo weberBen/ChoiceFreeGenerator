@@ -4,6 +4,23 @@
 
 #include "GraphGenerator.h"
 
+ void displayMatrix(int a[], unsigned int n)
+ {
+	 unsigned int i,j;
+	 
+	 for(i=0; i<n; i++)
+	 {
+		 for(j=0; j<n; j++)
+		 {
+			 fprintf(stderr, "%d ",a[i*n+j]);
+		 }
+		 fprintf(stderr, "\n");
+		 
+	 }
+	 fprintf(stderr, "\n");
+	 
+	 
+ }
 
 /**********************************************************************
  * 
@@ -11,8 +28,164 @@
  * 
  * 
  * *******************************************************************/
+
+ unsigned int connectTree(int network[], unsigned int n, unsigned int root, unsigned int node)
+ {
+	if(node==root || network[node*n + root]==-1)
+	{
+		return -1;
+	}
+	
+	unsigned int i;
+	
+	i=0;
+	while(i<n && network[node*n+i]!=-1)
+	{
+		i++;
+	}
+	
+	if(i==n)
+	{
+		network[node*n+root] = -1;
+		network[root*n+node] = 1;
+		
+		return node;
+	}
+	
+	return connectTree(network, n, root, i);
+ }
  
  
+ pArray * graphIntoTree(int network[], unsigned int n)
+ {
+	unsigned int root = 0; //root of the tree
+	
+	//convert the matrix into a list of sucessors
+	pArray * output = (pArray *)malloc(sizeof(array)*n);
+	assert(output);
+	initializeList((void *)output, n);
+	
+	unsigned int i,j,k;
+	unsigned int node;
+	
+	//convert the matrix into a list of sucessors
+	for(i=0, k=0; i<n; i++)
+	{
+		if( (node=connectTree(network, n, root, i ))!=-1 )
+		{
+			output[root] = add(output[root], uInt_t, uIntCreateNode(node));
+		}
+		
+		for(j=0; j<n; j++)
+		{
+			if(network[k]==1)
+			{
+				output[i] = add(output[i], uInt_t, uIntCreateNode(j));
+			}
+			
+			k++;
+		}
+	} 
+	 
+	return output;
+ }
+ 
+ pArray * forcedTree(unsigned int n, unsigned int D)
+ {
+	unsigned int size = n*n;
+	
+	/* Temporary all the links between nodes will be saved into a matrix
+	 *  		| node 1 | node 2 | node 3 | ... | node n
+	 * 	node 1  |
+	 *  node 2  |
+	 *    . 
+	 *    .
+	 *    .
+	 *  node 3  |
+	 * 
+	 * The line i represents all the links between the node i and the other nodes
+	 * The coefficient (i,j) is :
+	 * 			* 1 if the node j is a sucessor of the node i
+	 * 			* -1 if the node i is a sucessor of the node j
+	 * 			* 0 is there is no link between the node i and j
+	 */
+	int network[size];
+	initializeIntArray(network, size, 0);
+	
+	unsigned int i, j;
+	unsigned int node;
+	unsigned int num_suc;
+	
+	for(i=0; i<n; i++)
+	{
+		num_suc = rand()%D;//(between 0 and D-1)
+		randIni(0, n-1);
+		for(j=0; j<num_suc; j++)
+		{
+			//find a new node to add
+			do
+			{
+				node = randArray();
+				
+			}while( (node==i || network[i*n+node]!=0) && node!=-1);//while we pick the current node as a child or we pick a node that is already a sucessors
+			
+			//add node as child of the current
+			if(node!=-1)
+			{
+				network[i*n + node] = 1;
+				network[node*n + i] = -1;
+			}
+			
+		}
+		randEnd();
+	}
+	
+	
+	
+	//add links between some nodes to insure the existance of node with muliple entry
+	unsigned int num = (n-1)/3 + rand()%(n-(n-1)/3);
+	fprintf(stderr, "rand=%d\n", num);
+	unsigned int num_pred;
+	unsigned int count;
+	unsigned int p_node;
+	
+	for(i=0; i<num; i++)
+	{
+		p_node = getRandomInSegment(0,n-1);
+		//get the number of predecessors of the current node
+		count =0;
+		for(j=0; j<n; j++)
+		{
+			count+= (network[p_node*n+j]==-1)?1:0;
+		}
+		
+		//add new predecessors if necessary
+		num_pred = rand()%(n-count);
+		randIni(0, n-1);
+		for(j=0; j<num_pred; j++)
+		{
+			//find a new node to add
+			do
+			{
+				node = randArray();
+				
+			}while( (node==i || network[i*n+node]==-1) && node!=-1);
+			
+			//add node as child of the current
+			if(node!=-1)
+			{
+				network[p_node*n + node] = -1;
+				network[node*n + p_node] = 1;
+			}
+		}
+		randEnd();
+	}
+	
+	displayMatrix(network, n);
+	
+	
+	return graphIntoTree(network, n);
+ }
  
  
  
@@ -144,16 +317,6 @@ pArray * buildTree(unsigned int n, unsigned int D)
 enum colorTag {WHITE, GRAY};
 
 void connect(unsigned int u, pArray * tree, enum colorTag color[], int arrival_time[], int path_time[], unsigned int time);
-
-int getRandomInSegment(int start, int end)
-{
-	int m = end-start+1;
-	
-	if(m==0)
-		return start;
-	
-	return start + rand()%m;
-}
  
 void stronglyConnectedGraph(pArray * tree, unsigned int n)
 {
@@ -298,56 +461,3 @@ void connect(unsigned int u, pArray * tree, enum colorTag color[], int arrival_t
  * 
  * 
  * *******************************************************************/
-/*
-graph pretriNet(pArray * strongConnectedGraph, unsigned int n)
-{
-	pPetri * places = (pPetri *)malloc(sizeof(pPetri)*n);
-	assert(petriGraph);
-	initializeList(petriGraph);//initialize array to NULL pointer
-	
-	pArray places = NULL;
-	pArray trans = NULL;
-	pArray output_t = NULL;
-	
-	unsigned int i;
-	unsigned int node;
-	
-	for(i=0; i<n; i++)
-	{
-		pArray child = strongConnectedGraph[i];
-		
-		//add the current node as place into the list
-		places = add(places, place_t, placeCreateNode(i));
-
-		//create associated transition
-		trans = transitionCreateNode(pl, NULL);//create transition from the input (the parent node)
-		
-		//get all the output for the transition
-		while(child!=NULL)
-		{
-			node = uIntValue(child);//current child
-			//get the associated place
-			if(petriGraph[node]!=NULL)
-			{
-				/* We check if the current node was created before or no
-				 * For example if we have the relation place(0)->transition(1)->place(1)
-				 * Then for the node 0, we have to create the petri node 0 and the petri node 1
-				 * But when we will process with the node 1, the petry node had already been created
-				*/
-			/*	s_pl = placeCreateNode(node);
-			}else
-			{
-				s_pl = petriGraph[node]->node;//retrieve the node
-			}
-			
-			output_t = add(output_t, place_t, s_pl);
-			
-			child = child->next;
-		}
-		
-		petriGraph[i] = petriNode;
-		
-	}
-	
-	
-}*/

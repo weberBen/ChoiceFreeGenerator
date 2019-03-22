@@ -110,7 +110,6 @@ void freeList(pArray a[], unsigned int n)
 }
 
 
-
 /*********************************************************************
  * 
  * 					
@@ -156,6 +155,14 @@ void freeList(pArray a[], unsigned int n)
  }
  
 
+void initializeIntArray(int list[], unsigned int n, int value)
+{
+	unsigned int i;
+	for(i=0; i<n; i++)
+	{
+		list[i] =  value;
+	}
+}
 
 
 /*********************************************************************

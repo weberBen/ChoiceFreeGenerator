@@ -159,7 +159,7 @@ int py_establishCommunication(int PORT, int BUFFSIZE)
 				{	
 					fprintf(stderr, "creation d'un arbre (nb_noeud=%u, max_enfant=%d)\n", req->n, req->D);
 					
-					pArray * tree = buildTree(req->n, req->D);//create graph
+					pArray * tree = forcedTree(req->n, req->D);//create graph
 					
 					char * s;
 					listToString(&s,tree, req->n);//convert the tree into a string

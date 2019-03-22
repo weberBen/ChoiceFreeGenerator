@@ -113,9 +113,9 @@ def createStringlyConnectedGraph(n, D, nodeSize, widthArraw):
 
 srv = sc.Server()#create socket communication with C server (to fully use the C functions)
 
-'''res = createStringlyConnectedGraph(n=10,D=3, nodeSize=200, widthArraw=1.5)
+res = createStringlyConnectedGraph(n=10,D=5, nodeSize=200, widthArraw=1.5)
 f=res[0]
-f.show()'''
+f.show()
 
 '''
 request = sc.createRequest(task = sc.Task.f_createNonVolatileTree, n=10, D=3)
