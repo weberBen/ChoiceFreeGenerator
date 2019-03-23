@@ -11,8 +11,6 @@ import os
 import networkx as nx
 import matplotlib.pyplot as plt
 
-import SocketCommunication as sc
-
 #%%
 ARRAY_CHAR_SEPARATOR = '-'
 LIST_CHAR_SEPARATOR = '|'
@@ -88,44 +86,3 @@ def plotGraph(Xgraph, nodeSize, widthArraw):
     plt.ion()#active interactive mode
     return fig
 
-    
-#%%
-def createStringlyConnectedGraph(n, D, nodeSize, widthArraw):
-    ''' Python asks the C server to create the corresponding graph
-        Then the response is retrieve as string
-        The string is parse into an array
-        The array is converted into the correct format for networkx graph
-        The networkx graph is finally plot'''
-    request = sc.createRequest(task = sc.Task.f_createStronglyConnectedGraph, n=n, D=D)
-    response =  srv.getResponse(request)
-    print(response)
-    graph = ParseGraph(response)
-    print(graph)
-    Xgraph = toNetworkxGraph(graph)
-    
-    f = plotGraph(Xgraph, nodeSize=nodeSize, widthArraw=widthArraw)
-    
-    return f,graph, Xgraph#return the plot
-
-
-#%%
-#plt.figure(1,figsize=(8,8)) 
-
-srv = sc.Server()#create socket communication with C server (to fully use the C functions)
-
-res = createStringlyConnectedGraph(n=10,D=5, nodeSize=200, widthArraw=1.5)
-f=res[0]
-f.show()
-
-'''
-request = sc.createRequest(task = sc.Task.f_createNonVolatileTree, n=10, D=3)
-response =  srv.getResponse(request)
-print(response)
-graph = ParseGraph(response)
-print(graph)
-Xgraph = toNetworkxGraph(graph)
-
-f = plotGraph(Xgraph, nodeSize=200, widthArraw=1.5)
-f.show()'''
-
-#srv.close()

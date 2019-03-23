@@ -1,7 +1,7 @@
 #ifndef _STORAGE_H
 #define _STORAGE_H
 
-typedef enum Types {uInt_t, place_t, transition_t, petri_t} types;
+typedef enum Types {uInt_t, place_t, transition_t, petri_t, wrapper_t, array_t, list_t} types;
 
 /*********************************************************************
  * 							LINKED LIST
@@ -26,8 +26,27 @@ void initializeList(void * a[], unsigned int n);
 void freeArray(pArray p);
 void freeList(pArray a[], unsigned int n);
  
+void removeElemArray(pArray previous_elem);
+void freeNodeArray(pArray node);
+void freeType(types type, void * pData);
  
  
+/*********************************************************************
+ * 								LIST 
+ *********************************************************************/
+	// * struct * //
+typedef struct List * pList;
+typedef struct List
+{
+	pArray * data;
+	unsigned int size;
+} list;
+
+	// * associated functions * //
+pList listCreate(pArray * p, unsigned int size);
+void listFree(list * g);
+
+
 /*********************************************************************
  * 				  UNSIGNED INT TYPE (wrapper class)
  *********************************************************************/
@@ -108,19 +127,24 @@ void petriSetOutput(pPetri p, pArray output);
 void petriFree(pPetri p);
 
 
-
 /*********************************************************************
- * 								GRAPH 
+ * 								WRAPPER 
  *********************************************************************/
 	// * struct * //
-typedef struct Graph
+typedef struct Wrapper * pWrapper;
+typedef struct Wrapper
 {
-	pArray * data;
-	unsigned int size;
-} graph;
+	types type;
+	unsigned int id;
+	void * data;
+} wrapper;
 
 	// * associated functions * //
-void graphFree(graph * g);
-
+void wrapperFree(pWrapper p);
+pArray wrapperAddToList(pArray  w_list, unsigned int id, types type, void * data);
+int wrapperGetId(pArray p);
+pWrapper wrapperGetElem(pArray w_list, unsigned int id);
+pArray wrapperRemoveFromList(pArray w_list, unsigned int id);
+pArray wrapperFreeList(pArray w_list);
 
 #endif 

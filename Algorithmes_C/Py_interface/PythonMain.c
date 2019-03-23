@@ -29,6 +29,7 @@ int main(int argc, char ** argv)
     
     srand(time(NULL));
     //start server
+	
 	py_establishCommunication(PORT, BUFFERSIZE);
 	
 	return 0;

@@ -3,102 +3,265 @@
 #include <assert.h>
 
 #include "Rand.h"
+#include "Tools.h"
 
-#define FREE_VALUE 0
-#define USED_VALUE -1
-
-static int * _list = NULL;
-static unsigned int _size = 0;
-static int _count = 0;
-
-
-void freeStaticArray()
+/***********************************************************************
+ * 
+ * 						RANDOM IN AN ARRAY
+ * 
+ **********************************************************************/
+ 
+ /* All the functions help to pick random elements onces between two
+  * integer values start and end (end excluded)
+  * 
+  * The functions create a custom element "container" that will store the
+  * size of the linked list made of all the element between start and end, 
+  * an unique id, the size of the array.
+  * 
+  * For example, if for the first time we need to get random value between 
+  * 1 and 4 then we will have the following result :
+  * 
+  * 	* linked list of element between 1 and 3 :
+  * ---------	  ---------	    ---------   
+  * |		|	  |		  |     |		|
+  * |	1	|---> |	  2	  |---> |	3	|
+  * |		|	  |		  |     |		|
+  * ---------	  ---------		---------
+  * 	* the size of the linked list is then 3
+  * 	* the id of the new element (liked list, size) is 0 (for example)
+  * 
+  * Then the result will be the following wrapper :
+  * 	 -----------------------------------------------------
+  * 	|		   ---------------------------------------	 |
+  * 	|         |	---------	  ---------	    --------- |  |   
+  * 	|		  | |		|	  |		  |     |		| |  |
+  * 	|	* --> |	|	1	|---> |	  2	  |---> |	3	| |  |
+  * 	|		  |	|		|	  |		  |     |		| |  |
+  * 	|		  |	---------	  ---------		--------- |  |
+  * 	|		   ---------------------------------------   |
+  *     |													 |
+  * 	|	* size = 3										 |
+  * 	|	* id = 0										 |
+  * 	|													 |
+  * 	 -----------------------------------------------------
+  * 
+  * We use a wrapper to save multiple array at the same time (for example
+  * if the user need to get random number from two different range)
+  * 
+  * Then all the wrappers are saved into a linked list
+  * 
+  *  ----------- 	  -----------
+  * |			|	 |			 |
+  * | wrapper 1 |--> | wrapper 2 | --> ...
+  * |			|	 |			 |
+  *  -----------	  -----------
+  * 
+  * the id of the wrapper is used to retrive the corresponding array initialize by the user
+  * 
+  * When a user get a new random value from an array we remove the current element
+  * For example, if the array is [1,2,3] and we randomly pick the element at the position 1 (which here is 2), 
+  * then we removed the element 2, update the array to get [1,3], decrease the size of the array by one and return the result
+  */
+  
+  /********************************************************************
+  * 						DEFINITION
+  *********************************************************************/
+typedef struct _container//wrapper
 {
-	_size = 0;
+	pArray data;//linked list of element between start and end
+	unsigned int size;//size of the linked list
+	unsigned int id;//id of the wrapper
+} container;
+
+static pArray _list = NULL;//list of wrappers
+static unsigned int _id = 0;//count of the id
+
+  /********************************************************************
+  * 						FUNCTIONS
+  *********************************************************************/
+
+static void freeContainer(pArray p)
+{
+	if(p==NULL || p->data==NULL)
+		return;
+	
+	container * c = (container *)(p->data);
+	freeArray(c->data);//free linked list of value between start and end
+	free(c);//free the wrapper
+	free(p);//free the element of linked list of wrapper
+}
+
+static int getId(pArray p)
+{
+	/*given an element of the list of wrapper return the id of the wrapper*/
+	if(p==NULL || p->data==NULL)
+		return -1;
+	
+	container * c = (container *)(p->data);
+	
+	return c->id;
+}
+
+static void freeStaticArray(unsigned int id)
+{
+	/* remove wrapper with the given id from the list of wrapper
+	 * (and free the memory of all the inside element of the wrapper)
+	*/
 	if(_list==NULL)
 		return;
 	
-	free(_list);
-	_list=NULL;
-}
-
-void allocateStaticArray(unsigned int range)
-{
-	freeStaticArray(_list);
-	_list = (int *)malloc(sizeof(int)*range);
-	assert(_list);
-	_size = range;
-}
-
-void initializeStaticArray()
-{
-	unsigned int i;
-	for(i=0; i<_size; i++)
+	pArray cursor =_list;
+	pArray p_cursor = NULL;
+	int c_id;
+	
+	while(cursor && (c_id=getId(cursor))!=id)//get the wrapper
 	{
-		_list[i] =  FREE_VALUE;
+		p_cursor = cursor;//previous element
+		cursor = cursor->next;
 	}
+	
+	if(c_id==-1 || cursor==NULL)
+	{
+		return;
+	}
+	
+	if(p_cursor==NULL)//first element of the list of wrapper
+	{
+		cursor = _list->next;
+		freeContainer(_list);
+		_list = cursor;
+		
+		return;
+	}
+	
+	p_cursor->next = cursor->next;
+	freeContainer(cursor);//free the wrapper
 }
 
-void randIni(int start, int end)
+static unsigned int createNodeStaticArray(unsigned int start, unsigned int end)
 {
-	int range = end - start +1;
+	/* given a start and an end create the wrapper and return the id of the wrapper*/
+	int i;
+	
+	container * p =(container *)malloc(sizeof(container));//wrapper
+	assert(p);
+	pArray data = NULL;//linked list of elements between start and end
+	
+	 
+	for(i=start; i<end; i++)
+	{
+		data = add(data, uInt_t, uIntCreateNode(i));//add value to the linked list
+	}
+	
+	//initialize the wrapper
+	p->data = data;
+	p->size = end - start;//(end-1)-start+1
+	p->id = _id;
+	_id++;//increase the global count of the wrapper
+	
+	//add the wrapper into the list of wrapper
+	_list = add(_list, 0, p);
+	
+	return p->id;//return the id of the wrapper
+}
+
+static container * getElem(unsigned int id)
+{
+	/* given the id of the wrapper return the wrapper or NULL
+	 * if there is no such wrapper
+	*/
+	pArray cursor = _list;
+	
+	while(cursor && ((container *)(cursor->data))->id!=id)
+	{
+		cursor = cursor->next;
+	}
+	
+	if(cursor==NULL)
+	{
+		return NULL;
+	}
+	
+	return (container *)(cursor->data);
+}
+
+
+unsigned int randIni(int start, int end)
+{ 
+	/* user interface */
+	
+	int range = end - start;//(end-1)-start+1
 	if(range==0)
 	{
 		fprintf(stderr, "randIni ne peut pas prendre une taille de zeros comme entree !\n");
 		exit(-1);
 	}
 	
-	allocateStaticArray(range);
-	initializeStaticArray();
-	_count = range;//number of item
+	return createNodeStaticArray(start, end);//return the id of the created wrapper
 }
 
-void randEnd()
+void randEnd(unsigned int id)
 {
-	_count = 0;
-	freeStaticArray();
+	/* user interface */
+	freeStaticArray(id);//remove the wrapper from the list of wrapper
 }
 
-int randArray()
+int randArray(unsigned int id)
 {
+	/* return a unique random element from an array include in the wrapper with the given id
+	 * or -1 if all the value inside the array have been picked
+	*/
+	
 	if(_list==NULL)
 	{
 		fprintf(stderr, "Impossible d'executer randArray() sans avoir initialiser l'object\n");
 		exit(-1);
 	}
 	
-	if(_count==0)
+	container * c = getElem(id);//get the corresponding wrapper
+	if(c==NULL || c->size==0)
 	{
 		return -1;
 	}
 	
-	unsigned int i;
-	unsigned int cn;
-	int val;
-	unsigned int alea = 1 + rand()%_count;
+	pArray cursor = c->data;
+	pArray p_cursor = NULL;
+	unsigned int el = rand()%c->size;
+	//get the index of the element to get between 0 and the size of the linked list of values
 	
-	cn=0;
-	val = -1;
-	for(i=0; i<_size; i++)
+	unsigned int i;
+	
+	i=0;
+	while(i<el)//find the element inside the linked list
 	{
-		if(_list[i]==FREE_VALUE)
-		{
-			cn++;
-		}
-		
-		if(cn==alea)
-		{
-			val = i;
-			_list[i] = USED_VALUE;
-			break;
-		}
+		p_cursor = cursor;
+		cursor = cursor->next;
+		i++;
 	}
 	
-	_count--;
+	int val = uIntValue(cursor);//retrieve the value of the element
 	
-	return val; 
+	//remove the current element of the liked list of values
+	if(p_cursor==NULL)
+	{
+		pArray temp = cursor->next;
+		freeNodeArray(cursor);
+		c->data = temp;
+	}else
+	{
+		removeElemArray(p_cursor);
+	}
+	c->size = c->size -1;//decrease the size of the linkes list of values
+	
+	return val;
 }
 
+
+/**********************************************************************
+ * 
+ * 						RANDOM IN SEGMENT
+ * 
+ **********************************************************************/
 
 
 int getRandomInSegment(int start, int end)

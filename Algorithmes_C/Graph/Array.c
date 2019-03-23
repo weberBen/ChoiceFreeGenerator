@@ -60,38 +60,54 @@ void initializeList(void * a[], unsigned int n)
 void freeArray(pArray p)
 {
 	pArray cursor = p;
-	types type;
-	void * pData;
 	
 	while(cursor!=NULL)
 	{
-		type = cursor->type;
-		pData = cursor->data;
-		
-		switch(type)
-		{
-			case uInt_t:
-				uIntFree((pInt)(pData));
-				break;
-			case place_t:
-				placeFree((pPlace)(pData));
-				break;
-			case transition_t:
-				transitionFree((pTransition)(pData));
-				break;
-			case petri_t:
-				petriFree((pPetri)(pData));
-				break;
-			default:
-				fprintf(stderr, "Le type de la variable n'est pas connu : impossible de liberer l'espace memoire associe\n");
-				exit(-1);
-				break;
-		}
-		
-		p = cursor;
-		cursor = cursor->next;
-		free(p);
+		p = cursor->next;
+		freeNodeArray(cursor);
+		cursor = p;
 	}
+}
+
+void freeType(types type, void * pData)
+{
+	switch(type)
+	{
+		case uInt_t:
+			uIntFree((pInt)(pData));
+			break;
+		case place_t:
+			placeFree((pPlace)(pData));
+			break;
+		case transition_t:
+			transitionFree((pTransition)(pData));
+			break;
+		case petri_t:
+			petriFree((pPetri)(pData));
+			break;
+		case wrapper_t:
+			wrapperFree((pWrapper)(pData));
+			break;
+		case array_t:
+			freeArray((pArray)(pData));
+			break;
+		case list_t:
+			listFree((pList)(pData));
+			break;
+		default:
+			fprintf(stderr, "Le type de la variable n'est pas connu : impossible de liberer l'espace memoire associe\n");
+			exit(-1);
+			break;
+	}
+}
+
+void freeNodeArray(pArray node)
+{
+	if(node==NULL)
+		return;
+		
+	freeType(node->type, node->data);
+	free(node);
 }
 
 void freeList(pArray a[], unsigned int n)
@@ -109,6 +125,16 @@ void freeList(pArray a[], unsigned int n)
 	free(a);
 }
 
+
+void removeElemArray(pArray previous_elem)
+{
+	if(previous_elem==NULL)
+		return;
+	
+	pArray cursor = previous_elem->next;//element to remove
+	previous_elem->next = cursor->next;
+	freeNodeArray(cursor);
+}
 
 /*********************************************************************
  * 
@@ -379,12 +405,129 @@ void initializeIntArray(int list[], unsigned int n, int value)
  * 
  *********************************************************************/
 
-void graphFree(graph * g)
+pList listCreate(pArray * p, unsigned int size)
 {
-	if(g==NULL)
-		return;
-		
-	freeList(g->data, g->size);
-	free(g);
+	pList output = (pList)malloc(sizeof(list));
+	assert(output);
+	
+	output->data = p;
+	output->size = size;
+	
+	return output;
 }
 
+void listFree(list * p)
+{
+	if(p==NULL)
+		return;
+		
+	freeList(p->data, p->size);
+	free(p);
+}
+
+
+
+
+ /*********************************************************************
+ * 
+ * 					
+ * 						WRAPPER FUNCTIONS
+ * 
+ * 
+ *********************************************************************/
+
+void wrapperFree(pWrapper p)
+{
+	if(p==NULL)
+		return;
+	
+	freeType(p->type, p->data);
+	free(p);
+}
+
+pArray  wrapperAddToList(pArray  w_list, unsigned int id, types type, void * data)
+{
+	pWrapper c = (pWrapper)malloc(sizeof(wrapper));
+	assert(c);
+	
+	c->type = type;
+	c->id = id;
+	c->data = data;
+	
+	w_list = add(w_list, wrapper_t, c);
+	
+	return w_list;
+}
+
+int wrapperGetId(pArray p)
+{
+	/*given an element of the list of wrapper return the id of the wrapper*/
+	if(p==NULL || p->data==NULL)
+		return -1;
+	
+	pWrapper c = (pWrapper)(p->data);
+	
+	return c->id;
+}
+
+
+pWrapper wrapperGetElem(pArray w_list, unsigned int id)
+{
+	/* given the id of the wrapper return the wrapper or NULL
+	 * if there is no such wrapper
+	*/
+	pArray cursor = w_list;
+	
+	while(cursor && ((pWrapper)(cursor->data))->id!=id)
+	{
+		cursor = cursor->next;
+	}
+	
+	if(cursor==NULL)
+	{
+		return NULL;
+	}
+	
+	return (pWrapper)(cursor->data);
+}
+
+pArray  wrapperRemoveFromList(pArray w_list, unsigned int id)
+{
+	if(w_list==NULL)
+		return w_list;
+	
+	pArray cursor = w_list;
+	pArray p_cursor = NULL;
+	int c_id;
+	
+	while(cursor && (c_id=wrapperGetId(cursor))!=id)//get the wrapper
+	{
+		p_cursor = cursor;//previous element
+		cursor = cursor->next;
+	}
+	
+	if(c_id==-1 || cursor==NULL)
+	{
+		return w_list;
+	}
+	
+	if(p_cursor==NULL)//first element of the list of wrapper
+	{
+		cursor = w_list->next;
+		freeNodeArray(w_list);
+		w_list = cursor;
+		
+		return w_list;
+	}
+	
+	p_cursor->next = cursor->next;
+	freeNodeArray(cursor);//free the wrapper node
+	
+	return w_list;
+}
+
+pArray wrapperFreeList(pArray w_list)
+{
+	freeArray(w_list);
+	return NULL;
+}

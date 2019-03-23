@@ -3,9 +3,20 @@
 #include <time.h>
 #include <unistd.h>
 #include <string.h>
+#include <assert.h>
 
 #include "Python.h"
 
+typedef struct Request 
+{
+	int task;
+	unsigned int n;
+	unsigned int D;
+	unsigned int wrapperId;
+	int isTree;
+} request;
+
+typedef enum Tasks {t_closeServer=-1, t_buildTree = 0, t_stronglyConnectedGraph=1, t_randomGraph=2, t_free=3} tasks;
 
 /**********************************************************************
  * 
@@ -14,54 +25,90 @@
  * 
  * 
  **********************************************************************/
-static graph * nonVolatileGraph = NULL;
 
-void sendString(char * txt, char * buff, unsigned int buffer_size, unsigned int csock)
+static pArray _list = NULL;
+
+
+static char * nullResponse()
 {
-	/* From an array of char write into the buffer the desired text following
-	 * the maximun size of the buffer.
-	 * The function write one by one the character into a temporary varibale
-	 * when the size match with the size of the buffer, we write all the data into it
-	 * and start again.
-	 * All the text will end by the end char '\0' in the buffer
-	*/
-	unsigned int count =0;
-	char * cursor = txt;
+	char * s = (char *)malloc(sizeof(char)*1);
+	s[0] = '\0';
 	
-	while(*cursor)
-	{
-		if(count==buffer_size)
-		{
-			//send part of the message
-			sendMsg(csock, txt, sizeof(char)*buffer_size);
-			
-			//reset parms
-			txt = cursor;
-			count=0;
-			//bzero(buff, buffer_size);
-		}
-		
-		count++;
-		cursor++;
-	}
-	
-	if(count==buffer_size)//count exclude '\0'
-	{
-		sendMsg(csock, txt, sizeof(char)*count);
-		txt=cursor;
-		//wait for response
-		sendMsg(csock, txt, sizeof(char)*1);
-	}else if(count<buffer_size)
-	{
-		sendMsg(csock, txt, sizeof(char)*(count+1));//+1 for the char '\0'
-	}
+	return s;
 }
 
-void sendNullResponse(char * buff, unsigned int buffer_size, unsigned int csock)
+static void sendNullResponse(char * buff, unsigned int buffer_size, unsigned int csock)
 {
-	char s[1]={'\0'};//return void graph
+	char * s = nullResponse();
 	sendString(s, buff, buffer_size, csock);//send the string
+	free(s);
 }
+
+static char * getResponse(request * req)
+{
+	char * s = NULL;
+	
+	switch(req->task)
+	{
+		case t_buildTree:
+		{
+			printf("creation d'un arbre (nb_noeud=%u, max_enfant=%d)\n", req->n, req->D);
+					
+			pArray * tree = buildTree(req->n, req->D);//create graph
+			pList graph1 = listCreate(tree, req->n);
+			_list = wrapperAddToList(_list, req->wrapperId, list_t, (void *)graph1);
+			
+			listToString(&s,tree, req->n);//convert the tree into a strings
+			
+		}
+			break;
+		case t_stronglyConnectedGraph:
+		{
+			printf("Modification du graphe %d en graphe fortement connexe\n", req->wrapperId);
+			
+			pWrapper p = wrapperGetElem(_list, req->wrapperId);
+			pList  graph1 = (pList)(p->data);
+			stronglyConnectedGraph(graph1->data, graph1->size, req->isTree);
+			
+			listToString(&s,graph1->data, graph1->size);//convert the tree into a stringss
+		}
+			break;
+		case t_randomGraph:
+		{
+			printf("Creation d'un graphe aleatoirement\n");
+			
+			pArray * temp = randomGraph(req->n, req->D);//create graph
+			pList graph1 = listCreate(temp, req->n);
+			_list = wrapperAddToList(_list, req->wrapperId, list_t, (void *)graph1);
+			
+			listToString(&s,temp, req->n);//convert the tree into a strings
+		}
+			break;
+		case t_free:
+		{
+			printf("Suppression de l'element identifie : %d\n", req->wrapperId);
+			
+			_list = wrapperRemoveFromList(_list, req->wrapperId);
+			
+			s = nullResponse();
+		}
+			break;
+		default :
+		{
+			printf("Demande inconnue\n");
+			s = nullResponse();
+		}
+			break;
+	}
+	
+	if(s==NULL)
+	{
+		s = nullResponse();
+	}
+	
+	return s;
+}
+
 
 int py_establishCommunication(int PORT, int BUFFSIZE)
 {
@@ -94,100 +141,22 @@ int py_establishCommunication(int PORT, int BUFFSIZE)
         if((nread=read(csock, buff, sizeof(request)) > 0))//client send new request
         {
 			request * req = (request*) buff;
+			tasks task = req->task;
+			
 			fprintf(stderr, "\tTache entrante (%d) --> ", req->task);
 			
-			switch(req->task)//get the corresponding task
+			if(task==t_closeServer)
 			{
-				case closeServer://close the server
-				{
-					fprintf(stderr, "Fermeture du server\n");
+				fprintf(stderr, "Fermeture du server\n");
 					
-					open = 0;
-					sendNullResponse(buff, BUFFSIZE, csock);
-				}
-					break;
-				case f_createNonVolatileTree:
-				{
-					fprintf(stderr, "creation d'un arbre semi-permanent (nb_noeud=%u, max_enfant=%d)\n", req->n, req->D);
-					
-					//create graph that will not be discard at the end of the request
-					graphFree(nonVolatileGraph);//free the previous one (if it exists)
-					nonVolatileGraph = (graph *)malloc(sizeof(nonVolatileGraph));//create new one
-					nonVolatileGraph->data =  buildTree(req->n, req->D);
-					nonVolatileGraph->size = req->n;
-					
-					//send data
-					char * s;
-					listToString(&s,nonVolatileGraph->data, req->n);//convert the tree into a string
-					
-					sendString(s, buff, BUFFSIZE, csock);//send the string
-					
-					free(s);
-				}
-					break;
-				case f_freeNonVolatileGraph :
-				{
-					fprintf(stderr, "Effacement du graphe non volatil\n");
-					
-					graphFree(nonVolatileGraph);
-					nonVolatileGraph = NULL;
-					
-					sendNullResponse(buff, BUFFSIZE, csock);
-				}
-					break;
-				case f_stronglyConnectedOnNonVolatileGraph:
-				{
-					fprintf(stderr, "Creation d'un graph fortement connexe à partir du graphe non volatil\n");
-					
-					if(nonVolatileGraph==NULL)
-					{
-						fprintf(stderr, "\tAttention : le graphe n'a pas encore été crée\n");
-						sendNullResponse(buff, BUFFSIZE, csock);
-						break;
-					}
-					
-					stronglyConnectedGraph(nonVolatileGraph->data, nonVolatileGraph->size);
-					
-					char * s;
-					listToString(&s,nonVolatileGraph->data, nonVolatileGraph->size);//convert the tree into a string
-					sendString(s, buff, BUFFSIZE, csock);
-					free(s);
-					
-				}
-					break;
-				case f_createTree:
-				{	
-					fprintf(stderr, "creation d'un arbre (nb_noeud=%u, max_enfant=%d)\n", req->n, req->D);
-					
-					pArray * tree = forcedTree(req->n, req->D);//create graph
-					
-					char * s;
-					listToString(&s,tree, req->n);//convert the tree into a string
-					
-					sendString(s, buff, BUFFSIZE, csock);//send the string
-					
-					freeList(tree, req->n);//free the memory
-					free(s);
-				}
-					break;
-				case f_createStronglyConnectedGraph:
-				{
-					fprintf(stderr, "creation d'un graph fortement connexe (nb_noeud=%u, max_enfant=%d)\n", req->n, req->D);
-					
-					pArray * tree = buildTree(req->n, req->D);//create graph
-					stronglyConnectedGraph(tree, req->n);
-					
-					char * s;
-					listToString(&s,tree, req->n);//convert the tree into a string
-					sendString(s, buff, BUFFSIZE, csock);//send the string
-					
-					freeList(tree, req->n);//free the memory
-					free(s);
-				}
-					break;
-				
-				
+				open = 0;
+				sendNullResponse(buff, BUFFSIZE, csock);
+				break;
 			}
+			
+			char * s = getResponse(req);
+			sendString(s, buff, BUFFSIZE, csock);//send the string
+			free(s);
 		}
         printf("Fin de transmission\n");
         printf("----------------------------\n");
@@ -195,9 +164,9 @@ int py_establishCommunication(int PORT, int BUFFSIZE)
     }
     
     //close server
-    graphFree(nonVolatileGraph);
-	nonVolatileGraph = NULL;
-	
+    
+    _list = wrapperFreeList(_list);
+       
     closeSocket(ssock);
     printf("Serveur ferme\n");
     

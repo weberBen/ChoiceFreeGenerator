@@ -59,6 +59,21 @@ void displaySimpeNodeArray(pArray p)
 	printf("\n");
 }
 
+ void displayMatrix(int a[], unsigned int n)
+ {
+	 unsigned int i,j;
+	 
+	 for(i=0; i<n; i++)
+	 {
+		 for(j=0; j<n; j++)
+		 {
+			 fprintf(stderr, "%d ",a[i*n+j]);
+		 }
+		 fprintf(stderr, "\n");
+		 
+	 }
+	 fprintf(stderr, "\n");
+ }
 
 /**********************************************************************
  * 

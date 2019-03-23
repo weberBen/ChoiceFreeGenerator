@@ -45,3 +45,44 @@ void sendMsg(int sock, void* msg, uint32_t msgsize)
     printf("Message sent (%d bytes).\n", msgsize);
     return;
 }
+
+void sendString(char * txt, char * buff, unsigned int buffer_size, unsigned int csock)
+{
+	/* From an array of char write into the buffer the desired text following
+	 * the maximun size of the buffer.
+	 * The function write one by one the character into a temporary varibale
+	 * when the size match with the size of the buffer, we write all the data into it
+	 * and start again.
+	 * All the text will end by the end char '\0' in the buffer
+	*/
+	unsigned int count =0;
+	char * cursor = txt;
+	
+	while(*cursor)
+	{
+		if(count==buffer_size)
+		{
+			//send part of the message
+			sendMsg(csock, txt, sizeof(char)*buffer_size);
+			
+			//reset parms
+			txt = cursor;
+			count=0;
+			//bzero(buff, buffer_size);
+		}
+		
+		count++;
+		cursor++;
+	}
+	
+	if(count==buffer_size)//count exclude '\0'
+	{
+		sendMsg(csock, txt, sizeof(char)*count);
+		txt=cursor;
+		//wait for response
+		sendMsg(csock, txt, sizeof(char)*1);
+	}else if(count<buffer_size)
+	{
+		sendMsg(csock, txt, sizeof(char)*(count+1));//+1 for the char '\0'
+	}
+}

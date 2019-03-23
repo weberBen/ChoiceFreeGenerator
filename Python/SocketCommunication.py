@@ -30,20 +30,23 @@ class Directories:
 #%%
 class Task:
     '''task to send to the server'''
-    closeServer=-1
-    f_createTree=0
-    f_createStronglyConnectedGraph=1
-    f_createNonVolatileTree=2
-    f_freeNonVolatileGraph=3
-    f_stronglyConnectedOnNonVolatileGraph=4
-    
+    t_closeServer=-1
+    t_buildTree=0
+    t_stronglyConnectedGraph=1
+    t_randomGraph=2
+    t_free=3
+
+
 #%%
 class Request(ctypes.Structure):
     _fields_ = [("task", ctypes.c_int), 
                 ("n", ctypes.c_uint),
-                ("D", ctypes.c_uint)]
-
-def createRequest(task, n=None, D=None):
+                ("D", ctypes.c_uint),
+                ("wrapperId", ctypes.c_uint),
+                ("isTree", ctypes.c_uint)
+               ]
+    
+def createRequest(task, n=None, D=None, wrapperId=None, isTree=None):
     '''create request with the correct format for the arguments'''
     frame = inspect.currentframe()
     args, _, _, values = inspect.getargvalues(frame)#get arguments of the function
@@ -52,14 +55,30 @@ def createRequest(task, n=None, D=None):
         name_args = i
         value = values[i]
         
-        if(name_args=="task" and value is not None):
+        if(name_args=="task"):
             task = ctypes.c_int(value)
-        elif(name_args=="n" and value is not None):
-            n = ctypes.c_uint(value)
-        elif(name_args=="D" and value is not None):
-            D = ctypes.c_uint(value)
+        elif(name_args=="n"):
+            if(value is None):
+                n = ctypes.c_uint(0)
+            else :
+                    n = ctypes.c_uint(value)
+        elif(name_args=="D"):
+            if(value is None):
+                D = ctypes.c_uint(0)
+            else :
+                D = ctypes.c_uint(value)
+        elif(name_args=="wrapperId"):
+            if(value is None):
+                wrapperId = ctypes.c_uint(0)
+            else :
+                wrapperId = ctypes.c_uint(value)
+        elif(name_args=="isTree"):
+            if(value is None):
+                isTree = ctypes.c_uint(0)
+            else :
+                isTree = ctypes.c_uint(value)
         
-    return Request(task, n, D)
+    return Request(task, n, D, wrapperId, isTree)
 
 #%%
 class Server:
@@ -107,7 +126,7 @@ class Server:
     
     def close(self):
         '''close C socket server'''
-        request = Request(Task.closeServer)
+        request = Request(Task.t_closeServer)
         response = self.getResponse(request)
         
         if(len(response)==0):

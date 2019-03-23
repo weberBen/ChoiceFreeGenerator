@@ -12,30 +12,9 @@
 #include <string.h>
 #include <stdint.h>
 
-#pragma pack(1)
-
-typedef struct payload_t {
-    uint32_t id;
-    uint32_t counter;
-    float temp;
-} payload;
-
-#pragma pack()
-
-typedef struct Request 
-{
-	int task;
-	unsigned int n;
-	unsigned int D;
-	char * file;
-} request;
-
-
-enum tasks {closeServer=-1, f_createTree=0, f_createStronglyConnectedGraph=1, f_createNonVolatileTree=2, f_freeNonVolatileGraph=3, 
-			f_stronglyConnectedOnNonVolatileGraph=4};
-
 int createSocket(int port);
 void closeSocket(int sock);
 void sendMsg(int sock, void* msg, uint32_t msgsize);
+void sendString(char * txt, char * buff, unsigned int buffer_size, unsigned int csock);
 
 #endif 

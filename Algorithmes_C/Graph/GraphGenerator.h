@@ -4,8 +4,12 @@
 #include "Array.h"
 #include "Rand.h"
 
-pArray * forcedTree(unsigned int n, unsigned int D);
+pArray * matrixIntoList(int network[], unsigned int n);
+pArray * graphIntoTree(int network[], unsigned int n);
+pArray * randomGraph(unsigned int n, unsigned int D);
+
 pArray * buildTree(unsigned int n, unsigned int D);
-void stronglyConnectedGraph(pArray * tree, unsigned int n);
+
+void stronglyConnectedGraph(pArray * tree, unsigned int n, int isTree);
 
 #endif 
