@@ -4,24 +4,6 @@
 
 #include "GraphGenerator.h"
 
- void displayMatrix(int a[], unsigned int n)
- {
-	 unsigned int i,j;
-	 
-	 for(i=0; i<n; i++)
-	 {
-		 for(j=0; j<n; j++)
-		 {
-			 fprintf(stderr, "%d ",a[i*n+j]);
-		 }
-		 fprintf(stderr, "\n");
-		 
-	 }
-	 fprintf(stderr, "\n");
-	 
-	 
- }
-
 /**********************************************************************
  * 
  * 						GRAPH FUNCTIONS
@@ -90,11 +72,38 @@
 	return output;
  }
  
- pArray * forcedTree(unsigned int n, unsigned int D)
+ pArray * matrixIntoList(int network[], unsigned int n)
+ {
+	//convert the matrix into a list of sucessors
+	pArray * output = (pArray *)malloc(sizeof(array)*n);
+	assert(output);
+	initializeList((void *)output, n);
+	
+	unsigned int i,j,k;
+	
+	//convert the matrix into a list of sucessors
+	for(i=0, k=0; i<n; i++)
+	{
+		for(j=0; j<n; j++)
+		{
+			if(network[k]==1)
+			{
+				output[i] = add(output[i], uInt_t, uIntCreateNode(j));
+			}
+			
+			k++;
+		}
+	} 
+	
+	return output;
+ }
+ 
+ 
+ pArray * randomGraph(unsigned int n, unsigned int D)
  {
 	unsigned int size = n*n;
 	
-	/* Temporary all the links between nodes will be saved into a matrix
+	/* Temporarily all the links between nodes will be saved into a matrix
 	 *  		| node 1 | node 2 | node 3 | ... | node n
 	 * 	node 1  |
 	 *  node 2  |
@@ -113,45 +122,59 @@
 	initializeIntArray(network, size, 0);
 	
 	unsigned int i, j;
-	unsigned int node;
+	unsigned int p_node, node;
 	unsigned int num_suc;
 	
 	for(i=0; i<n; i++)
 	{
+		p_node = i;
+		
 		num_suc = rand()%D;//(between 0 and D-1)
-		randIni(0, n-1);
+		unsigned int r1 = randIni(0, n-1);
 		for(j=0; j<num_suc; j++)
 		{
 			//find a new node to add
 			do
 			{
-				node = randArray();
+				node = randArray(r1);
 				
-			}while( (node==i || network[i*n+node]!=0) && node!=-1);//while we pick the current node as a child or we pick a node that is already a sucessors
+			}while( (node!=-1) && (node==p_node || network[p_node*n+node]!=0));//while we pick the current node as a child or we pick a node that is already a sucessors
 			
 			//add node as child of the current
 			if(node!=-1)
 			{
-				network[i*n + node] = 1;
-				network[node*n + i] = -1;
+				network[p_node*n + node] = 1;
+				network[node*n + p_node] = -1;
 			}
 			
 		}
-		randEnd();
+		randEnd(r1);
 	}
 	
 	
 	
 	//add links between some nodes to insure the existance of node with muliple entry
-	unsigned int num = (n-1)/3 + rand()%(n-(n-1)/3);
-	fprintf(stderr, "rand=%d\n", num);
 	unsigned int num_pred;
 	unsigned int count;
-	unsigned int p_node;
 	
-	for(i=0; i<num; i++)
+	//Set the number of node to apply the transformation
+	unsigned int num_t; //number of node to apply the transformation
+	unsigned int factor = 2;// (n/factor) where n is the number of node
+	if(n/factor==0)
 	{
-		p_node = getRandomInSegment(0,n-1);
+		num_t = 1;
+	}else
+	{
+		num_t = (n/factor)  + rand()%(n-n/factor) ;
+		//if the factor is a then the number is [n/a, (n-1) - n/a + 1]=[n/2, n-n/a]}
+	}
+	
+	
+	unsigned int r1 = randIni(0, n-1);
+	for(i=0; i<num_t; i++)
+	{
+		p_node = randArray(r1);
+		
 		//get the number of predecessors of the current node
 		count =0;
 		for(j=0; j<n; j++)
@@ -161,15 +184,16 @@
 		
 		//add new predecessors if necessary
 		num_pred = rand()%(n-count);
-		randIni(0, n-1);
+		unsigned int r2 = randIni(0, n-1);
 		for(j=0; j<num_pred; j++)
 		{
 			//find a new node to add
 			do
 			{
-				node = randArray();
+				node = randArray(r2);
 				
-			}while( (node==i || network[i*n+node]==-1) && node!=-1);
+			}while( (node!=-1) && (node==p_node || network[p_node*n+node]==-1));
+			
 			
 			//add node as child of the current
 			if(node!=-1)
@@ -178,13 +202,11 @@
 				network[node*n + p_node] = 1;
 			}
 		}
-		randEnd();
+		randEnd(r2);
 	}
+	randEnd(r1);
 	
-	displayMatrix(network, n);
-	
-	
-	return graphIntoTree(network, n);
+	return matrixIntoList(network, n);
  }
  
  
@@ -318,7 +340,7 @@ enum colorTag {WHITE, GRAY};
 
 void connect(unsigned int u, pArray * tree, enum colorTag color[], int arrival_time[], int path_time[], unsigned int time);
  
-void stronglyConnectedGraph(pArray * tree, unsigned int n)
+void stronglyConnectedGraph(pArray * tree, unsigned int n, int isTree)
 {
 	unsigned int i;
 	//initialise color array
@@ -363,8 +385,17 @@ void stronglyConnectedGraph(pArray * tree, unsigned int n)
 	//initialize time origin
 	unsigned int time = 1;
 	
-	connect(0, tree, color, arrival_time, path_time, time);
-	//since all the node are connected to the root, we just have one call as the initialization
+	if(isTree)//non zero value
+	{
+		connect(0, tree, color, arrival_time, path_time, time);
+		//since all the node are connected to the root, we just have one call as the initialization
+	}else
+	{
+		for(i=0; i<n; i++)
+		{
+			connect(i, tree, color, arrival_time, path_time, time);
+		}
+	}
 }
 
 void connect(unsigned int u, pArray * tree, enum colorTag color[], int arrival_time[], 
@@ -405,16 +436,6 @@ void connect(unsigned int u, pArray * tree, enum colorTag color[], int arrival_t
 	if(path_time[u]==arrival_time[u])
 	{//if there is no child of the current node in the previous nodes (node from the root until the current one)
 		
-		if(u==0)//root
-		{ 
-			/* can only be connected to itself because 0 is the root, 
-			 * then the condition at the start time and the end time 
-			 * produces start_time=1=end_time 
-			 * (and 1 is the origin of the time which represents the root)
-			*/
-			return;
-		}
-		
 		start_time = getRandomInSegment(arrival_time[u], time-1);//between arrival_time[u] and (time-1)
 		/* get time of child of the current node */
 		
@@ -448,6 +469,16 @@ void connect(unsigned int u, pArray * tree, enum colorTag color[], int arrival_t
 			i++;
 		}
 		
+		if(start_node==end_node)//root
+		{ 
+			/* can only be connected to itself because 0 is the root, 
+			 * then the condition at the start time and the end time 
+			 * produces start_time=1=end_time 
+			 * (and 1 is the origin of the time which represents the root)
+			*/
+			return;
+		}
+		
 		//connected the two nodes (start_node to end_node)
 		tree[start_node] = add(tree[start_node], uInt_t, uIntCreateNode(end_node));
 		path_time[u] = end_time;
@@ -461,3 +492,4 @@ void connect(unsigned int u, pArray * tree, enum colorTag color[], int arrival_t
  * 
  * 
  * *******************************************************************/
+
