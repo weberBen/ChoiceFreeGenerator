@@ -115,15 +115,14 @@ void transitionFree(pTransition p);
 typedef struct Petri * pPetri;
 typedef struct Petri
 {
-	pPlace node; //place
-	pArray input_t; //input transitions of the place
-	pArray output_t; //output transitions of the place
+	int * places;//1D array
+	unsigned int num_pl;//number of places
+	int * trans;//2D array
+	unsigned int num_tr;//number of transitions
 } petri;
 	
 	// * associated functions * //
-pPetri petriCreateNode(pPlace node);
-void petriSetInput(pPetri p, pArray input);
-void petriSetOutput(pPetri p, pArray output);
+pPetri petriCreateNode();
 void petriFree(pPetri p);
 
 

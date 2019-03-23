@@ -354,30 +354,17 @@ void initializeIntArray(int list[], unsigned int n, int value)
  * 
  * 
  *********************************************************************/
- pPetri petriCreateNode(pPlace node)
+ pPetri petriCreateNode()
  {
 	pPetri p = (pPetri)malloc(sizeof(petri));
     assert(p);
     
-    p->node = node;
-    p->input_t = NULL;
-    p->output_t = NULL;
+    p->places = NULL;
+    p->num_pl =0;
+    p->trans = NULL;
+    p->num_tr =0;
 
     return p; 
- }
- 
- void petriSetInput(pPetri p, pArray input)
- {
-	 assert(p);
-	 
-	 p->output_t = input;
- }
- 
- void petriSetOutput(pPetri p, pArray output)
- {
-	 assert(p);
-	 
-	 p->output_t = output;
  }
  
  void petriFree(pPetri p)
@@ -385,12 +372,9 @@ void initializeIntArray(int list[], unsigned int n, int value)
 	 if(p==NULL)
 		return;
 	
-	 pPetri d = (pPetri)p;
-	 
-	 placeFree(d->node);
-	 freeArray(d->input_t);
-	 freeArray(d->output_t);
-	 free(d);
+	 free(p->places);
+	 free(p->trans);
+	 free(p);
  }
  
  

@@ -6,6 +6,10 @@
 
 #include "Tools.h"
 
+#define CHAR_ARRAY_SEPARATOR '|'
+#define CHAR_LIST_SEPARATOR '/'
+#define CHAR_DATA_SEPARATOR ';'
+
 /**********************************************************************
  * 
  * 
@@ -59,15 +63,15 @@ void displaySimpeNodeArray(pArray p)
 	printf("\n");
 }
 
- void displayMatrix(int a[], unsigned int n)
+ void displayMatrix(int a[], unsigned int num_l, unsigned int num_c)
  {
 	 unsigned int i,j;
 	 
-	 for(i=0; i<n; i++)
+	 for(i=0; i<num_l; i++)
 	 {
-		 for(j=0; j<n; j++)
+		 for(j=0; j<num_c; j++)
 		 {
-			 fprintf(stderr, "%d ",a[i*n+j]);
+			 fprintf(stderr, "%d ",a[i*num_c+j]);
 		 }
 		 fprintf(stderr, "\n");
 		 
@@ -157,7 +161,7 @@ unsigned int arrayToString(char ** output, pArray p)
 		
 		if(p->next!=NULL)
 		{
-			string[i] = ARRAY_CHAR_SEPARATOR;//add the separator
+			string[i] = CHAR_ARRAY_SEPARATOR;//add the separator
 			i++;
 		}
 		
@@ -204,7 +208,7 @@ unsigned int listToString(char ** output, pArray a[], unsigned int n)
 			j++;
 		}
 		
-		string[j] = LIST_CHAR_SEPARATOR;
+		string[j] = CHAR_LIST_SEPARATOR;
 		j++;
 
 	}
@@ -220,6 +224,153 @@ unsigned int listToString(char ** output, pArray a[], unsigned int n)
 	//return the result
 	*output = string;
 	return size;
+}
+
+unsigned int matrixLineToString(char ** output, int * line, unsigned int n)
+{
+	char * linked_string[n];
+	char * cursor;
+	unsigned int digit;
+	unsigned int i;
+	unsigned int count;
+	
+	int * l_cursor;
+	int * size = line+n;
+	
+	//convert all the value inside a temporary array
+	count = 0;
+	for(l_cursor=line, i=0; l_cursor<size; l_cursor++, i++)
+	{
+		digit = getNumberOfDigit(*l_cursor);
+		count+=(digit+1);//+1 for the separator char
+		linked_string[i] = (char *)malloc(sizeof(char)*(digit+1));
+		assert(linked_string[i]);
+		sprintf(linked_string[i], "%d", *l_cursor);//convert the data into string
+	}
+	count--;//-1 because the last element does not need to be followed by a spearator char
+	
+	char * _output = (char *)malloc(sizeof(char)*(count+1));//+1 for the end char '\0'
+	assert(_output);
+	char * temp;
+	
+	for(i=0, cursor = _output; i<n; i++, cursor++)
+	{
+		temp = linked_string[i];
+		while(*temp)
+		{
+			*cursor = *temp;
+			temp++; cursor++;
+		}
+		if(i!=n-1)
+		{
+			*cursor = CHAR_ARRAY_SEPARATOR;
+		}else
+		{
+			cursor--;
+		}
+	}
+	*cursor ='\0';
+	
+	//free
+	for(i=0; i<n; i++)
+	{
+		free(linked_string[i]);
+	}
+	
+	//return results
+	*output = _output;
+	return count;
+}
+
+unsigned int matrixToString(char ** output, int * matrix, unsigned int num_l, unsigned int num_c)
+{
+	char * linked_string[num_l];
+	unsigned int i;
+	unsigned int count;
+	
+	int * cursor_l;
+	unsigned int j =0;
+	count = 0;
+	for(i=0, cursor_l = matrix; i<num_l; i++, cursor_l+=num_c, j+=num_c)
+	{
+		count+= matrixLineToString(linked_string + i, cursor_l, num_c);
+		count++;//separator char
+	}
+	count--;//one loop to far (no separator char next to the last element)
+	
+	char * _output = (char *)malloc(sizeof(char)*(count+1));//+1 for the end char '\0'
+	assert(_output);
+	char * cursor, *temp;
+	
+	for(i=0, cursor=_output; i<num_l; i++, cursor++)
+	{
+		temp = linked_string[i];
+		while(*temp)
+		{
+			*cursor=*temp;
+			temp++; cursor++;
+		}
+		if(i!=num_l-1)
+		{
+			*cursor = CHAR_LIST_SEPARATOR;
+		}else
+		{
+			cursor--;
+		}
+	}
+	*cursor='\0';
+	
+	//free
+	for(i=0; i<num_l; i++)
+	{
+		free(linked_string[i]);
+	}
+	
+	//return results
+	*output = _output;
+	return count;
+}
+
+unsigned int petriToString(char ** output, pPetri p)
+{
+	char * places;
+	char * trans;
+	unsigned int count =0;
+	
+	count+= matrixToString(&places, p->places, 1, p->num_pl);
+	count++;//for the separator char
+	count+= matrixToString(&trans, p->trans, p->num_tr, p->num_pl);
+	
+	char * _output = (char *)malloc(sizeof(char)*(count+1));//+1 for the end char '\0'
+	assert(output);
+	char * cursor, *temp_cursor;
+	
+	cursor = _output;
+	
+	temp_cursor = places;
+	while(*temp_cursor)
+	{
+		*cursor = *temp_cursor;
+		temp_cursor++;cursor++;
+	}
+	*cursor = CHAR_DATA_SEPARATOR;
+	cursor++;
+	
+	temp_cursor = trans;
+	while(*temp_cursor)
+	{
+		*cursor = *temp_cursor;
+		temp_cursor++;cursor++;
+	}
+	*cursor='\0';
+	
+	//free
+	free(places);
+	free(trans);
+	
+	//return results
+	*output=_output;
+	return count;
 }
 
 
@@ -262,7 +413,7 @@ int listToFile(char * filename, pArray a[], unsigned int n)
 			
 			if(p->next!=NULL)//if there is a next element
 			{
-				fputc(ARRAY_CHAR_SEPARATOR, file);
+				fputc(CHAR_ARRAY_SEPARATOR, file);
 			}
 			
 			p = p->next;
@@ -270,7 +421,7 @@ int listToFile(char * filename, pArray a[], unsigned int n)
 		//all the element of the linked list has been written into the file
 		if(i!=n-1)//if there is a next element
 		{
-			fputc(LIST_CHAR_SEPARATOR, file);
+			fputc(CHAR_LIST_SEPARATOR, file);
 		}
 		
 	}

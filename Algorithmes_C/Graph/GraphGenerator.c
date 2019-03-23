@@ -497,7 +497,7 @@ void connect(unsigned int u, pArray * tree, enum colorTag color[], int arrival_t
  * Pour chaque sommet, on crée une ligne de la matrice place transition avec +W(ou-) comme coefficient à la colonne du numero de la place vers laquelle on va.
  * Si il y a déjà une transition vers cette place, on rajoute -W sur l autre colonne.
  */
- 
+ /*
 int estdanstab(int u, int[] tab, int taille){
   for(int i=0; i<taille; i++){
     if(tab[i]==u)
@@ -522,3 +522,4 @@ void transformation(pArray * graph, int nbrsommet, int * mat[][]){
   mat=realloc((nbr)*sizeof(int*));
   places=realloc((nbr)*sizeof(int));
 }
+*/
