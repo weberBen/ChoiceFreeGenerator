@@ -492,4 +492,33 @@ void connect(unsigned int u, pArray * tree, enum colorTag color[], int arrival_t
  * 
  * 
  * *******************************************************************/
-
+/* Transformation d'un graphe fortement connexe à un réseau de Pétri
+ * On parcourt le graphe. À chaque sommet correspond une place et à chaque arc une transition.
+ * Pour chaque sommet, on crée une ligne de la matrice place transition avec +W(ou-) comme coefficient à la colonne du numero de la place vers laquelle on va.
+ * Si il y a déjà une transition vers cette place, on rajoute -W sur l autre colonne.
+ */
+ 
+int estdanstab(int u, int[] tab, int taille){
+  for(int i=0; i<taille; i++){
+    if(tab[i]==u)
+      return 1; //True
+  }
+  return 0; //False
+}
+void transformation(pArray * graph, int nbrsommet, int * mat[][]){
+  mat=malloc(sizeof(int*));
+  int nbr=0;
+  int places[]; //Tableaux des places ayant déjà au moins une entrée
+  places=malloc(sizeof(int));
+  mat[nbr]=malloc(nbrsommet*sizeof(int));
+  for(int i=0; i<nbrsommet; i++){
+    mat[nbr][i]=0;
+  }
+  mat[nbr][...]=+ou-1; //Pour l instant je met le poids à 1
+  places[nbr]=...
+  //On passe au prochain sommet
+  if(!estdanstab(...,places, nbr)){
+  nbr++;
+  mat=realloc((nbr)*sizeof(int*));
+  places=realloc((nbr)*sizeof(int));
+}
