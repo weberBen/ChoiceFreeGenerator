@@ -51,4 +51,10 @@ void randEnd(unsigned int id);
  **********************************************************************/
 int getRandomInSegment(int start, int end);
 
+/**********************************************************************
+ * 				get random values with fixed sum
+ **********************************************************************/
+
+unsigned int * randomFixedSum(unsigned int n, int sum);
+
 #endif
