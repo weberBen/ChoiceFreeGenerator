@@ -12,13 +12,12 @@ import networkx as nx
 import matplotlib.pyplot as plt
 
 #%%
-ARRAY_CHAR_SEPARATOR = '-'
-LIST_CHAR_SEPARATOR = '|'
+CHAR_ARRAY_SEPARATOR = '|'
+CHAR_LIST_SEPARATOR = '/'
+CHAR_DATA_SEPARATOR =';'
 
-
-#%%,
-
-def ParseGraph(string_graph):
+#%%,        
+def parseGraph(string_graph):
     ''' Input = a formatted string that represente a graph (a list of list of successors)
             the format is for an element i of the list is : 
                 successors_1_of_node_i successors_2_of_node_i...
@@ -33,11 +32,11 @@ def ParseGraph(string_graph):
     s_number = ""
     
     for c in string_graph:
-        if(c==ARRAY_CHAR_SEPARATOR):
+        if(c==CHAR_ARRAY_SEPARATOR):
             if(len(s_number)!=0):
                 array.append(int(s_number))
             s_number = ""
-        elif(c==LIST_CHAR_SEPARATOR or c=='\n'):
+        elif(c==CHAR_LIST_SEPARATOR):
             if(len(s_number)!=0):
                 array.append(int(s_number))
             graph.append(array)
@@ -48,6 +47,30 @@ def ParseGraph(string_graph):
     
     return graph
 
+def parsePetriNetwork(string_graph):
+    s_number = ""
+    places=[]
+    trans=[]
+    
+    i=0
+    
+    for c in string_graph:
+        if(c==CHAR_DATA_SEPARATOR):
+            break
+        elif(c==CHAR_ARRAY_SEPARATOR):
+            if(len(s_number)!=0):
+                places.append(int(s_number))
+            s_number=""
+        else :
+            s_number = s_number + c
+        i = i+1
+    
+    string_graph=string_graph[(i+1):]
+    
+    trans=parseGraph(string_graph)
+            
+    return [places, trans]
+#%%
 
 def toNetworkxGraph(graph) :
     ''' convert an standar array into the correct format for networkx graph
@@ -86,3 +109,51 @@ def plotGraph(Xgraph, nodeSize, widthArraw):
     plt.ion()#active interactive mode
     return fig
 
+#%%
+def toPetriNetwork(graph):
+    places = graph[0]
+    trans=graph[1]
+    pn = nx.DiGraph()
+    
+    
+    #add links between transition and places
+    labels={}
+    for i in range(len(trans)):
+        for j in range(len(trans[i])):
+            val = trans[i][j]
+            pl = "p"+str(j)+"\n"+str(places[j])
+            tr = "t"+str(i)
+            if(val>0):
+                e = (pl, tr)
+                labels.update({e:str(val)})
+                pn.add_edge(*e)
+            elif(val<0):
+                e = (tr, pl)
+                labels.update({e:str(abs(val))})
+                pn.add_edge(*e)
+            
+                
+    return [pn, labels]
+
+def drawPetriNetwork(petri, nodeSize, widthArraw):
+    G = petri[0]
+    labels=petri[1]
+    color_map=[]
+    for node in G:
+        if(node[0]=='p'):
+            color_map.append('red')
+        else:
+            color_map.append('grey')
+    
+    pos = nx.kamada_kawai_layout(G)
+    
+    plt.ioff()#desactive interactive mode (then figure won't pop up directly after plt.figure())
+    fig = plt.figure()
+    
+    nx.draw_networkx_nodes(G, pos, node_size = nodeSize, node_color = color_map, alpha=0.5)
+    nx.draw_networkx_labels(G, pos)
+    nx.draw_networkx_edges(G, pos, width= widthArraw, arrows=True)
+    nx.draw_networkx_edge_labels(G,pos,edge_labels=labels,font_color='red')
+    
+    plt.ion()#active interactive mode
+    return fig

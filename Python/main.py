@@ -8,6 +8,7 @@ Created on Sat Mar 23 17:31:35 2019
 import CFunctions as c
 import GraphDisplay as gd
 
+#%%
 #create graph 1 (as tree)
 graph1 = c.buildTree(10,5)
 Xgraph1 = gd.toNetworkxGraph(graph1.obj)
@@ -33,3 +34,11 @@ c.free(graph2)
 
 #exit
 c.exit()
+
+#%%
+
+string = '0|1|2|3|4|5|/;1|-1|-1|0|0|0|/0|-1|1|0|0|0|/0|0|-1|0|0|1|/0|1|0|1|-1|-1|/'
+p=gd.parsePetriNetwork(string)
+pn=gd.toPetriNetwork(p)
+f = gd.drawPetriNetwork(pn, 700, 2)
+f.show()

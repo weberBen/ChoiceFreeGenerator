@@ -16,7 +16,7 @@ typedef struct Request
 	int isTree;
 } request;
 
-typedef enum Tasks {t_closeServer=-1, t_buildTree = 0, t_stronglyConnectedGraph=1, t_randomGraph=2, t_free=3} tasks;
+typedef enum Tasks {t_closeServer=-1, t_buildTree = 0, t_stronglyConnectedGraph=1, t_randomGraph=2, t_free=3, t_petri=4} tasks;
 
 /**********************************************************************
  * 
@@ -91,6 +91,11 @@ static char * getResponse(request * req)
 			_list = wrapperRemoveFromList(_list, req->wrapperId);
 			
 			s = nullResponse();
+		}
+			break;
+		case t_petri:
+		{
+			
 		}
 			break;
 		default :

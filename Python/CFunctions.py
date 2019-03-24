@@ -31,7 +31,7 @@ def buildTree(n, D):
     response =  srv.getResponse(request)
     _id = _id +1
     
-    return Graph(id, gd.ParseGraph(response))
+    return Graph(id, gd.parseGraph(response))
 
 #%%
 def stronglyConnectedGraph(graph, isTree):
@@ -44,7 +44,7 @@ def stronglyConnectedGraph(graph, isTree):
                                wrapperId = graph.id, isTree=tree)
     response =  srv.getResponse(request)
 
-    graph.obj = gd.ParseGraph(response)
+    graph.obj = gd.parseGraph(response)
     return graph
 
 #%%
@@ -55,7 +55,7 @@ def randomGraph(n, D):
     response =  srv.getResponse(request)
     _id = _id +1
     
-    return Graph(id, gd.ParseGraph(response))
+    return Graph(id, gd.parseGraph(response))
 #%%
 def free(graph):
     request = sc.createRequest(task = sc.Task.t_free,  wrapperId = graph.id)
@@ -72,7 +72,7 @@ def createStringlyConnectedGraph(n, D, nodeSize, widthArraw):
     request = sc.createRequest(task = sc.Task.f_createStronglyConnectedGraph, n=n, D=D)
     response =  srv.getResponse(request)
     print(response)
-    graph = gd.ParseGraph(response)
+    graph = gd.parseGraph(response)
     print(graph)
     Xgraph = gd.toNetworkxGraph(graph)
     

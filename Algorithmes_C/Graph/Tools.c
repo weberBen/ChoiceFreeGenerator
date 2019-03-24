@@ -247,7 +247,6 @@ unsigned int matrixLineToString(char ** output, int * line, unsigned int n)
 		assert(linked_string[i]);
 		sprintf(linked_string[i], "%d", *l_cursor);//convert the data into string
 	}
-	count--;//-1 because the last element does not need to be followed by a spearator char
 	
 	char * _output = (char *)malloc(sizeof(char)*(count+1));//+1 for the end char '\0'
 	assert(_output);
@@ -261,13 +260,7 @@ unsigned int matrixLineToString(char ** output, int * line, unsigned int n)
 			*cursor = *temp;
 			temp++; cursor++;
 		}
-		if(i!=n-1)
-		{
-			*cursor = CHAR_ARRAY_SEPARATOR;
-		}else
-		{
-			cursor--;
-		}
+		*cursor = CHAR_ARRAY_SEPARATOR;
 	}
 	*cursor ='\0';
 	
@@ -296,7 +289,6 @@ unsigned int matrixToString(char ** output, int * matrix, unsigned int num_l, un
 		count+= matrixLineToString(linked_string + i, cursor_l, num_c);
 		count++;//separator char
 	}
-	count--;//one loop to far (no separator char next to the last element)
 	
 	char * _output = (char *)malloc(sizeof(char)*(count+1));//+1 for the end char '\0'
 	assert(_output);
@@ -310,13 +302,7 @@ unsigned int matrixToString(char ** output, int * matrix, unsigned int num_l, un
 			*cursor=*temp;
 			temp++; cursor++;
 		}
-		if(i!=num_l-1)
-		{
-			*cursor = CHAR_LIST_SEPARATOR;
-		}else
-		{
-			cursor--;
-		}
+		*cursor = CHAR_LIST_SEPARATOR;
 	}
 	*cursor='\0';
 	
