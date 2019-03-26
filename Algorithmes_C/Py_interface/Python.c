@@ -13,6 +13,7 @@ typedef struct Request
 	unsigned int n;
 	unsigned int D;
 	unsigned int wrapperId;
+	unsigned int newWrapperId;
 	int isTree;
 } request;
 
@@ -70,7 +71,7 @@ static char * getResponse(request * req)
 			pList  graph1 = (pList)(p->data);
 			stronglyConnectedGraph(graph1->data, graph1->size, req->isTree);
 			
-			listToString(&s,graph1->data, graph1->size);//convert the tree into a stringss
+			listToString(&s,graph1->data, graph1->size);//convert the tree into a strings
 		}
 			break;
 		case t_randomGraph:
@@ -95,7 +96,15 @@ static char * getResponse(request * req)
 			break;
 		case t_petri:
 		{
+			printf("Conversion du graphe en réseau de pétri\n");
 			
+			pWrapper p = wrapperGetElem(_list, req->wrapperId);
+			pList  graph1 = (pList)(p->data);
+			
+			pPetri petriN = petriTransformation(graph1->data, graph1->size);
+			_list = wrapperAddToList(_list, req->newWrapperId, petri_t, (void *)petriN);
+			
+			petriToString(&s,petriN);//convert the tree into a stringss
 		}
 			break;
 		default :

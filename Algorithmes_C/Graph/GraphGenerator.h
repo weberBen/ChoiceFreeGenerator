@@ -12,4 +12,6 @@ pArray * buildTree(unsigned int n, unsigned int D);
 
 void stronglyConnectedGraph(pArray * tree, unsigned int n, int isTree);
 
+pPetri petriTransformation(pArray *graph, unsigned int size);
+
 #endif 

@@ -35,6 +35,7 @@ class Task:
     t_stronglyConnectedGraph=1
     t_randomGraph=2
     t_free=3
+    t_petri=4
 
 
 #%%
@@ -43,10 +44,11 @@ class Request(ctypes.Structure):
                 ("n", ctypes.c_uint),
                 ("D", ctypes.c_uint),
                 ("wrapperId", ctypes.c_uint),
-                ("isTree", ctypes.c_uint)
+                ("isTree", ctypes.c_uint),
+                ("newWrapperId", ctypes.c_uint)
                ]
     
-def createRequest(task, n=None, D=None, wrapperId=None, isTree=None):
+def createRequest(task, n=None, D=None, wrapperId=None, isTree=None, newWrapperId=None):
     '''create request with the correct format for the arguments'''
     frame = inspect.currentframe()
     args, _, _, values = inspect.getargvalues(frame)#get arguments of the function
@@ -77,8 +79,13 @@ def createRequest(task, n=None, D=None, wrapperId=None, isTree=None):
                 isTree = ctypes.c_uint(0)
             else :
                 isTree = ctypes.c_uint(value)
+        elif(name_args=="newWrapperId"):
+            if(value is None):
+                newWrapperId = ctypes.c_uint(0)
+            else :
+                newWrapperId = ctypes.c_uint(value)
         
-    return Request(task, n, D, wrapperId, isTree)
+    return Request(task, n, D, wrapperId, isTree, newWrapperId)
 
 #%%
 class Server:

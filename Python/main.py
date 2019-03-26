@@ -25,20 +25,34 @@ f.show()
 
 #convert graph 1 into a strongly connected graph
 graph1 = c.stronglyConnectedGraph(graph1, True) #True to specify that the graph is a tree
+#display
+Xgraph = gd.toNetworkxGraph(graph1.obj)
+f = gd.plotGraph(Xgraph, nodeSize=200, widthArraw=1.5)
+f.show()
+
 #convert graph 2 into a strongly connected graph
 graph2 = c.stronglyConnectedGraph(graph2, False)
+
+#create petri network from an existing strongly connected graph
+petri = c.petriTransformation(graph2)
+#show
+Xpetri = gd.toPetriNetwork(petri.obj)
+f = gd.drawPetriNetwork(Xpetri, 500, 1.5)
+f.show()
+
 
 #free memory
 c.free(graph1)
 c.free(graph2)
+c.free(petri)
 
 #exit
 c.exit()
 
 #%%
-
+'''
 string = '0|1|2|3|4|5|/;1|-1|-1|0|0|0|/0|-1|1|0|0|0|/0|0|-1|0|0|1|/0|1|0|1|-1|-1|/'
 p=gd.parsePetriNetwork(string)
 pn=gd.toPetriNetwork(p)
 f = gd.drawPetriNetwork(pn, 700, 2)
-f.show()
+f.show()'''

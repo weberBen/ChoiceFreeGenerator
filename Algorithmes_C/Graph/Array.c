@@ -354,15 +354,15 @@ void initializeIntArray(int list[], unsigned int n, int value)
  * 
  * 
  *********************************************************************/
- pPetri petriCreateNode()
+ pPetri petriCreateNode(int * places, unsigned int num_pl, int * trans, unsigned int num_tr)
  {
 	pPetri p = (pPetri)malloc(sizeof(petri));
     assert(p);
     
-    p->places = NULL;
-    p->num_pl =0;
-    p->trans = NULL;
-    p->num_tr =0;
+    p->places = places;
+    p->num_pl = num_pl;
+    p->trans = trans;
+    p->num_tr =num_tr;
 
     return p; 
  }

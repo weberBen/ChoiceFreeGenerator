@@ -12,6 +12,12 @@ import SocketCommunication as sc
 _id = 0
 srv = sc.Server()
 
+def getnewId():
+    global _id
+    output = _id;
+    _id = _id+1
+    return output
+
 #%%
 class Graph:
     def __init__(self,id, obj):
@@ -25,11 +31,9 @@ def buildTree(n, D):
         The string is parse into an array
         The array is converted into the correct format for networkx graph
         The networkx graph is finally plot'''
-    global _id
-    id = _id
+    id = getnewId()
     request = sc.createRequest(task = sc.Task.t_buildTree, n=n, D=D, wrapperId = id)
     response =  srv.getResponse(request)
-    _id = _id +1
     
     return Graph(id, gd.parseGraph(response))
 
@@ -49,36 +53,24 @@ def stronglyConnectedGraph(graph, isTree):
 
 #%%
 def randomGraph(n, D):
-    global _id
-    id = _id
+    id = getnewId()
     request = sc.createRequest(task = sc.Task.t_randomGraph, n=n, D=D, wrapperId = id)
     response =  srv.getResponse(request)
-    _id = _id +1
     
     return Graph(id, gd.parseGraph(response))
 #%%
 def free(graph):
     request = sc.createRequest(task = sc.Task.t_free,  wrapperId = graph.id)
     srv.getResponse(request)
-    
-#%%
 
-def createStringlyConnectedGraph(n, D, nodeSize, widthArraw):
-    ''' Python asks the C server to create the corresponding graph
-        Then the response is retrieve as string
-        The string is parse into an array
-        The array is converted into the correct format for networkx graph
-        The networkx graph is finally plot'''
-    request = sc.createRequest(task = sc.Task.f_createStronglyConnectedGraph, n=n, D=D)
+#%%
+def petriTransformation(graph):
+    id = getnewId()
+    request = sc.createRequest(task = sc.Task.t_petri, 
+                               wrapperId = graph.id, newWrapperId = id)
     response =  srv.getResponse(request)
-    print(response)
-    graph = gd.parseGraph(response)
-    print(graph)
-    Xgraph = gd.toNetworkxGraph(graph)
-    
-    f = gd.plotGraph(Xgraph, nodeSize=nodeSize, widthArraw=widthArraw)
-    
-    return f,graph, Xgraph#return the plot
+
+    return Graph(id, gd.parsePetriNetwork(response))
 
 #%%
 def exit():

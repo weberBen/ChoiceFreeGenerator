@@ -90,7 +90,13 @@ unsigned int getNumberOfDigit(int num)
 	if(num==0)
 		return 1;
 	
-	return floor(log10(abs(num))) + 1;
+	unsigned int count = floor(log10(abs(num))) + 1;
+	if(num<0)
+	{
+		count++;//take the char '-' for negative input
+	}
+	
+	return count;
 }
 
 unsigned int arrayToString(char ** output, pArray p)
@@ -251,7 +257,7 @@ unsigned int matrixLineToString(char ** output, int * line, unsigned int n)
 	char * _output = (char *)malloc(sizeof(char)*(count+1));//+1 for the end char '\0'
 	assert(_output);
 	char * temp;
-	
+
 	for(i=0, cursor = _output; i<n; i++, cursor++)
 	{
 		temp = linked_string[i];

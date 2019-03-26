@@ -15,21 +15,22 @@ int main(int argc, char ** argv)
 	
 	//srand(time(NULL));
 	
-	unsigned int n =1 + rand()%1000;
-	unsigned int sum = n + rand()%(3*n-n+1);
-	unsigned int *r = randomFixedSum(n, sum);
-	unsigned int i;
-	int count=0;
+	unsigned int n = 10;
+	pArray * tree = buildTree(n, 3);
+	stronglyConnectedGraph(tree, n, 1);
 	
-	for(i=0; i<n; i++)
-	{
-		fprintf(stderr, "%d\n", r[i]);
-		//fprintf(stderr, "res%d\n", r[i]);
-		count+=r[i];
-	}
-	fprintf(stderr, "(n=%u, fixedSum=%d, sum=%d)\n", n, sum, count);
+	pPetri p = petriTransformation(tree, n);
+	char *s=NULL;
+	displayMatrix(p->trans, p->num_tr, p->num_pl);
 	
-	free(r);
+	petriToString(&s, p);
+	
+	
+	fprintf(stderr, "res=%s\n", s);
+	free(s);
+	
+	freeList(tree, n);
+	petriFree(p);
 	
 	return 0;
 }

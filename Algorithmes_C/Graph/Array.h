@@ -122,7 +122,7 @@ typedef struct Petri
 } petri;
 	
 	// * associated functions * //
-pPetri petriCreateNode();
+pPetri petriCreateNode(int * places, unsigned int num_pl, int * trans, unsigned int num_tr);
 void petriFree(pPetri p);
 
 
