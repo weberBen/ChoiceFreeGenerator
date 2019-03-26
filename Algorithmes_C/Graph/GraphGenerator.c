@@ -523,3 +523,32 @@ void transformation(pArray * graph, int nbrsommet, int * mat[][]){
   places=realloc((nbr)*sizeof(int));
 }
 */
+pPetri transformation(pArray * graph, int size){
+  pPetri graphpetri=malloc(sizeof(petri));
+  graphpetri->num_pl=size;
+  graphpetri->places=malloc(size*sizeof(int));
+  int i, j;
+  for(i=0; i<size; i++){
+    graphpetri->places[i]=0; //Pour l'instant rien sur les places
+  }
+  graphpetri->num_tr=size;
+  graphpetri->trans=malloc(size*sizeof(int*));
+  for( i=0; i<size; i++){
+    graphpetri->trans[i]=malloc(size*sizeof(int));
+  }
+  for( i=0; i<size; i++){
+    for( j=0; j<size; j++){
+      graphpetri->trans[i][j]=0;
+    }
+  }
+  for(i=0; i<size; i++){
+    graphpetri->trans[i][i]=1; //poids egal a 1 pour l instant
+    pArray graphi=graph[i];
+    while(graphi!=NULL){
+      graphpetri->trans[uIntValue(graphi)][i]=-1; 
+      graphi=graphi->next;
+    }
+  }
+  return graphpetri;
+}
+
