@@ -525,7 +525,7 @@ void transformation(pArray * graph, int nbrsommet, int * mat[][]){
 */
 
 
-pPetri transformation(pArray * graph, int size){
+pPetri petriTransformation(pArray * graph, unsigned int size){
   pPetri graphpetri=malloc(sizeof(petri));
   graphpetri->num_pl=size;
   graphpetri->places=malloc(size*sizeof(int));
@@ -552,7 +552,7 @@ pPetri transformation(pArray * graph, int size){
 }
 
 
-pPetri petriTransformation(pArray *graph, unsigned int size)
+/*pPetri petriTransformation(pArray *graph, unsigned int size)
 {
 	const unsigned int num_pl = 6;
 	const unsigned int num_tr = 4;
@@ -575,4 +575,4 @@ pPetri petriTransformation(pArray *graph, unsigned int size)
 	}
 						
 	return petriCreateNode(places, num_pl, trans, num_tr);
-}
+}*/
