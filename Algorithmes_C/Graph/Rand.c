@@ -302,7 +302,7 @@ unsigned int * randomFixedSum(unsigned int n, int sum)
 }*/
 
 
-
+/*
 unsigned int * randomFixedSum(unsigned int n, int sum)
 {
 	unsigned int * output = (unsigned int *)malloc(sizeof(unsigned int)*n);
@@ -321,6 +321,29 @@ unsigned int * randomFixedSum(unsigned int n, int sum)
 	
 	for(i=0; i<n; i++)
 	{
+		output[i]= ceil(output[i]*factor);
+	}
+	
+	return output;
+}*/
+
+unsigned int * randomFixedSum(unsigned int n, int sum){
+	
+	unsigned int * output = (unsigned int *)malloc(sizeof(unsigned int)*n);
+	assert(output);
+	
+	unsigned int i;
+	int count =0;
+	
+	for(i=0; i<n; i++){
+		output[i]= rand()%(sum-n+1);
+		count+=output[i];
+	}
+	
+	float factor = ((float)sum-n)/((float)count);
+	
+	for(i=0; i<n; i++){
+		
 		output[i]= ceil(output[i]*factor);
 	}
 	
