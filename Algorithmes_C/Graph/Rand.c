@@ -343,8 +343,10 @@ unsigned int * randomFixedSum(unsigned int n, int sum){
 	float factor = ((float)sum-n)/((float)count);
 	
 	for(i=0; i<n; i++){
-		
-		output[i]= ceil(output[i]*factor)+1;
+		if(i%2)
+		    output[i]= ceil(output[i]*factor)+1;
+		else
+		    output[i]= floor(output[i]*factor)+1;
 		
 	}
 	
