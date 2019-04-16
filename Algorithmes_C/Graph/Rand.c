@@ -344,7 +344,8 @@ unsigned int * randomFixedSum(unsigned int n, int sum){
 	
 	for(i=0; i<n; i++){
 		
-		output[i]= ceil(output[i]*factor);
+		output[i]= ceil(output[i]*factor)+1;
+		
 	}
 	
 	return output;
