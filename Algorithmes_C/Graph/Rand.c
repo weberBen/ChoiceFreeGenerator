@@ -396,6 +396,52 @@ int getRandomInSegment(int start, int end)
  * 					RANDOM NUMBERS WITH FIXED SUM
  * 
  **********************************************************************/
+/*
+unsigned int * randomFixedSum(unsigned int n, int sum)
+{
+	unsigned int * output = (unsigned int *)malloc(sizeof(unsigned int)*n);
+	assert(output);
+	initializeIntArray((int *)output, n, 1);//set to one all the value
+	
+	int r;
+	
+	sum-=n;
+	while(sum>=0)
+	{
+		r = getRandomInSegment(0, n-1);
+		output[r]++;
+		sum--;
+	}
+	
+	return output;
+}*/
+
+
+/*
+unsigned int * randomFixedSum(unsigned int n, int sum)
+{
+	unsigned int * output = (unsigned int *)malloc(sizeof(unsigned int)*n);
+	assert(output);
+	
+	unsigned int i;
+	int count =0;
+	
+	for(i=0; i<n; i++)
+	{
+		output[i]=1 + rand()%n;
+		count+=output[i];
+	}
+	
+	float factor = ((float)sum)/((float)count);
+	
+	for(i=0; i<n; i++)
+	{
+		output[i]= ceil(output[i]*factor);
+	}
+	
+	return output;
+}*/
+
 unsigned int * randomFixedSum(unsigned int n, int sum){
 	
 	unsigned int * output = (unsigned int *)malloc(sizeof(unsigned int)*n);

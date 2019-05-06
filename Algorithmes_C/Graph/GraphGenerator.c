@@ -534,20 +534,17 @@ pPetri petriTransformation(pArray * graph, unsigned int size){
     graphpetri->places[i]=0; //Pour l'instant rien sur les places
   }
   graphpetri->num_tr=size;
-  graphpetri->trans=malloc(size*sizeof(int*));
-  for(i=0; i<size; i++){
-    graphpetri->trans[i]=malloc(size*sizeof(int));
-  }
+  graphpetri->trans=malloc(size*size*sizeof(int*));
   for(i=0; i<size; i++){
     for(j=0; j<size; j++){
-      graphpetri->trans[i][j]=0;
+      graphpetri->trans[i*size+j]=0;
     }
   }
   for(i=0; i<size; i++){
-    graphpetri->trans[i][i]=1; //poids egal a 1 pour l instant
+    graphpetri->trans[i*size +i]=1; //poids egal a 1 pour l instant
     pArray graphi=graph[i];
     while(graphi!=NULL){
-      graphpetri->trans[uIntValue(graphi)][i]=-1; 
+      graphpetri->trans[uIntValue(graphi)*size +i]=-1; 
       graphi=graphi->next;
     }
   }
@@ -555,8 +552,7 @@ pPetri petriTransformation(pArray * graph, unsigned int size){
 }
 
 
-/*
-pPetri petriTransformation(pArray *graph, unsigned int size)
+/*pPetri petriTransformation(pArray *graph, unsigned int size)
 {
 	const unsigned int num_pl = 6;
 	const unsigned int num_tr = 4;
