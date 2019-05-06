@@ -497,33 +497,6 @@ void connect(unsigned int u, pArray * tree, enum colorTag color[], int arrival_t
  * Pour chaque sommet, on crée une ligne de la matrice place transition avec +W(ou-) comme coefficient à la colonne du numero de la place vers laquelle on va.
  * Si il y a déjà une transition vers cette place, on rajoute -W sur l autre colonne.
  */
- /*
-int estdanstab(int u, int[] tab, int taille){
-  for(int i=0; i<taille; i++){
-    if(tab[i]==u)
-      return 1; //True
-  }
-  return 0; //False
-}
-void transformation(pArray * graph, int nbrsommet, int * mat[][]){
-  mat=malloc(sizeof(int*));
-  int nbr=0;
-  int places[]; //Tableaux des places ayant déjà au moins une entrée
-  places=malloc(sizeof(int));
-  mat[nbr]=malloc(nbrsommet*sizeof(int));
-  for(int i=0; i<nbrsommet; i++){
-    mat[nbr][i]=0;
-  }
-  mat[nbr][...]=+ou-1; //Pour l instant je met le poids à 1
-  places[nbr]=...
-  //On passe au prochain sommet
-  if(!estdanstab(...,places, nbr)){
-  nbr++;
-  mat=realloc((nbr)*sizeof(int*));
-  places=realloc((nbr)*sizeof(int));
-}
-*/
-
 
 pPetri petriTransformation(pArray * graph, unsigned int size){
   pPetri graphpetri=malloc(sizeof(petri));
@@ -550,29 +523,3 @@ pPetri petriTransformation(pArray * graph, unsigned int size){
   }
   return graphpetri;
 }
-
-
-/*pPetri petriTransformation(pArray *graph, unsigned int size)
-{
-	const unsigned int num_pl = 6;
-	const unsigned int num_tr = 4;
-	
-	int * places = (int *)malloc(sizeof(int)*num_pl);
-	assert(places);
-	initializeIntArray(places, num_pl, 0);
-	
-	int  temp[24] = {1,-1,-1,0,0,0,
-					  0,-1,1,0,0,0,
-					  0,0,-1,0,0,1,
-					  0,1,0,1,-1,-1};
-	
-	int * trans = (int *)malloc(sizeof(int)*24);
-	assert(trans);
-	unsigned int i;
-	for(i=0; i<24; i++)
-	{
-		trans[i] = temp[i];
-	}
-						
-	return petriCreateNode(places, num_pl, trans, num_tr);
-}*/
