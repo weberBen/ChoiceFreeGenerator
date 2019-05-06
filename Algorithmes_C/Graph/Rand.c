@@ -260,6 +260,121 @@ int randArray(unsigned int id)
 
 /**********************************************************************
  * 
+ * 				RANDOM WITH PROBABILITY ARRAY
+ * 
+ **********************************************************************/
+
+static pArray _listProba = NULL;
+
+
+typedef struct CumulativeProbabilityHandler * pProbaH;
+typedef struct CumulativeProbabilityHandler//wrapper
+{
+	double * proba;
+	double * cumulProba;
+	unsigned int size;
+} probaH;
+
+void freeProbaHandler(void * p)
+{
+	 if(p==NULL)
+		return;
+		
+	 pProbaH q = (pProbaH)p;
+	 free(q->proba);
+	 free(q->cumulProba);
+	 free(q);
+}
+
+static pProbaH createCumulProbaHandler(double * proba, unsigned int size)
+{
+	 pProbaH node = (pProbaH)malloc(sizeof(probaH));
+	 assert(node);
+	 
+	 node->proba = proba;
+	 node->cumulProba = getCumulativeProba(proba, size);
+	 node->size = size;
+	 
+	 return node;
+}
+
+pProbaH getCumulProbaHandler(unsigned int id)
+{
+	pWrapper p = wrapperGetElem(_listProba, id);
+	if(p==NULL || p->data==NULL)
+		return NULL;
+	
+	return ((pProbaH)wrapperGetElem(_listProba, id)->data);
+}
+
+unsigned int randCumulProbaIni(double * proba, unsigned int size)
+{
+	static unsigned int id = 0;
+	unsigned int tempId = id;
+	id++;
+	
+	if(proba==NULL)
+		return -1;
+	
+	pProbaH node = createCumulProbaHandler(proba, size);
+	wrapperAddToList(&_listProba, wrapperCreateCustomNode(tempId, freeProbaHandler, (void *)node));
+	
+	return tempId;
+}
+
+void randCumulProbaEnd(unsigned int id)
+{
+	wrapperRemoveFromList(&_listProba, id);
+}
+
+void randCumulProbaUpdate(unsigned int id, unsigned int index)
+{
+	pWrapper p = wrapperGetElem(_listProba, id);
+	if(p==NULL || p->data==NULL)
+		return ;
+		
+	pProbaH q = (pProbaH)(p->data);
+	updateCumulativeProba(q->cumulProba, q->proba, q->size, index);
+}
+
+
+void randCumulProbaChangeData(unsigned int id, double * proba, unsigned int size)
+{
+	pWrapper p = wrapperGetElem(_listProba, id);
+	if(p==NULL || p->data==NULL)
+		return ;
+		
+	pProbaH q = (pProbaH)(p->data);
+	
+	if(size!=q->size)
+	{
+		free(q->cumulProba);
+		q->cumulProba = (double *)malloc(sizeof(double)*size);
+		assert(q->cumulProba);
+	}
+	
+	q->proba = proba;
+	
+	updateCumulativeProba(q->cumulProba, q->proba, q->size, 0);
+}
+
+int randCumulProba(unsigned int id)
+{
+	pWrapper p = wrapperGetElem(_listProba, id);
+	if(p==NULL || p->data==NULL)
+		return -1;
+	
+	pProbaH q = (pProbaH)(p->data);
+	
+	double rand_val = randf(0, q->cumulProba[q->size-1]);
+	
+	return getIndexCumulativeProba(q->cumulProba, q->size, rand_val);
+}
+
+
+
+/**********************************************************************
+ * 
  * 						RANDOM IN SEGMENT
  * 
  **********************************************************************/
@@ -281,47 +396,27 @@ int getRandomInSegment(int start, int end)
  * 					RANDOM NUMBERS WITH FIXED SUM
  * 
  **********************************************************************/
-/*
-unsigned int * randomFixedSum(unsigned int n, int sum)
-{
-	unsigned int * output = (unsigned int *)malloc(sizeof(unsigned int)*n);
-	assert(output);
-	initializeIntArray((int *)output, n, 1);//set to one all the value
+unsigned int * randomFixedSum(unsigned int n, int sum){
 	
-	int r;
-	
-	sum-=n;
-	while(sum>=0)
-	{
-		r = getRandomInSegment(0, n-1);
-		output[r]++;
-		sum--;
-	}
-	
-	return output;
-}*/
-
-
-
-unsigned int * randomFixedSum(unsigned int n, int sum)
-{
 	unsigned int * output = (unsigned int *)malloc(sizeof(unsigned int)*n);
 	assert(output);
 	
 	unsigned int i;
 	int count =0;
 	
-	for(i=0; i<n; i++)
-	{
-		output[i]=1 + rand()%n;
+	for(i=0; i<n; i++){
+		output[i]= rand()%(sum-n+1);
 		count+=output[i];
 	}
 	
-	float factor = ((float)sum)/((float)count);
+	float factor = ((float)sum-n)/((float)count);
 	
-	for(i=0; i<n; i++)
-	{
-		output[i]= ceil(output[i]*factor);
+	for(i=0; i<n; i++){
+		if(i%2)
+		    output[i]= ceil(output[i]*factor)+1;
+		else
+		    output[i]= floor(output[i]*factor)+1;
+		
 	}
 	
 	return output;
@@ -329,6 +424,13 @@ unsigned int * randomFixedSum(unsigned int n, int sum)
 
 
 
+/**********************************************************************
+ * 
+ * 							RANDOM FLOAT
+ * 
+ **********************************************************************/
 
-
-
+double randf(double start, double end)
+{
+	return start + ((double)rand())/((double)RAND_MAX)*(end-start);
+}

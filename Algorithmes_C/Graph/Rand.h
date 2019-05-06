@@ -2,6 +2,7 @@
 #define _RAND_H
 
 #include "Array.h"
+#include "Tools.h"
 
 /**********************************************************************
  * 				get unique random value in an array
@@ -44,6 +45,15 @@ void randEnd(unsigned int id);
  *  
 */
 
+/**********************************************************************
+ * 		get random value from an array filled with probability value
+ **********************************************************************/
+
+unsigned int randCumulProbaIni(double * proba, unsigned int size);
+void randCumulProbaEnd(unsigned int id);
+int randCumulProba(unsigned int id);
+void randCumulProbaUpdate(unsigned int id, unsigned int index);
+void randCumulProbaChangeData(unsigned int id, double * proba, unsigned int size);
 
 
 /**********************************************************************
@@ -56,5 +66,10 @@ int getRandomInSegment(int start, int end);
  **********************************************************************/
 
 unsigned int * randomFixedSum(unsigned int n, int sum);
+
+/**********************************************************************
+ * 				random tools function
+ **********************************************************************/
+double randf(double start, double end);
 
 #endif

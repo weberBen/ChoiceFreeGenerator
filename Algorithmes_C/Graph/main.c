@@ -7,7 +7,6 @@
 #include "Tools.h"
 #include "Rand.h"
 
-
 int main(int argc, char ** argv)
 {
 	
@@ -15,7 +14,7 @@ int main(int argc, char ** argv)
 	
 	//srand(time(NULL));
 	
-	unsigned int n = 10;
+	/*unsigned int n = 10;
 	pArray * tree = buildTree(n, 3);
 	stronglyConnectedGraph(tree, n, 1);
 	
@@ -30,8 +29,23 @@ int main(int argc, char ** argv)
 	free(s);
 	
 	freeList(tree, n);
-	petriFree(p);
+	petriFree(p);*/
 	
+	unsigned int size = 10;
+	unsigned int Ki = 3;
+	unsigned int Ko = -1;
+	
+	//pArray * graph = randomGraph(size, Ke, Ko);
+	//displayGraph(graph, size);
+	
+	//freeList(graph, size);
+	
+	pArray * temp = randomGraph(size, Ki, Ko);//create graph
+	
+	displayGraph(temp, size);
+	
+	freeList(temp, size);
+
 	return 0;
 }
 

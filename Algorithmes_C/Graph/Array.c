@@ -14,16 +14,32 @@
  * 
  *********************************************************************/
 
-pArray createNode(types type, void * data)
+pArray _createNode(types type, void (* freeFunction)(void *pData), void * data)
 {
+	if(type==custom_t && freeFunction==NULL)
+	{
+		fprintf(stderr, "Creation d'un noeud personalise mais fonction de liberation de la memoire donne invalide (NULL)\n");
+		exit(-1);
+	}
     pArray node = (pArray)malloc(sizeof(array));
     assert(node);
 
 	node->type = type;
+	node->freeFunction = freeFunction;
     node->data = data;
     node->next = NULL;
 
     return node;
+}
+
+pArray createNode(types type, void * data)
+{
+    return _createNode(type, NULL, data);
+}
+
+pArray createCustomNode(void (* freeFunction)(void *pData), void * data)
+{
+	return _createNode(custom_t, freeFunction, data);
 }
 
 pArray add(pArray l, types type, void * data)
@@ -47,16 +63,6 @@ unsigned int lengthArray(pArray p)
 	return count;
 }
 
-void initializeList(void * a[], unsigned int n)
-{
-	unsigned int i;
-	
-	for(i=0; i<n; i++)
-	{
-		a[i] = NULL;
-	}
-}
-
 void freeArray(pArray p)
 {
 	pArray cursor = p;
@@ -69,7 +75,24 @@ void freeArray(pArray p)
 	}
 }
 
-void freeType(types type, void * pData)
+
+pArray getArrayElement(pArray p, void * data, int (* booleanFunction)(void * ref, pArray compareTo))
+{
+	//if the function return 0 then false, else true
+	
+	while(p!=NULL)
+	{
+		if(booleanFunction(data, p))
+		{
+			return p;
+		}
+		p = p->next;
+	}
+	
+	return NULL;
+}
+
+void freeType(types type, void (* freeFunction)(void * pData), void * pData)
 {
 	switch(type)
 	{
@@ -94,6 +117,14 @@ void freeType(types type, void * pData)
 		case list_t:
 			listFree((pList)(pData));
 			break;
+		case custom_t:
+			if(freeFunction==NULL)
+			{
+				fprintf(stderr, "Creation d'un noeud personalise mais fonction free passe en argumument NULL\n");
+				exit(-1);
+			}
+			freeFunction(pData);
+			break;
 		default:
 			fprintf(stderr, "Le type de la variable n'est pas connu : impossible de liberer l'espace memoire associe\n");
 			exit(-1);
@@ -106,7 +137,7 @@ void freeNodeArray(pArray node)
 	if(node==NULL)
 		return;
 		
-	freeType(node->type, node->data);
+	freeType(node->type, node->freeFunction, node->data);
 	free(node);
 }
 
@@ -179,15 +210,24 @@ void removeElemArray(pArray previous_elem)
 	 
 	 free(p);
  }
- 
 
-void initializeIntArray(int list[], unsigned int n, int value)
+
+
+int comparaison(void * ref, pArray compareTo)
 {
-	unsigned int i;
-	for(i=0; i<n; i++)
-	{
-		list[i] =  value;
-	}
+	
+	if(compareTo==NULL || compareTo->type!=uInt_t)
+		return 0;//false
+		
+	if(ref==NULL && compareTo->data==NULL)
+		return 1;//true
+	else if(ref==NULL || compareTo->data==NULL)
+		return 0;//false
+	
+	int * p1 = (int *)ref;
+	pInt p2 = (pInt)(compareTo->data);
+	
+	return *p1==p2->data;
 }
 
 
@@ -425,22 +465,48 @@ void wrapperFree(pWrapper p)
 	if(p==NULL)
 		return;
 	
-	freeType(p->type, p->data);
+	freeType(p->type, p->freeFunction, p->data);
 	free(p);
 }
 
-pArray  wrapperAddToList(pArray  w_list, unsigned int id, types type, void * data)
+pWrapper _wrapperCreateNode(unsigned int id, types type, void (* freeFunction)(void * pData), void * data)
 {
+	if(type==custom_t && freeFunction==NULL)
+	{
+		fprintf(stderr, "Creation d'un noeud personalise mais fonction de liberation de la memoire donne invalide (NULL)\n");
+		exit(-1);
+	}
+	
 	pWrapper c = (pWrapper)malloc(sizeof(wrapper));
 	assert(c);
 	
 	c->type = type;
+	c->freeFunction = freeFunction;
 	c->id = id;
 	c->data = data;
 	
+	return c;
+}
+
+
+pWrapper wrapperCreateNode(unsigned int id, types type, void * data)
+{
+	return _wrapperCreateNode(id, type, NULL, data);
+}
+
+pWrapper wrapperCreateCustomNode(unsigned int id, void (* freeFunction)(void * pData), void * data)
+{
+	return _wrapperCreateNode(id, custom_t, freeFunction, data);
+}
+
+
+void  wrapperAddToList(pArray * pp_list, pWrapper c)
+{
+	pArray w_list = * pp_list;
 	w_list = add(w_list, wrapper_t, c);
 	
-	return w_list;
+	* pp_list = w_list;
+	return ;
 }
 
 int wrapperGetId(pArray p)
@@ -448,7 +514,7 @@ int wrapperGetId(pArray p)
 	/*given an element of the list of wrapper return the id of the wrapper*/
 	if(p==NULL || p->data==NULL)
 		return -1;
-	
+		
 	pWrapper c = (pWrapper)(p->data);
 	
 	return c->id;
@@ -475,10 +541,11 @@ pWrapper wrapperGetElem(pArray w_list, unsigned int id)
 	return (pWrapper)(cursor->data);
 }
 
-pArray  wrapperRemoveFromList(pArray w_list, unsigned int id)
+void  wrapperRemoveFromList(pArray * pp_list, unsigned int id)
 {
+	pArray w_list = * pp_list;
 	if(w_list==NULL)
-		return w_list;
+		return ;
 	
 	pArray cursor = w_list;
 	pArray p_cursor = NULL;
@@ -491,9 +558,8 @@ pArray  wrapperRemoveFromList(pArray w_list, unsigned int id)
 	}
 	
 	if(c_id==-1 || cursor==NULL)
-	{
-		return w_list;
-	}
+		return;
+	
 	
 	if(p_cursor==NULL)//first element of the list of wrapper
 	{
@@ -501,13 +567,15 @@ pArray  wrapperRemoveFromList(pArray w_list, unsigned int id)
 		freeNodeArray(w_list);
 		w_list = cursor;
 		
-		return w_list;
+		* pp_list = w_list;
+		return ;
 	}
 	
 	p_cursor->next = cursor->next;
 	freeNodeArray(cursor);//free the wrapper node
 	
-	return w_list;
+	* pp_list = w_list;
+	return ;
 }
 
 pArray wrapperFreeList(pArray w_list)

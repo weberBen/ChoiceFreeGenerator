@@ -4,9 +4,7 @@
 #include "Array.h"
 #include "Rand.h"
 
-pArray * matrixIntoList(int network[], unsigned int n);
-pArray * graphIntoTree(int network[], unsigned int n);
-pArray * randomGraph(unsigned int n, unsigned int D);
+pArray * randomGraph(unsigned int n, int Ki, int Ko);
 
 pArray * buildTree(unsigned int n, unsigned int D);
 

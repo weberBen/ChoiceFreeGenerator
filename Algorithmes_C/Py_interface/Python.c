@@ -7,17 +7,8 @@
 
 #include "Python.h"
 
-typedef struct Request 
-{
-	int task;
-	unsigned int n;
-	unsigned int D;
-	unsigned int wrapperId;
-	unsigned int newWrapperId;
-	int isTree;
-} request;
 
-typedef enum Tasks {t_closeServer=-1, t_buildTree = 0, t_stronglyConnectedGraph=1, t_randomGraph=2, t_free=3, t_petri=4} tasks;
+
 
 /**********************************************************************
  * 
@@ -45,7 +36,7 @@ static void sendNullResponse(char * buff, unsigned int buffer_size, unsigned int
 	free(s);
 }
 
-static char * getResponse(request * req)
+char * getResponse(request * req)
 {
 	char * s = NULL;
 	
@@ -57,7 +48,7 @@ static char * getResponse(request * req)
 					
 			pArray * tree = buildTree(req->n, req->D);//create graph
 			pList graph1 = listCreate(tree, req->n);
-			_list = wrapperAddToList(_list, req->wrapperId, list_t, (void *)graph1);
+			wrapperAddToList(&_list, wrapperCreateNode(req->wrapperId, list_t, (void *)graph1));
 			
 			listToString(&s,tree, req->n);//convert the tree into a strings
 			
@@ -78,9 +69,9 @@ static char * getResponse(request * req)
 		{
 			printf("Creation d'un graphe aleatoirement\n");
 			
-			pArray * temp = randomGraph(req->n, req->D);//create graph
+			pArray * temp = randomGraph(req->n, req->Ki, req->Ko);//create graph
 			pList graph1 = listCreate(temp, req->n);
-			_list = wrapperAddToList(_list, req->wrapperId, list_t, (void *)graph1);
+			wrapperAddToList(&_list, wrapperCreateNode(req->wrapperId, list_t, (void *)graph1));
 			
 			listToString(&s,temp, req->n);//convert the tree into a strings
 		}
@@ -89,7 +80,7 @@ static char * getResponse(request * req)
 		{
 			printf("Suppression de l'element identifie : %d\n", req->wrapperId);
 			
-			_list = wrapperRemoveFromList(_list, req->wrapperId);
+			wrapperRemoveFromList(&_list, req->wrapperId);
 			
 			s = nullResponse();
 		}
@@ -102,7 +93,7 @@ static char * getResponse(request * req)
 			pList  graph1 = (pList)(p->data);
 			
 			pPetri petriN = petriTransformation(graph1->data, graph1->size);
-			_list = wrapperAddToList(_list, req->newWrapperId, petri_t, (void *)petriN);
+			wrapperAddToList(&_list, wrapperCreateNode(req->newWrapperId, petri_t, (void *)petriN));
 			
 			petriToString(&s,petriN);//convert the tree into a stringss
 		}

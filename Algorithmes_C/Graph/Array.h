@@ -1,7 +1,7 @@
 #ifndef _STORAGE_H
 #define _STORAGE_H
 
-typedef enum Types {uInt_t, place_t, transition_t, petri_t, wrapper_t, array_t, list_t} types;
+typedef enum Types {custom_t=-1, uInt_t, place_t, transition_t, petri_t, wrapper_t, array_t, list_t} types;
 
 /*********************************************************************
  * 							LINKED LIST
@@ -10,26 +10,26 @@ typedef enum Types {uInt_t, place_t, transition_t, petri_t, wrapper_t, array_t, 
 typedef struct Array * pArray;
 typedef struct Array
 {
-	types type;//type of the void *
+	types type;//type of void * pointer
+	void (*freeFunction)(void * pData);//in case of custom type the corresponding custum function for the void * poiter
     void * data;
     struct Array * next;
 } array;
 
 	// * associated functions * //
 pArray createNode(types type, void * data);
+pArray createCustomNode(void (* freeFunction)(void *pData), void * data);
 pArray add(pArray l, types type, void * data);
 
 unsigned int lengthArray(pArray p);
-
-void initializeList(void * a[], unsigned int n);
 
 void freeArray(pArray p);
 void freeList(pArray a[], unsigned int n);
  
 void removeElemArray(pArray previous_elem);
 void freeNodeArray(pArray node);
-void freeType(types type, void * pData);
- 
+void freeType(types type, void (* freeFunction)(void * pData), void * pData);
+pArray getArrayElement(pArray p, void * data, int (* booleanFunction)(void * ref, pArray compareTo));
  
 /*********************************************************************
  * 								LIST 
@@ -61,8 +61,7 @@ typedef struct _Int
 pInt uIntCreateNode(unsigned int data);
 unsigned int uIntValue(pArray p);
 void uIntFree(pInt p);
-
-void initializeIntArray(int list[], unsigned int n, int value);
+int comparaison(void * ref, pArray compareTo);
 
 /*********************************************************************
  * 							Place Type
@@ -134,16 +133,19 @@ typedef struct Wrapper * pWrapper;
 typedef struct Wrapper
 {
 	types type;
+	void (*freeFunction)(void * pData);
 	unsigned int id;
 	void * data;
 } wrapper;
 
 	// * associated functions * //
+pWrapper wrapperCreateNode(unsigned int id, types type, void * data);
+pWrapper wrapperCreateCustomNode(unsigned int id, void (* freeFunction)(void * pData), void * data);
 void wrapperFree(pWrapper p);
-pArray wrapperAddToList(pArray  w_list, unsigned int id, types type, void * data);
+void  wrapperAddToList(pArray * pp_list, pWrapper c);
 int wrapperGetId(pArray p);
 pWrapper wrapperGetElem(pArray w_list, unsigned int id);
-pArray wrapperRemoveFromList(pArray w_list, unsigned int id);
+void  wrapperRemoveFromList(pArray * pp_list, unsigned int id);
 pArray wrapperFreeList(pArray w_list);
 
 #endif 

@@ -52,11 +52,11 @@ def stronglyConnectedGraph(graph, isTree):
     return graph
 
 #%%
-def randomGraph(n, D):
+def randomGraph(n, Ki, Ko):
     id = getnewId()
-    request = sc.createRequest(task = sc.Task.t_randomGraph, n=n, D=D, wrapperId = id)
+    request = sc.createRequest(task = sc.Task.t_randomGraph, n=n, wrapperId = id, Ki=Ki, Ko=Ko)
     response =  srv.getResponse(request)
-    
+    print("response="+ response)
     return Graph(id, gd.parseGraph(response))
 #%%
 def free(graph):

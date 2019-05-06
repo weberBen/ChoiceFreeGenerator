@@ -45,10 +45,12 @@ class Request(ctypes.Structure):
                 ("D", ctypes.c_uint),
                 ("wrapperId", ctypes.c_uint),
                 ("isTree", ctypes.c_uint),
-                ("newWrapperId", ctypes.c_uint)
+                ("newWrapperId", ctypes.c_uint),
+                ("Ki", ctypes.c_int),
+                ("Ko", ctypes.c_int)
                ]
     
-def createRequest(task, n=None, D=None, wrapperId=None, isTree=None, newWrapperId=None):
+def createRequest(task, n=None, D=None, wrapperId=None, isTree=None, newWrapperId=None, Ki=None, Ko=None):
     '''create request with the correct format for the arguments'''
     frame = inspect.currentframe()
     args, _, _, values = inspect.getargvalues(frame)#get arguments of the function
@@ -63,7 +65,7 @@ def createRequest(task, n=None, D=None, wrapperId=None, isTree=None, newWrapperI
             if(value is None):
                 n = ctypes.c_uint(0)
             else :
-                    n = ctypes.c_uint(value)
+                n = ctypes.c_uint(value)
         elif(name_args=="D"):
             if(value is None):
                 D = ctypes.c_uint(0)
@@ -84,8 +86,18 @@ def createRequest(task, n=None, D=None, wrapperId=None, isTree=None, newWrapperI
                 newWrapperId = ctypes.c_uint(0)
             else :
                 newWrapperId = ctypes.c_uint(value)
+        elif(name_args=="Ki"):
+            if(value is None):
+                Ki = ctypes.c_int(-1)
+            else :
+                Ki = ctypes.c_int(value)
+        elif(name_args=="Ko"):
+            if(value is None):
+                Ko = ctypes.c_int(-1)
+            else :
+                Ko = ctypes.c_int(value)
         
-    return Request(task, n, D, wrapperId, isTree, newWrapperId)
+    return Request(task, n, D, wrapperId, isTree, newWrapperId, Ki, Ko)
 
 #%%
 class Server:

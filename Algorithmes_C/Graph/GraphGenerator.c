@@ -11,53 +11,18 @@
  * 
  * *******************************************************************/
 
- unsigned int connectTree(int network[], unsigned int n, unsigned int root, unsigned int node)
+ static pArray * matrixIntoList(int network[], unsigned int n)
  {
-	if(node==root || network[node*n + root]==-1)
-	{
-		return -1;
-	}
-	
-	unsigned int i;
-	
-	i=0;
-	while(i<n && network[node*n+i]!=-1)
-	{
-		i++;
-	}
-	
-	if(i==n)
-	{
-		network[node*n+root] = -1;
-		network[root*n+node] = 1;
-		
-		return node;
-	}
-	
-	return connectTree(network, n, root, i);
- }
- 
- 
- pArray * graphIntoTree(int network[], unsigned int n)
- {
-	unsigned int root = 0; //root of the tree
-	
 	//convert the matrix into a list of sucessors
 	pArray * output = (pArray *)malloc(sizeof(array)*n);
 	assert(output);
 	initializeList((void *)output, n);
 	
 	unsigned int i,j,k;
-	unsigned int node;
 	
 	//convert the matrix into a list of sucessors
 	for(i=0, k=0; i<n; i++)
 	{
-		if( (node=connectTree(network, n, root, i ))!=-1 )
-		{
-			output[root] = add(output[root], uInt_t, uIntCreateNode(node));
-		}
-		
 		for(j=0; j<n; j++)
 		{
 			if(network[k]==1)
@@ -68,40 +33,24 @@
 			k++;
 		}
 	} 
+	
+	return output;
+ }
+ 
+ pArray * randomGraph(unsigned int n, int Ki,  int Ko)
+ {
+	 const int setI = (Ki>0)?1:0;
+	 if(!setI)
+		Ki = max(Ki, Ko);
+	 const int setO = (Ko>0)?1:0;
+	 if(!setO)
+		Ko = max(Ki, Ko);
 	 
-	return output;
- }
- 
- pArray * matrixIntoList(int network[], unsigned int n)
- {
-	//convert the matrix into a list of sucessors
-	pArray * output = (pArray *)malloc(sizeof(array)*n);
-	assert(output);
-	initializeList((void *)output, n);
-	
-	unsigned int i,j,k;
-	
-	//convert the matrix into a list of sucessors
-	for(i=0, k=0; i<n; i++)
-	{
-		for(j=0; j<n; j++)
-		{
-			if(network[k]==1)
-			{
-				output[i] = add(output[i], uInt_t, uIntCreateNode(j));
-			}
-			
-			k++;
-		}
-	} 
-	
-	return output;
- }
- 
- 
- pArray * randomGraph(unsigned int n, unsigned int D)
- {
-	unsigned int size = n*n;
+	 
+	 /*****************************************************************
+	  * 				CREATION OF THE NETWORK
+	  ****************************************************************/
+	 unsigned int size = n*n;
 	
 	/* Temporarily all the links between nodes will be saved into a matrix
 	 *  		| node 1 | node 2 | node 3 | ... | node n
@@ -121,92 +70,143 @@
 	int network[size];
 	initializeIntArray(network, size, 0);
 	
-	unsigned int i, j;
-	unsigned int p_node, node;
-	unsigned int num_suc;
+	 
+	 /*****************************************************************
+	  * 				PROBABILITY HANDLER
+	  ****************************************************************/
+	  
+	 //initialisation fo the probability
+	 double proba_o[n];
+	 double * temp_proba_o = (double *)malloc(sizeof(double)*n);
+	 assert(temp_proba_o);
+	 
+	 double proba_i[n];
+	 double * temp_proba_i = (double *)malloc(sizeof(double)*n);
+	 assert(temp_proba_i);
+	 
+	 unsigned int i;
+	 for(i=0; i<n; i++)
+	 {
+		 proba_o[i] = Ko;
+		 proba_i[i] = Ki;
+	 }
 	
-	for(i=0; i<n; i++)
-	{
-		p_node = i;
-		
-		num_suc = rand()%D;//(between 0 and D-1)
-		unsigned int r1 = randIni(0, n-1);
-		for(j=0; j<num_suc; j++)
-		{
-			//find a new node to add
-			do
-			{
-				node = randArray(r1);
+	 int idRandVertexI = randCumulProbaIni(temp_proba_i, n);
+	 int idRandVertexO = randCumulProbaIni(temp_proba_o, n);
+	
+	 
+	 /*****************************************************************
+	  * 				CREATION OF THE RELATION
+	  ****************************************************************/
+	 
+	 //build the graph
+	 unsigned int k,l;
+	 unsigned int vertex, temp, cursor;
+	 const unsigned int sum = Ki + Ko;
+	 int index;
+	 int id;
+	 
+	 for(vertex=0; vertex<n; vertex++)//loop through the vertex of the graph
+	 {
+		 //change the probability by removing all already linked node (as child or parent) and the current node
+		 cursor = vertex*n;
+		 for(k=0, temp=cursor; k<n; k++, temp++)
+		 {
+			 temp_proba_o[k] = proba_o[k];
+			 temp_proba_i[k] = proba_i[k];
+				 
+			 if(k==vertex)
+			 {
+				 temp_proba_o[k] = 0;
+				 temp_proba_i[k] = 0;
+			 }else if(network[temp]==1)
+			 {
+				 temp_proba_o[k] = 0;
+
+			 }else if(network[temp]==-1)
+			 {
+				 temp_proba_i[k] = 0;
+			 }
+		 }
+		 //update the probability array
+		 randCumulProbaUpdate(idRandVertexI, 0);
+		 randCumulProbaUpdate(idRandVertexO, 0);
+		 
+
+
+		 //get new links between the current node and other nodes
+		 for(l=0; l<sum; l++)
+		 { 
+			 // OUTPUT OF THE CURRENT NODE
+			 
+			 if(proba_o[vertex]!=0 && setO)
+			 {
+				 //get child node (get nodes for which the current node will be it parent) 
+				id = idRandVertexI;
+				index = randCumulProba(id);
 				
-			}while( (node!=-1) && (node==p_node || network[p_node*n+node]!=0));//while we pick the current node as a child or we pick a node that is already a sucessors
+				//the previous index could no be the current node or a node that is already a child of the current node because of their nul probability
+				if(index!=-1)
+				{
+					//update global probability
+					if(proba_o[vertex]!=0)
+						proba_o[vertex]--;
+					if(proba_i[index]!=0)
+						proba_i[index]--;
+						
+					//register the new output for the current node
+					network[cursor + index] = 1;
+					temp_proba_i[index] = 0;
+					randCumulProbaUpdate(id, index);
+					
+					//register the new input for the child of the current node
+					network[index*n + vertex] = -1;
+				}
+			}
+			 
+			// INPUT OF THE CURRENT NODE
 			
-			//add node as child of the current
-			if(node!=-1)
+			if(proba_i[vertex]!=0 && setI)
 			{
-				network[p_node*n + node] = 1;
-				network[node*n + p_node] = -1;
+				 //get parent node
+				id = idRandVertexO;
+				index = randCumulProba(id);
+				
+				//the previous index could no be the current node or a node that is already a parent of the current node because of their nul probability
+				if(index!=-1)
+				{
+					//update global probability
+					if(proba_i[vertex]!=0)
+						proba_i[vertex]--;
+					if(proba_o[index]!=0)
+						proba_o[index]--;
+						
+					//register the new input for the current node
+					network[cursor + index] = -1;
+					temp_proba_o[index] = 0;
+					randCumulProbaUpdate(id, index);
+					
+					//register the new output for the child of the current node
+					network[index*n + vertex] = 1;
+					
+				}
 			}
 			
-		}
-		randEnd(r1);
-	}
-	
-	
-	
-	//add links between some nodes to insure the existance of node with muliple entry
-	unsigned int num_pred;
-	unsigned int count;
-	
-	//Set the number of node to apply the transformation
-	unsigned int num_t; //number of node to apply the transformation
-	unsigned int factor = 2;// (n/factor) where n is the number of node
-	if(n/factor==0)
-	{
-		num_t = 1;
-	}else
-	{
-		num_t = (n/factor)  + rand()%(n-n/factor) ;
-		//if the factor is a then the number is [n/a, (n-1) - n/a + 1]=[n/2, n-n/a]}
-	}
-	
-	
-	unsigned int r1 = randIni(0, n-1);
-	for(i=0; i<num_t; i++)
-	{
-		p_node = randArray(r1);
+		}//end loop through the parent and child of a particular node of the graph
 		
-		//get the number of predecessors of the current node
-		count =0;
-		for(j=0; j<n; j++)
-		{
-			count+= (network[p_node*n+j]==-1)?1:0;
-		}
-		
-		//add new predecessors if necessary
-		num_pred = rand()%(n-count);
-		unsigned int r2 = randIni(0, n-1);
-		for(j=0; j<num_pred; j++)
-		{
-			//find a new node to add
-			do
-			{
-				node = randArray(r2);
-				
-			}while( (node!=-1) && (node==p_node || network[p_node*n+node]==-1));
-			
-			
-			//add node as child of the current
-			if(node!=-1)
-			{
-				network[p_node*n + node] = -1;
-				network[node*n + p_node] = 1;
-			}
-		}
-		randEnd(r2);
-	}
-	randEnd(r1);
-	
-	return matrixIntoList(network, n);
+	 }//end loop through node of the graph
+	 
+	 
+	 
+	 /*****************************************************************
+	  * 				FREE MEMORY
+	  ****************************************************************/
+	 
+	 randCumulProbaEnd(idRandVertexO);
+	 randCumulProbaEnd(idRandVertexI);
+	 
+	 
+	 return matrixIntoList(network, n);
  }
  
  
@@ -524,8 +524,8 @@ void transformation(pArray * graph, int nbrsommet, int * mat[][]){
 }
 */
 
-/*
-pPetri transformation(pArray * graph, int size){
+
+pPetri petriTransformation(pArray * graph, unsigned int size){
   pPetri graphpetri=malloc(sizeof(petri));
   graphpetri->num_pl=size;
   graphpetri->places=malloc(size*sizeof(int));
@@ -553,8 +553,9 @@ pPetri transformation(pArray * graph, int size){
   }
   return graphpetri;
 }
-* */
 
+
+/*
 pPetri petriTransformation(pArray *graph, unsigned int size)
 {
 	const unsigned int num_pl = 6;
@@ -578,4 +579,4 @@ pPetri petriTransformation(pArray *graph, unsigned int size)
 	}
 						
 	return petriCreateNode(places, num_pl, trans, num_tr);
-}
+}*/
