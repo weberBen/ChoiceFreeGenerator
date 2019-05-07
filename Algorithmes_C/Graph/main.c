@@ -32,8 +32,8 @@ int main(int argc, char ** argv)
 	petriFree(p);*/
 	
 	unsigned int size = 10;
-	unsigned int Ki = 3;
-	unsigned int Ko = -1;
+	unsigned int Ki = 4;
+	unsigned int Ko = 3;
 	
 	//pArray * graph = randomGraph(size, Ke, Ko);
 	//displayGraph(graph, size);

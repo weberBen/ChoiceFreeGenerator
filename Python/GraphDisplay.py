@@ -10,7 +10,6 @@ import numpy
 import os
 import networkx as nx
 import matplotlib.pyplot as plt
-
 #%%
 CHAR_ARRAY_SEPARATOR = '|'
 CHAR_LIST_SEPARATOR = '/'

@@ -12,6 +12,9 @@ import SocketCommunication as sc
 _id = 0
 srv = sc.Server()
 
+def showErrors():
+    print(srv.getTerminalErros())
+
 def getnewId():
     global _id
     output = _id;
@@ -56,7 +59,6 @@ def randomGraph(n, Ki, Ko):
     id = getnewId()
     request = sc.createRequest(task = sc.Task.t_randomGraph, n=n, wrapperId = id, Ki=Ki, Ko=Ko)
     response =  srv.getResponse(request)
-    print("response="+ response)
     return Graph(id, gd.parseGraph(response))
 #%%
 def free(graph):

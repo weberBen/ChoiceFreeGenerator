@@ -19,7 +19,7 @@ f.show()'''
 
 
 #create graph 1 (as random graph)
-graph2 = c.randomGraph(n=10,Ki=4,Ko=-1)
+graph2 = c.randomGraph(n=10,Ki=2,Ko=2)
 Xgraph2 = gd.toNetworkxGraph(graph2.obj)
 
 f = gd.plotGraph(Xgraph2, nodeSize=200, widthArraw=1.5)

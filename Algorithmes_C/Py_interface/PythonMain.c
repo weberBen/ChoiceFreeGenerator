@@ -27,21 +27,10 @@ int main(int argc, char ** argv)
 		return -1;
 	}
     
-    srand(time(NULL));
+	srand(time(NULL));
     //start server
 	
 	py_establishCommunication(PORT, BUFFERSIZE);
-	
-	/*request req;
-	req.task = t_randomGraph;
-	req.n = 10;
-	req.Ki=3;
-	req.Ko=2;
-	req.wrapperId = 1;
-	
-	char * s = getResponse(&req);
-	fprintf(stderr, "res=%s\n", s);
-	free(s);*/
 	
 	return 0;
 }

@@ -13,7 +13,22 @@
 
  static pArray * matrixIntoList(int network[], unsigned int n)
  {
-	//convert the matrix into a list of sucessors
+	/* For a matrix line that store all the links between nodes of the graph as following
+	 *  		| node 1 | node 2 | node 3 | ... | node n
+	 * 	node 1  |
+	 *  node 2  |
+	 *    . 
+	 *    .
+	 *    .
+	 *  node 3  |
+	 * 
+	 * Line i represents all the outputs of node i and columun i represent all inputs of node i
+	 * The coefficient (i,j) is :
+	 * 			* 1 if node j is a child of node i
+	 * 			* 0 is there is no link between nodes i and j
+	 * 
+	 * Then the function return a list of list of children for each node
+	 */
 	pArray * output = (pArray *)malloc(sizeof(array)*n);
 	assert(output);
 	initializeList((void *)output, n);
@@ -29,7 +44,6 @@
 			{
 				output[i] = add(output[i], uInt_t, uIntCreateNode(j));
 			}
-			
 			k++;
 		}
 	} 
@@ -39,58 +53,121 @@
  
  pArray * randomGraph(unsigned int n, int Ki,  int Ko)
  {
+	 /* Build a random graph with a given number of node. For each node 
+	  * Ki represent the number of input node for each node and Ko the number of
+	  * output node for each node. The function then construct as much as possible a graph
+	  * that follow these constraint of input and ouput for a node
+	  * If the number of input or output does not need to be set, then set the value to -1
+	 */
+	 
+	 /*****************************************************************
+	  * 					SET PARAMETERS
+	  ****************************************************************/
+	  
+	 //check which constraints need to be followed
 	 const int setI = (Ki>0)?1:0;
+	 //If the number of output or input node is not set, then he must be at the same value as the other parameters
 	 if(!setI)
 		Ki = max(Ki, Ko);
 	 const int setO = (Ko>0)?1:0;
 	 if(!setO)
 		Ko = max(Ki, Ko);
+		
+	const unsigned int sum = (setI)?Ki:0 + (setO)?Ko:0;
 	 
 	 
 	 /*****************************************************************
 	  * 				CREATION OF THE NETWORK
 	  ****************************************************************/
-	 unsigned int size = n*n;
-	
-	/* Temporarily all the links between nodes will be saved into a matrix
-	 *  		| node 1 | node 2 | node 3 | ... | node n
-	 * 	node 1  |
-	 *  node 2  |
-	 *    . 
-	 *    .
-	 *    .
-	 *  node 3  |
-	 * 
-	 * The line i represents all the links between the node i and the other nodes
-	 * The coefficient (i,j) is :
-	 * 			* 1 if the node j is a sucessor of the node i
-	 * 			* -1 if the node i is a sucessor of the node j
-	 * 			* 0 is there is no link between the node i and j
-	 */
+	  
+	/* In order to save all the link between the nodes and be able to
+	 * randomly pick one node that has no link with the desired one 
+	 * we use a matrix. Line i represents outputs of the node i and columun i
+	 * represents inputs of the node i 
+	 * matrix[i][j] is 0 if there is no link between i and j, and, 1 if i is
+	 * a parent of j (or in other words, if j is a child of i)
+	*/
+	unsigned int size = n*n;
 	int network[size];
-	initializeIntArray(network, size, 0);
-	
+	initializeIntArray(network, size, 0);//set all the value to 0 (no links)
 	 
 	 /*****************************************************************
 	  * 				PROBABILITY HANDLER
 	  ****************************************************************/
 	  
-	 //initialisation fo the probability
-	 double proba_o[n];
-	 double * temp_proba_o = (double *)malloc(sizeof(double)*n);
+	 /* To randomly pick a node we associate a probability for each node
+	  * to be picked as an output and as an input. At the begining, each
+	  * node as the same probability to be picked (probability of 1 = Ki/Ki = Ko/Ko)
+	  * Then if a node is select as an output for another its probability to be picked
+	  * next time decrease ((1-Ki)/Ki). When the probability is 0, then the node does not 
+	  * need any ohter node as input or as output or both.
+	  * 
+	  * Then we have two probabilities array :
+	  * 	* one that represents the probability for a node to be picked as
+	  * an input for another, that is the output array
+	  * 	* one that represents the probability for a node to be picked as
+	  * an output for another, that is the input array
+	  * 
+	  * Indeed, if node (a) become (a) prent of node b ( (a)--->(b) ), then 
+	  * probability of node (a) to be picked as an output decrease because it
+	  * has for now one output link and for node (b) probability to be picked as 
+	  * an input decrease. 
+	  * Then when we need to pick a node as child of another node (find an output), we need to see
+	  * the probability of the input array : for a node (a) we search a node that can be a child 
+	  * of (a). In other words, we search a node that have not enough input.
+	  * And to pick a node as parent of another (find an input), we need to see the probability of the output parent
+	  * 
+	  * 
+	  * For example, if Ko=5, in others workds the number of output node per node is 5,
+	  * let us say that : 
+	  * 		* a+(i) represents number of outputs for node i
+	  * 		* p+(i) represents the associate probability for output array
+	  * 		* p-(i) represents the associate probability for input array
+	  * 
+	  * Then :
+	  * a+(i)=0 ==> p+(i)=5/5=1
+	  * a+(i)=1 ==> p+(i)=4/5
+	  * a+(i)=2 ==> p+(i)=3/5
+	  * ...
+	  * a+(i)=5 ==> p+(i)=0/5=0
+	  * 
+	  * Then let us say that a+(i)=2 and we connect the node (b), with a-(b)=3, as a child of the node i
+	  * So, (i)---->(b)
+	  * 	* a+(i)<---3  ===> p+(i)=2/5
+	  * 	* a-(b)<---4  ===> p-(b)=1/5
+	  * 
+	  * Then to randmoly select a node we use cumulative probability :
+	  * |-------|----------------|-------|...|---------------|
+	  * 0     p+(1)*Ko		(p+(1) + p+(2))*Ko				(p+(1)+...p+(n))*Ko
+	  * Then a randomly select a integer between 0 included and (p+(1)+...p+(n))*Ko excluded
+	  * Since all the probability are reduced by the same factor Ko, Ki we can set the probability without that factor
+	  * 
+	  * Moreover, even if for each node we have the probability of input and ouput, for a particular node we don't want
+	  * to link itself with itself or to link a node that is already linked with the current node. In other words, if we pick
+	  * node (b) as an output of the current node, we don't want to pick the node (b) after for the current node.
+	  * Thus, we have to superimpose a mask over the real probability : when we pick a node, then we temporarily set to 0
+	  * its probability. Then the node will no longer be picked. 
+	 */
+	 
+	 double proba_o[n];//output array for probability
+	 double * temp_proba_o = (double *)malloc(sizeof(double)*n);//temporary mask for the output probability array
 	 assert(temp_proba_o);
 	 
-	 double proba_i[n];
-	 double * temp_proba_i = (double *)malloc(sizeof(double)*n);
+	 double proba_i[n];//input array for probability
+	 double * temp_proba_i = (double *)malloc(sizeof(double)*n);//temporary mask for the input probability array
 	 assert(temp_proba_i);
 	 
+	 //set to 1 all the probability for input and output
 	 unsigned int i;
 	 for(i=0; i<n; i++)
 	 {
-		 proba_o[i] = Ko;
-		 proba_i[i] = Ki;
+		 proba_o[i] = Ko;//represent the probability multiplied by Ko (p=1=Ko/Ko =>Ko*p=Ko)
+		 proba_i[i] = Ki;//represent the probability multiplied by Ki (p=1=Ki/Ki =>Ki*p=Ki)
 	 }
 	
+	 /* Since we will use a temporarily mask over the real probability, we set the 
+	  * ramdom cumulative probability with that array and not the real probability array
+	 */
 	 int idRandVertexI = randCumulProbaIni(temp_proba_i, n);
 	 int idRandVertexO = randCumulProbaIni(temp_proba_o, n);
 	
@@ -99,74 +176,82 @@
 	  * 				CREATION OF THE RELATION
 	  ****************************************************************/
 	 
-	 //build the graph
 	 unsigned int k,l;
-	 unsigned int vertex, temp, cursor;
-	 const unsigned int sum = Ki + Ko;
+	 unsigned int vertex, temp_l, temp_c, cursor_l, cursor_c;
 	 int index;
 	 int id;
 	 
 	 for(vertex=0; vertex<n; vertex++)//loop through the vertex of the graph
 	 {
-		 //change the probability by removing all already linked node (as child or parent) and the current node
-		 cursor = vertex*n;
-		 for(k=0, temp=cursor; k<n; k++, temp++)
+		 /* Create the probability mask for the current node*/
+		 cursor_c = vertex*n;//line of the current vertex in the network matrix
+		 cursor_l = vertex;
+		 for(k=0, temp_c=cursor_c, temp_l=cursor_l; k<n; k++, temp_c++, temp_l+=n)
 		 {
+			 //copy the current probability
 			 temp_proba_o[k] = proba_o[k];
 			 temp_proba_i[k] = proba_i[k];
 				 
 			 if(k==vertex)
 			 {
+				 /* if the current node is the current vertex the we set its probability
+				  * to 0 for input and ouput array (we don't want to select the current vertex as an
+				  * input or as an output for the current vertex)
+				 */
 				 temp_proba_o[k] = 0;
 				 temp_proba_i[k] = 0;
-			 }else if(network[temp]==1)
+			 }else if(network[temp_c]==1)//check output of the current vertex
 			 {
-				 temp_proba_o[k] = 0;
+				 /* If the current node is a child of the current vertex, we set its input probability to 0, 
+				  * we don't want to pick that node as a new child of the current vertex*/
+				 temp_proba_i[k] = 0;
 
-			 }else if(network[temp]==-1)
+			 }else if(network[temp_l]==1)//check input of the current vertex
 			 {
-				 temp_proba_i[k] = 0;
+				 /* If the current node is a parent of the current vertex, we set its output probability to 0, 
+				  * we don't want to pick that node as a new parent of the current vertex*/
+				 temp_proba_o[k] = 0;
 			 }
 		 }
-		 //update the probability array
+		 //update the probability array from begining
 		 randCumulProbaUpdate(idRandVertexI, 0);
 		 randCumulProbaUpdate(idRandVertexO, 0);
 		 
-
-
-		 //get new links between the current node and other nodes
+		 
+		 //get all the inputs and outputs for the current vertex
 		 for(l=0; l<sum; l++)
 		 { 
-			 // OUTPUT OF THE CURRENT NODE
+			 /** OUTPUT OF THE CURRENT NODE **/
 			 
-			 if(proba_o[vertex]!=0 && setO)
+			 if(proba_o[vertex]!=0 && setO)//if the current vertex need new output and if the user set the output
 			 {
 				 //get child node (get nodes for which the current node will be it parent) 
 				id = idRandVertexI;
 				index = randCumulProba(id);
+				/* To get a child of the current vertex we look for nodes that can accept new input
+				 * we check the input probability
+				 * 
+				 * At that step, we picked node can not be the current vertex itself, neither a node that is 
+				 * already a child of the current vertex
+				*/
 				
-				//the previous index could no be the current node or a node that is already a child of the current node because of their nul probability
-				if(index!=-1)
+				if(index!=-1)//a node that verify the constraints exists
 				{
 					//update global probability
-					if(proba_o[vertex]!=0)
-						proba_o[vertex]--;
-					if(proba_i[index]!=0)
-						proba_i[index]--;
+					proba_o[vertex]--;
+					proba_i[index]--;
 						
-					//register the new output for the current node
-					network[cursor + index] = 1;
-					temp_proba_i[index] = 0;
-					randCumulProbaUpdate(id, index);
+					//register the new link between the nodes
+					network[cursor_c + index] = 1;//set the link as an output of the current node
+					temp_proba_i[index] = 0;//temporarily set the probability of the picked node to have new input to 0 (then for the current vertex that node cannot be picked)
+					randCumulProbaUpdate(id, index);//update cumulative probability
 					
-					//register the new input for the child of the current node
-					network[index*n + vertex] = -1;
 				}
 			}
 			 
-			// INPUT OF THE CURRENT NODE
+			/** INPUT OF THE CURRENT NODE **/
 			
-			if(proba_i[vertex]!=0 && setI)
+			if(proba_i[vertex]!=0 && setI)//if the current vertex need new input and if the user set the input
 			{
 				 //get parent node
 				id = idRandVertexO;
@@ -176,20 +261,15 @@
 				if(index!=-1)
 				{
 					//update global probability
-					if(proba_i[vertex]!=0)
-						proba_i[vertex]--;
-					if(proba_o[index]!=0)
-						proba_o[index]--;
-						
-					//register the new input for the current node
-					network[cursor + index] = -1;
+					proba_i[vertex]--;
+					proba_o[index]--;
+					
+					//register the new link between the nodes
+					network[index*n + vertex] = 1;//set the link as an output of picked node
 					temp_proba_o[index] = 0;
 					randCumulProbaUpdate(id, index);
-					
-					//register the new output for the child of the current node
-					network[index*n + vertex] = 1;
-					
 				}
+				
 			}
 			
 		}//end loop through the parent and child of a particular node of the graph
@@ -201,12 +281,12 @@
 	 /*****************************************************************
 	  * 				FREE MEMORY
 	  ****************************************************************/
-	 
+	 //stop the random cumulative probability generator
 	 randCumulProbaEnd(idRandVertexO);
 	 randCumulProbaEnd(idRandVertexI);
 	 
-	 
-	 return matrixIntoList(network, n);
+	 displayMatrix(network, n, n);
+	 return matrixIntoList(network, n);//convert the network matrix into a list of list of children
  }
  
  

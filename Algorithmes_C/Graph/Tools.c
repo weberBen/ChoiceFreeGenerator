@@ -498,6 +498,7 @@ int listToFile(char * filename, pArray a[], unsigned int n)
  
 double * getCumulativeProba(double * proba, unsigned int size)
 {
+	/* From an array of probability return the associate cumulative probability array*/
 	double * cumulProba = (double *)malloc(sizeof(double)*size);
 	assert(cumulProba);
 	updateCumulativeProba(cumulProba, proba, size, 0);
@@ -508,6 +509,7 @@ double * getCumulativeProba(double * proba, unsigned int size)
 void updateCumulativeProba(double * cumulProba,
 						double * proba, unsigned int size, unsigned int index)
 {
+	/* From the given index update the cumulative array*/
 	 unsigned int i;
 	 if(index==0)
 	 {

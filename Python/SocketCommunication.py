@@ -44,11 +44,12 @@ class Request(ctypes.Structure):
                 ("n", ctypes.c_uint),
                 ("D", ctypes.c_uint),
                 ("wrapperId", ctypes.c_uint),
-                ("isTree", ctypes.c_uint),
                 ("newWrapperId", ctypes.c_uint),
                 ("Ki", ctypes.c_int),
-                ("Ko", ctypes.c_int)
+                ("Ko", ctypes.c_int),
+                ("isTree", ctypes.c_uint)
                ]
+    ''' must be at the same order than the field of the c structure'''
     
 def createRequest(task, n=None, D=None, wrapperId=None, isTree=None, newWrapperId=None, Ki=None, Ko=None):
     '''create request with the correct format for the arguments'''
@@ -97,7 +98,7 @@ def createRequest(task, n=None, D=None, wrapperId=None, isTree=None, newWrapperI
             else :
                 Ko = ctypes.c_int(value)
         
-    return Request(task, n, D, wrapperId, isTree, newWrapperId, Ki, Ko)
+    return Request(task, n, D, wrapperId, newWrapperId, Ki, Ko, isTree)
 
 #%%
 class Server:
@@ -113,7 +114,7 @@ class Server:
         self.NAME_MAIN_SERVER_C = Directories.NAME_MAIN_SERVER_C
         
         #start C server
-        self.openCServerSide();
+        self.openCServerSide()
     
     @staticmethod
     def findFreePort():
@@ -121,7 +122,6 @@ class Server:
             s.bind(('', 0))
             s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
             return s.getsockname()[1]
-    
     
     def openCServerSide(self):
         '''Launch the C functions that will create the socket server and 
@@ -139,7 +139,7 @@ class Server:
         print("\tParms : Port="+str(self.PORT)+", Buffersize="+str(self.BUFFERSIZE))
         
         args.insert(0, function)
-        subprocess.Popen(args)
+        subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         #Popen(['/bin/sh', '-c', args[0], args[1], ...])
         
     

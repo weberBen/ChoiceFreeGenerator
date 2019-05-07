@@ -7,8 +7,19 @@
 
 #include "Python.h"
 
+typedef enum Tasks {t_closeServer=-1, t_buildTree = 0, t_stronglyConnectedGraph=1, t_randomGraph=2, t_free=3, t_petri=4} tasks;
 
-
+typedef struct Request 
+{
+	int task;
+	unsigned int n;
+	unsigned int D;
+	unsigned int wrapperId;
+	unsigned int newWrapperId;
+	int Ki;
+	int Ko;
+	int isTree;
+} request;
 
 /**********************************************************************
  * 
@@ -36,7 +47,7 @@ static void sendNullResponse(char * buff, unsigned int buffer_size, unsigned int
 	free(s);
 }
 
-char * getResponse(request * req)
+static char * getResponse(request * req)
 {
 	char * s = NULL;
 	
