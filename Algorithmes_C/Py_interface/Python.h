@@ -3,6 +3,7 @@
 
 #include "GraphGenerator.h"
 #include "Tools.h"
+#include "Display.h"
 #include "Server.h"
 
 int py_establishCommunication(int PORT, int BUFFERSIZE);

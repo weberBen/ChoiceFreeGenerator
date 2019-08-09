@@ -137,19 +137,30 @@ def toPetriNetwork(graph):
 def drawPetriNetwork(petri, nodeSize, widthArraw):
     G = petri[0]
     labels=petri[1]
+    types=[]
     color_map=[]
     for node in G:
         if(node[0]=='p'):
             color_map.append('red')
+            types.append('p')
         else:
             color_map.append('grey')
+            types.append('t')
     
     pos = nx.kamada_kawai_layout(G)
     
     plt.ioff()#desactive interactive mode (then figure won't pop up directly after plt.figure())
     fig = plt.figure()
     
-    nx.draw_networkx_nodes(G, pos, node_size = nodeSize, node_color = color_map, alpha=0.5)
+    #nx.draw_networkx_nodes(G, pos, node_size = nodeSize, node_color = color_map, alpha=0.5)
+    nx.set_node_attributes(G, "type", types)
+    #set shaphe node
+    pl_nodes = [n for (n,ty) in nx.get_node_attributes(G, 'type').iteritemns() if ty == 'p']
+    tr_nodes = [n for (n,ty) in nx.get_node_attributes(G, 'type').iteritemns() if ty == 't']
+    
+    nx.draw_networkx_nodes(G, pos, nodelist=pl_nodes, node_color='red', node_shape='o', node_size=nodeSize, alpha=0.5)
+    nx.draw_networkx_nodes(G, pos, nodelist=tr_nodes, node_color='grey', node_shape='^', node_size=nodeSize, alpha=0.5)
+    
     nx.draw_networkx_labels(G, pos)
     nx.draw_networkx_edges(G, pos, width= widthArraw, arrows=True)
     nx.draw_networkx_edge_labels(G,pos,edge_labels=labels,font_color='red')

@@ -1,13 +1,15 @@
 #ifndef _STORAGE_H
 #define _STORAGE_H
 
-typedef enum Types {custom_t=-1, uInt_t, place_t, transition_t, petri_t, wrapper_t, array_t, list_t} types;
+#include "Tools.h"
+
+typedef enum Types {custom_t=-1, uInt_t, petri_t, petriElem_t, petriNode_t, petriLink_t, wrapper_t, array_t, list_t, directedGraph_t} types;
 
 /*********************************************************************
- * 							LINKED LIST
+ * 							SIMPLE LINKED LIST
  *********************************************************************/
 	// * struct * //
-typedef struct Array * pArray;
+typedef struct Array * pArray;//one side array (can only get a node next to another)
 typedef struct Array
 {
 	types type;//type of void * pointer
@@ -16,21 +18,53 @@ typedef struct Array
     struct Array * next;
 } array;
 
+
 	// * associated functions * //
+//Array
 pArray createNode(types type, void * data);
 pArray createCustomNode(void (* freeFunction)(void *pData), void * data);
 pArray add(pArray l, types type, void * data);
+pArray addCustom(pArray l, void * data, void (* freeFunction)(void *pData));
 
 unsigned int lengthArray(pArray p);
 
 void freeArray(pArray p);
 void freeList(pArray a[], unsigned int n);
- 
-void removeElemArray(pArray previous_elem);
 void freeNodeArray(pArray node);
+ 
+pArray removeElemArray(pArray previous_elem);
+pArray removeFirstElemArray(pArray * pp);
+pArray removeCustomElemArray(pArray * pp, int (* booleanFunction)(void * data, pArray input_to_compare), void * data);
 void freeType(types type, void (* freeFunction)(void * pData), void * pData);
 pArray getArrayElement(pArray p, void * data, int (* booleanFunction)(void * ref, pArray compareTo));
- 
+
+
+/*********************************************************************
+ * 							DOUBLE LINKED LIST
+ *********************************************************************/
+	// * struct * //
+typedef struct Array2 * pArray2;//two side array (can only get thes previous and next node from a given node, no loop at the end)
+typedef struct Array2
+{
+	types type;//type of void * pointer
+	void (*freeFunction)(void * pData);//in case of custom type the corresponding custum function for the void * poiter
+    void * data;
+    struct Array2 * next;
+	struct Array2 * prev;
+} array2;
+
+	// * associated functions * //
+pArray2 createNode2(types type, void * data);
+pArray2 createCustomNode2(void (* freeFunction)(void *pData), void * data);
+pArray2 add2(pArray2 l, types type, void * data);
+pArray2 addCustom2(pArray2 l, void * data, void (* freeFunction)(void *pData));
+
+void freeArray2(pArray2 p);
+void freeNodeArray2(pArray2 node);
+
+pArray2 removeElemArray2(pArray2 * _array, pArray2 elem);
+
+
 /*********************************************************************
  * 								LIST 
  *********************************************************************/
@@ -63,67 +97,141 @@ unsigned int uIntValue(pArray p);
 void uIntFree(pInt p);
 int comparaison(void * ref, pArray compareTo);
 
-/*********************************************************************
- * 							Place Type
- *********************************************************************/
-	// * struct * //
-typedef struct Place * pPlace;
-typedef struct Place
-{
-	unsigned int label;
-	int M;
-} place;
-
-	// * associated functions * //
-pPlace placeCreateNode(unsigned int label);
-void placeSetM(pPlace p, int M);
-unsigned int placeLabel(pArray p);
-int placeM(pArray p);
-void placeFree(pPlace p);
-
-
 
 /*********************************************************************
- * 							Transition Type
+ * 							DIRECTED GRAPH
  *********************************************************************/
-	// * struct * //
-typedef struct Transition * pTransition;
-typedef struct Transition
+typedef struct _directedGraph * pDirectedGraph;
+typedef struct _directedGraph
 {
-	pPlace input; //input place
-	pArray output; //output places
-	int in_weigth;//input weigth
-	int out_weigth; //output weigth
-} transition;
+	pArray * links_list;
+	unsigned int nb_nodes;
+	unsigned int nb_edges;
+} directedGraph;
 
-	// * associated functions * //
-pTransition transitionCreateNode(pPlace input, pArray output);
-void transitionSetWeigth(pTransition p, int in_w, int out_w);
-pArray transitionOutput(pArray p);
-pPlace transitionInput(pArray p);
-int transitionInWeigth(pArray p);
-int transitionOutWeigth(pArray p);
-void transitionFree(pTransition p);
 
+pDirectedGraph directedGraphCreate(unsigned int nb_nodes);
+void directedGraphAddLink(pDirectedGraph graph, unsigned int src_node, unsigned int dest_node);
+void directedGraphFree(pDirectedGraph p);
 
 
 /*********************************************************************
  * 							Petri Type
  *********************************************************************/
 	// * struct * //
+#define PETRI_PLACE_TYPE 1
+#define PETRI_TRANSITION_TYPE 0
+
+typedef struct PetriElem * pPetriElem;
+typedef struct PetriElem
+{
+	int type;
+	unsigned int label;
+	int val;//for a place it will be use to store the initial marking
+} petriElem;
+
+pPetriElem petriElemCreate(int type, unsigned int label, int val);
+pPetriElem petriElemCreatePlace(unsigned int label, int val);
+pPetriElem petriElemCreateTransition(unsigned int label);
+void petriElemFree(pPetriElem p);
+
+
+typedef struct PetriLink * pPetriLink;
+typedef struct PetriLink
+{
+	pPetriElem input;
+	pPetriElem output;
+	unsigned int weight;
+} petriLink;
+
+pPetriLink petriLinkCreate(pPetriElem input, pPetriElem output, int weight);
+void petriLinkFree(pPetriLink p);
+
+typedef struct PetriNode * pPetriNode;
+typedef struct PetriNode
+{
+	unsigned int nb_inputs;
+	pArray input_links;//linked list of petri links (inputs of the node, then the node is the output inside the link)
+	unsigned int nb_outputs;
+	pArray output_links;//linked list of petri links (ouputs of the node, then the node is the input inside the link)
+} petriNode;
+
+pPetriNode petriNodeCreate();
+void petriNodeAddInput(pPetriNode node, pArray2 plink_in_array);
+void petriNodeAddOutput(pPetriNode node, pArray2 plink_in_array);
+void petriNodeRemoveInput(pPetriNode node, pArray2 plink_in_array);
+void petriNodeRemoveOutput(pPetriNode node, pArray2 plink_in_array);
+pPetriLink petriNodeGetLinkFromArrayNode(pArray node);
+void petriNodeFree(pPetriNode p);
+
 typedef struct Petri * pPetri;
 typedef struct Petri
 {
-	int * places;//1D array
-	unsigned int num_pl;//number of places
-	int * trans;//2D array
-	unsigned int num_tr;//number of transitions
+	unsigned int nb_pl;
+	pPetriNode * places;
+	unsigned int nb_tr;
+	pPetriNode * transitions;
+	unsigned int nb_links;
+	pArray2 links;//linked list of petri links
+	pPetriElem * pl_elems;
+	pPetriElem * tr_elems;
 } petri;
+/* Petri net is represented by :
+
+			places = [*, ...]
+					  |
+					 \/
+					 -------------------------
+					|				 ------>--|------
+					| nb_inputs 	 |		  |		|
+					| input_links = [*, ...]  |		|
+    (Petri node)	| nb_outputs 			  |		|
+					| output_links = [*, ...] |		|
+					|			 	  |		  |		|
+					|			 	  |		  |		|
+					 -----------------|-------		|	
+				 -----------------<---|				|
+				 |		---------------------<-------
+				 |	    |
+				 \/	   \/		
+			links = [* ,  ...]
+					 |
+					\/
+				 -------------------           
+				|   input_elem   *--|--------->--
+  (Petri link)	|   output_elem  *--|-->--      |
+				|	weight          |    |      |
+				 -------------------	 |		|
+				 		------------<-----		|
+						|	---------------<-----
+					    |	|
+						\/  \/
+			elements = [*, ...]
+						|   |
+					   \/	---------->----------------------------
+				 ------------------								  |
+				| type of element  | (Petri element)			  |
+				| label			   |							  |
+				 ------------------								 \/
+														 ------------------								  
+														| type of element  | (Petri element)			  
+														| label			   |							  
+														 ------------------
+
+			transitions = [*, ...] same thing as for places
+
+		The two array places an transitions are not needed but help to quickly find a link based on a place
+		or on a transition. The sharing of the same link element saved in another array allow to edit the weight
+		of a link wihtout having to change that value in both places and transitions arrays.
+*/	
 	
 	// * associated functions * //
-pPetri petriCreateNode(int * places, unsigned int num_pl, int * trans, unsigned int num_tr);
-void petriFree(pPetri p);
 
+pPetri petriCreate(unsigned int nb_pl, unsigned int nb_tr);
+void petriAddPlace(pPetri net, unsigned int index, unsigned int initial_marking);
+void petriAddTransition(pPetri net, unsigned int index);
+void petriAddlink(pPetri net, int input_type, unsigned int input, int output_type, unsigned int output, int weight);
+void petriFree(pPetri p);
 
 /*********************************************************************
  * 								WRAPPER 

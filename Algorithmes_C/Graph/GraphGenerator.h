@@ -3,13 +3,17 @@
 
 #include "Array.h"
 #include "Rand.h"
+#include "Tools.h"
+#include "Display.h"
 
-pArray * randomGraph(unsigned int n, int Ki, int Ko);
+pDirectedGraph randomGraph(unsigned int n, int Ki, int Ko);
 
-pArray * buildTree(unsigned int n, unsigned int D);
+pDirectedGraph buildTree(unsigned int n, unsigned int D);
 
-void stronglyConnectedGraph(pArray * tree, unsigned int n, int isTree);
+void stronglyConnectedGraph(pDirectedGraph graph, int isTree);
 
-pPetri petriTransformation(pArray *graph, unsigned int size);
+unsigned int * weightsComputation(unsigned int nb_transition, unsigned int repetition_vect_norm);
+
+pPetri petriTransformation(pDirectedGraph graph);
 
 #endif 

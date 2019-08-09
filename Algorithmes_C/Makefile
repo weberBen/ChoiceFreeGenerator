@@ -19,6 +19,9 @@ Array.o : $(FOLDER_GRAPH)/Array.c
 GraphGenerator.o : $(FOLDER_GRAPH)/GraphGenerator.c
 	gcc ${GCC_FLAGS} -c $(FOLDER_GRAPH)/GraphGenerator.c
 
+Display.o : $(FOLDER_GRAPH)/Display.c
+	gcc ${GCC_FLAGS} -c $(FOLDER_GRAPH)/Display.c
+
 Tools.o : $(FOLDER_GRAPH)/Tools.c
 	gcc ${GCC_FLAGS} -c $(FOLDER_GRAPH)/Tools.c
 
@@ -39,16 +42,16 @@ Python.o : $(FOLDER_PY)/Python.c
 main.o : $(FOLDER_GRAPH)/main.c 
 	gcc ${GCC_FLAGS} -c $(FOLDER_GRAPH)/main.c 
 
-main : main.o Array.o GraphGenerator.o Tools.o Rand.o
-	gcc ${GCC_FLAGS} -o $(EXEC) main.o Array.o GraphGenerator.o Tools.o Rand.o  -lm
+main : main.o Array.o GraphGenerator.o Tools.o Rand.o Display.o
+	gcc ${GCC_FLAGS} -o $(EXEC) main.o Array.o GraphGenerator.o Tools.o Rand.o Display.o -lm
 
 	#Python
 PythonMain.o : $(FOLDER_PY)/PythonMain.c 
 	gcc ${GCC_FLAGS} -I$(FOLDER_GRAPH) -c $(FOLDER_PY)/PythonMain.c
 	#-I -> specify header path (for include)
 
-main_py : Array.o GraphGenerator.o Tools.o Rand.o Python.o Server.o PythonMain.o
-	gcc ${GCC_FLAGS} -o $(EXEC_PY) PythonMain.o Python.o Server.o  Array.o GraphGenerator.o Tools.o Rand.o -lm
+main_py : Array.o GraphGenerator.o Tools.o Rand.o Python.o Server.o PythonMain.o Display.o
+	gcc ${GCC_FLAGS} -o $(EXEC_PY) PythonMain.o Python.o Server.o  Array.o GraphGenerator.o Tools.o Rand.o Display.o -lm
 
 
 #Tools option

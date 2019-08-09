@@ -250,7 +250,7 @@ int randArray(unsigned int id)
 		c->data = temp;
 	}else
 	{
-		removeElemArray(p_cursor);
+		free(removeElemArray(p_cursor));//free the element removed from the array
 	}
 	c->size = c->size -1;//decrease the size of the linkes list of values
 	

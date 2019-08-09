@@ -6,6 +6,7 @@
 
 #include "GraphGenerator.h"
 #include "Tools.h"
+#include "Display.h"
 #include "Python.h"
 #include "Server.h"
 

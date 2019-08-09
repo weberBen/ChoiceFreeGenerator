@@ -114,7 +114,7 @@ class Server:
         self.NAME_MAIN_SERVER_C = Directories.NAME_MAIN_SERVER_C
         
         #start C server
-        self.openCServerSide()
+        #self.openCServerSide()
     
     @staticmethod
     def findFreePort():

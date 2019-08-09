@@ -11,7 +11,7 @@
  * 
  * *******************************************************************/
 
- static pArray * matrixIntoList(int network[], unsigned int n)
+ static pDirectedGraph matrixIntoList(int network[], unsigned int n)
  {
 	/* For a matrix line that store all the links between nodes of the graph as following
 	 *  		| node 1 | node 2 | node 3 | ... | node n
@@ -29,9 +29,7 @@
 	 * 
 	 * Then the function return a list of list of children for each node
 	 */
-	pArray * output = (pArray *)malloc(sizeof(array)*n);
-	assert(output);
-	initializeList((void *)output, n);
+	pDirectedGraph output = directedGraphCreate(n);
 	
 	unsigned int i,j,k;
 	
@@ -42,7 +40,7 @@
 		{
 			if(network[k]==1)
 			{
-				output[i] = add(output[i], uInt_t, uIntCreateNode(j));
+				directedGraphAddLink(output, i, j);
 			}
 			k++;
 		}
@@ -51,7 +49,7 @@
 	return output;
  }
  
- pArray * randomGraph(unsigned int n, int Ki,  int Ko)
+pDirectedGraph randomGraph(unsigned int n, int Ki,  int Ko)
  {
 	 /* Build a random graph with a given number of node. For each node 
 	  * Ki represent the number of input node for each node and Ko the number of
@@ -285,7 +283,6 @@
 	 randCumulProbaEnd(idRandVertexO);
 	 randCumulProbaEnd(idRandVertexI);
 	 
-	 displayMatrix(network, n, n);
 	 return matrixIntoList(network, n);//convert the network matrix into a list of list of children
  }
  
@@ -298,7 +295,7 @@
  * 
  * 
  * *******************************************************************/
-pArray * buildTree(unsigned int n, unsigned int D)
+pDirectedGraph buildTree(unsigned int n, unsigned int D)
 {
     /* Return a tree of n vertex with a maximun number of child of D
      * The output is a list of child sucessor. Each element i (list[i]) 
@@ -315,9 +312,7 @@ pArray * buildTree(unsigned int n, unsigned int D)
     */
     
     
-    pArray * tree = (pArray *)malloc(sizeof(array)*n);
-    assert(tree);
-    initializeList((void *)tree, n);
+    pDirectedGraph tree = directedGraphCreate(n);
 
     unsigned int i;
     unsigned int num_suc;
@@ -383,11 +378,11 @@ pArray * buildTree(unsigned int n, unsigned int D)
 			
 			int i = num_node-1;//check into the previous nodes of the current one
 			
-			while(lengthArray(tree[i])>=D)
+			while(lengthArray(tree->links_list[i])>=D)
 			{
 				i--;
 			}
-			tree[i] = add(tree[i], uInt_t, uIntCreateNode(count));
+			directedGraphAddLink(tree, i, count);
 			
 			//update value
 			num_suc -= ((num_suc==0)?0:1);//tyhe variable is an unsigned int which cannot be negative
@@ -396,7 +391,7 @@ pArray * buildTree(unsigned int n, unsigned int D)
 		//add node as child of the current nodedd
 		for(i=0; i<num_suc; i++)
 		{
-			tree[num_node] = add(tree[num_node], uInt_t, uIntCreateNode(count));
+			directedGraphAddLink(tree, num_node, count);
 			count++;
 		}
 		
@@ -418,23 +413,25 @@ pArray * buildTree(unsigned int n, unsigned int D)
  * *******************************************************************/
 enum colorTag {WHITE, GRAY};
 
-void connect(unsigned int u, pArray * tree, enum colorTag color[], int arrival_time[], int path_time[], unsigned int time);
+void connect(unsigned int u, pDirectedGraph graph, enum colorTag color[], int arrival_time[], int path_time[], unsigned int time);
  
-void stronglyConnectedGraph(pArray * tree, unsigned int n, int isTree)
+void stronglyConnectedGraph(pDirectedGraph graph, int isTree)
 {
+	unsigned int size = graph->nb_nodes;
+
 	unsigned int i;
 	//initialise color array
-	enum colorTag color[n];
-	for(i=0; i<n; i++)
+	enum colorTag color[size];
+	for(i=0; i<size; i++)
 	{
 		color[i] = WHITE;
 	}
 	//initialize time arrays
-	int arrival_time[n];//when set for the first time remain constant
+	int arrival_time[size];//when set for the first time remain constant
 	/* for each node i, the element i of the array represents
 	 * the time its take to discovered (to arrive to) this node
 	*/
-	int path_time[n];//suceptible to change over time
+	int path_time[size];//suceptible to change over time
 	/* for each node i, the element i of the array represents 
 	 * the time its take to find a node j as a child of the node i is directly
 	 * connected to the node i (j is a child of i)
@@ -456,7 +453,7 @@ void stronglyConnectedGraph(pArray * tree, unsigned int n, int isTree)
 	 * 
 	*/
 	
-	for(i=0; i<n; i++)
+	for(i=0; i<size; i++)
 	{
 		arrival_time[i] = -1;
 		path_time[i] =-1;
@@ -467,18 +464,18 @@ void stronglyConnectedGraph(pArray * tree, unsigned int n, int isTree)
 	
 	if(isTree)//non zero value
 	{
-		connect(0, tree, color, arrival_time, path_time, time);
+		connect(0, graph, color, arrival_time, path_time, time);
 		//since all the node are connected to the root, we just have one call as the initialization
 	}else
 	{
-		for(i=0; i<n; i++)
+		for(i=0; i<size; i++)
 		{
-			connect(i, tree, color, arrival_time, path_time, time);
+			connect(i, graph, color, arrival_time, path_time, time);
 		}
 	}
 }
 
-void connect(unsigned int u, pArray * tree, enum colorTag color[], int arrival_time[], 
+void connect(unsigned int u, pDirectedGraph graph, enum colorTag color[], int arrival_time[], 
 			 int path_time[], unsigned int time)
 {
 	//update configuration
@@ -488,14 +485,14 @@ void connect(unsigned int u, pArray * tree, enum colorTag color[], int arrival_t
 	
 	//run into the child of the current node
 	unsigned int v;
-    pArray cursor = tree[u];
+    pArray cursor = graph->links_list[u];
     
     while(cursor)
     {
 		v = uIntValue(cursor);
 		if(color[v]==WHITE)
 		{
-			connect(v, tree, color, arrival_time, path_time, time);
+			connect(v, graph, color, arrival_time, path_time, time);
 		}	
 		
 		if(path_time[v]<path_time[u])
@@ -560,7 +557,7 @@ void connect(unsigned int u, pArray * tree, enum colorTag color[], int arrival_t
 		}
 		
 		//connected the two nodes (start_node to end_node)
-		tree[start_node] = add(tree[start_node], uInt_t, uIntCreateNode(end_node));
+		directedGraphAddLink(graph, start_node, end_node);
 		path_time[u] = end_time;
 	}
 }
@@ -578,28 +575,85 @@ void connect(unsigned int u, pArray * tree, enum colorTag color[], int arrival_t
  * Si il y a déjà une transition vers cette place, on rajoute -W sur l autre colonne.
  */
 
-pPetri petriTransformation(pArray * graph, unsigned int size){
-  pPetri graphpetri=malloc(sizeof(petri));
-  graphpetri->num_pl=size;
-  graphpetri->places=malloc(size*sizeof(int));
+/*
+pPetri petriTransformation(pDirectedGraph graph){
+
+  // node <-> transition and arc <-> place
+  pPetri graphPetri=malloc(sizeof(petri));
+  graphPetri->num_pl=graph->nb_edges;
+  graphPetri->places=malloc(size*sizeof(int));
   int i, j;
   for(i=0; i<size; i++){
-    graphpetri->places[i]=0; //Pour l'instant rien sur les places
+    graphPetri->places[i]=0; //Pour l'instant rien sur les places
   }
-  graphpetri->num_tr=size;
-  graphpetri->trans=malloc(size*size*sizeof(int*));
-  for(i=0; i<size; i++){
-    for(j=0; j<size; j++){
-      graphpetri->trans[i*size+j]=0;
+  //set matrix to 0
+  graphPetri->num_tr=graph->nb_nodes;
+  graphPetri->trans=malloc(graphPetri->num_tr*graphPetri->num_pl*sizeof(int*));
+  for(i=0; i<graphPetri->num_pl; i++){
+    for(j=0; j<graphPetri->num_tr; j++){
+      graphPetri->trans[i*size+j]=0;
     }
   }
+  //set correct weights
   for(i=0; i<size; i++){
-    graphpetri->trans[i*size +i]=1; //poids egal a 1 pour l instant
+    graphPetri->trans[i*size +i]=1; //poids egal a 1 pour l instant
     pArray graphi=graph[i];
     while(graphi!=NULL){
-      graphpetri->trans[uIntValue(graphi)*size +i]=-1; 
+      graphPetri->trans[uIntValue(graphi)*size +i]=-1; 
       graphi=graphi->next;
     }
   }
-  return graphpetri;
+  return graphPetri;
+}*/
+
+pPetri petriTransformation(pDirectedGraph graph)
+{
+	return NULL;
 }
+
+/**********************************************************************
+ * 
+ * 						WEIGHTS COMPUTATION
+ * 
+ * 
+ * *******************************************************************/
+unsigned int * weightsComputation(unsigned int nb_transition, unsigned int repetition_vect_norm)
+{
+	/* Fist the function generate an array of n integers, where n is the number of transitions in the Petri net, such as
+		the sum of each element of the array is approximativly equal to the nomr of the T-semiflow.
+		Then to make sure there is no useless tokens we ensure that the gcm of the array is 1
+	*/
+
+	//generate array of random integers with a fixed sum
+	unsigned int * random_weights = randomFixedSum(nb_transition, repetition_vect_norm);
+
+	//ensure gcm of the array is 1
+	int gcd_val = gcd_array(random_weights, nb_transition);//get gcm of the array
+	if(gcd_val<=0)
+	{
+		fprintf(stderr, "Erreur calcul pgcd des poids\n");
+		exit(EXIT_FAILURE);
+	}
+
+	if(gcd_val!=1)
+	{
+		unsigned int temp[3];
+		temp[0]=gcd_val;
+		//could had been all different index in the array (not exclusively 0 and 1)
+		temp[1]=random_weights[0];
+		temp[2]=random_weights[1];
+
+		while(gcd_array(temp, 3)!=1)
+		{
+			temp[1]--;
+			/* The value cannot be inferior to 1, because when finally if it reach 1, then the gcm will be 1 */
+			temp[2]++;//keep intact the fixed sum
+		}
+
+		random_weights[0]=temp[1];
+		random_weights[1]=temp[2];
+	}
+
+	return random_weights;
+}
+

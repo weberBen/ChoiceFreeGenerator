@@ -57,11 +57,10 @@ static char * getResponse(request * req)
 		{
 			printf("creation d'un arbre (nb_noeud=%u, max_enfant=%d)\n", req->n, req->D);
 					
-			pArray * tree = buildTree(req->n, req->D);//create graph
-			pList graph1 = listCreate(tree, req->n);
-			wrapperAddToList(&_list, wrapperCreateNode(req->wrapperId, list_t, (void *)graph1));
+			pDirectedGraph tree = buildTree(req->n, req->D);//create graph
+			wrapperAddToList(&_list, wrapperCreateNode(req->wrapperId, directedGraph_t, (void *)tree));
 			
-			listToString(&s,tree, req->n);//convert the tree into a strings
+			listToString(&s,tree->links_list, req->n);//convert the tree into a strings
 			
 		}
 			break;
@@ -70,21 +69,20 @@ static char * getResponse(request * req)
 			printf("Modification du graphe %d en graphe fortement connexe\n", req->wrapperId);
 			
 			pWrapper p = wrapperGetElem(_list, req->wrapperId);
-			pList  graph1 = (pList)(p->data);
-			stronglyConnectedGraph(graph1->data, graph1->size, req->isTree);
+			pDirectedGraph  graph1 = (pDirectedGraph)(p->data);
+			stronglyConnectedGraph(graph1, req->isTree);
 			
-			listToString(&s,graph1->data, graph1->size);//convert the tree into a strings
+			listToString(&s,graph1->links_list, graph1->nb_nodes);//convert the tree into a strings
 		}
 			break;
 		case t_randomGraph:
 		{
 			printf("Creation d'un graphe aleatoirement\n");
 			
-			pArray * temp = randomGraph(req->n, req->Ki, req->Ko);//create graph
-			pList graph1 = listCreate(temp, req->n);
-			wrapperAddToList(&_list, wrapperCreateNode(req->wrapperId, list_t, (void *)graph1));
+			pDirectedGraph graph1 = randomGraph(req->n, req->Ki, req->Ko);//create graph
+			wrapperAddToList(&_list, wrapperCreateNode(req->wrapperId, directedGraph_t, (void *)graph1));
 			
-			listToString(&s,temp, req->n);//convert the tree into a strings
+			listToString(&s,graph1->links_list, req->n);//convert the tree into a strings
 		}
 			break;
 		case t_free:
@@ -97,16 +95,16 @@ static char * getResponse(request * req)
 		}
 			break;
 		case t_petri:
-		{
+		{/*
 			printf("Conversion du graphe en réseau de pétri\n");
 			
 			pWrapper p = wrapperGetElem(_list, req->wrapperId);
-			pList  graph1 = (pList)(p->data);
+			pDirectedGraph graph1 = (pDirectedGraph)(p->data);
 			
-			pPetri petriN = petriTransformation(graph1->data, graph1->size);
+			pPetri petriN = petriTransformation(graph1);
 			wrapperAddToList(&_list, wrapperCreateNode(req->newWrapperId, petri_t, (void *)petriN));
 			
-			petriToString(&s,petriN);//convert the tree into a stringss
+			petriToString(&s,petriN);//convert the tree into a stringss*/
 		}
 			break;
 		default :
