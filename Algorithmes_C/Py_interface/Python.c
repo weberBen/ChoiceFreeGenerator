@@ -47,7 +47,7 @@ static void sendNullResponse(char * buff, unsigned int buffer_size, unsigned int
 	free(s);
 }
 
-static char * getResponse(request * req)
+static void sendResponse(request * req, char * buff, int BUFFSIZE, unsigned int csock)
 {
 	char * s = NULL;
 	
@@ -95,7 +95,7 @@ static char * getResponse(request * req)
 		}
 			break;
 		case t_petri:
-		{/*
+		{
 			printf("Conversion du graphe en réseau de pétri\n");
 			
 			pWrapper p = wrapperGetElem(_list, req->wrapperId);
@@ -104,7 +104,9 @@ static char * getResponse(request * req)
 			pPetri petriN = petriTransformation(graph1);
 			wrapperAddToList(&_list, wrapperCreateNode(req->newWrapperId, petri_t, (void *)petriN));
 			
-			petriToString(&s,petriN);//convert the tree into a stringss*/
+			petriWrite(petriN, csock);//write petri net to the socket
+
+			return ;
 		}
 			break;
 		default :
@@ -120,7 +122,8 @@ static char * getResponse(request * req)
 		s = nullResponse();
 	}
 	
-	return s;
+	sendString(s, buff, BUFFSIZE, csock);//send the string
+	free(s);
 }
 
 
@@ -168,9 +171,7 @@ int py_establishCommunication(int PORT, int BUFFSIZE)
 				break;
 			}
 			
-			char * s = getResponse(req);
-			sendString(s, buff, BUFFSIZE, csock);//send the string
-			free(s);
+			sendResponse(req, buff, BUFFSIZE, csock);
 		}
         printf("Fin de transmission\n");
         printf("----------------------------\n");

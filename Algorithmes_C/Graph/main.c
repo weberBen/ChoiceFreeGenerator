@@ -2,6 +2,11 @@
 #include <stdlib.h>
 #include <time.h>
 #include <assert.h>
+#include <unistd.h>
+#include <sys/stat.h>
+#include <string.h>
+#include <errno.h>
+#include <fcntl.h>
 
 #include "GraphGenerator.h"
 #include "Tools.h"
@@ -51,8 +56,11 @@ int main(int argc, char ** argv)
 	petriAddlink(net, PETRI_TP_LINK, 3, 3, 36);
 	petriAddlink(net, PETRI_TP_LINK, 4, 4, 63);
 
+	petriWrite(net, dup(1));
+	
 	int sum, weight1, weight2;
 	
+	sum = 0;
 	weight2 = petriGetWeightLink(net, PETRI_PT_LINK, 0, 4);
 	sum+=weight2;
 

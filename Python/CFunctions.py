@@ -10,7 +10,7 @@ import SocketCommunication as sc
 
 #%%
 _id = 0
-srv = sc.Server(1423,512)
+srv = sc.Server(1438,512)
 
 def showErrors():
     print(srv.getTerminalErros())

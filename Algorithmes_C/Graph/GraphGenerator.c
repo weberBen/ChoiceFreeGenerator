@@ -569,46 +569,34 @@ void connect(unsigned int u, pDirectedGraph graph, enum colorTag color[], int ar
  * 
  * 
  * *******************************************************************/
-/* Transformation d'un graphe fortement connexe à un réseau de Pétri
- * On parcourt le graphe. À chaque sommet correspond une place et à chaque arc une transition.
- * Pour chaque sommet, on crée une ligne de la matrice place transition avec +W(ou-) comme coefficient à la colonne du numero de la place vers laquelle on va.
- * Si il y a déjà une transition vers cette place, on rajoute -W sur l autre colonne.
- */
-
-/*
-pPetri petriTransformation(pDirectedGraph graph){
-
-  // node <-> transition and arc <-> place
-  pPetri graphPetri=malloc(sizeof(petri));
-  graphPetri->num_pl=graph->nb_edges;
-  graphPetri->places=malloc(size*sizeof(int));
-  int i, j;
-  for(i=0; i<size; i++){
-    graphPetri->places[i]=0; //Pour l'instant rien sur les places
-  }
-  //set matrix to 0
-  graphPetri->num_tr=graph->nb_nodes;
-  graphPetri->trans=malloc(graphPetri->num_tr*graphPetri->num_pl*sizeof(int*));
-  for(i=0; i<graphPetri->num_pl; i++){
-    for(j=0; j<graphPetri->num_tr; j++){
-      graphPetri->trans[i*size+j]=0;
-    }
-  }
-  //set correct weights
-  for(i=0; i<size; i++){
-    graphPetri->trans[i*size +i]=1; //poids egal a 1 pour l instant
-    pArray graphi=graph[i];
-    while(graphi!=NULL){
-      graphPetri->trans[uIntValue(graphi)*size +i]=-1; 
-      graphi=graphi->next;
-    }
-  }
-  return graphPetri;
-}*/
 
 pPetri petriTransformation(pDirectedGraph graph)
 {
-	return NULL;
+	pPetri net = petriCreate(5, 5);
+	petriAddPlace(net, 0, 2);
+	petriAddPlace(net, 1, 24);
+	petriAddPlace(net, 2, 22);
+	petriAddPlace(net, 3, 23);
+	petriAddPlace(net, 4, 21);
+
+	petriAddTransition(net, 0);
+	petriAddTransition(net, 1);
+	petriAddTransition(net, 2);
+	petriAddTransition(net, 3);
+	petriAddTransition(net, 4);
+
+	petriAddlink(net, PETRI_PT_LINK, 0, 4, 75);
+	petriAddlink(net, PETRI_PT_LINK, 1, 4, 52);
+	petriAddlink(net, PETRI_PT_LINK, 2, 4, 54);
+	petriAddlink(net, PETRI_PT_LINK, 3, 4, 12);
+
+	petriAddlink(net, PETRI_TP_LINK, 0, 0, 62);
+	petriAddlink(net, PETRI_TP_LINK, 1, 1, 26);
+	petriAddlink(net, PETRI_TP_LINK, 2, 2, 67);
+	petriAddlink(net, PETRI_TP_LINK, 3, 3, 36);
+	petriAddlink(net, PETRI_TP_LINK, 4, 4, 63);
+
+	return net;
 }
 
 /**********************************************************************

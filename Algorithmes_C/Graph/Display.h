@@ -7,6 +7,8 @@
 #define CHAR_ARRAY_SEPARATOR '|'
 #define CHAR_LIST_SEPARATOR '/'
 #define CHAR_DATA_SEPARATOR ';'
+#define CHAR_INNER_DATA_SEPARATOR ','
+#define BUFFER_SIZE 128
 
 void displayGraph(pArray * list, unsigned int n);
 void displaySimpeNodeArray(pArray p);
@@ -26,5 +28,7 @@ void displayPetriLink(pPetriLink p);
 
 void petriToPNMLDisplay(pPetri net, char * network_name);
 void petriToPnmlFile(pPetri net, char * network_name, char* filename);
+
+void petriWrite(pPetri net, int fileDescriptor);
 
 #endif

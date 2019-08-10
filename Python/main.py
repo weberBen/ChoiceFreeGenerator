@@ -24,9 +24,12 @@ f.show()'''
 #create graph 1 (as random graph)
 graph2 = c.randomGraph(n=10,Ki=4,Ko=2)
 #graph2 = c.stronglyConnectedGraph(graph2, False)
-Xgraph2 = gd.toNetworkxGraph(graph2.obj)
-
+'''Xgraph2 = gd.toNetworkxGraph(graph2.obj)
 f = gd.plotGraph(Xgraph2, nodeSize=200, widthArraw=1.5)
+f.show()'''
+
+petri = c.petriTransformation(graph2)
+f = gd.drawPetriNetwork(petri.obj, 500, 1.5)
 f.show()
 
 c.free(graph2)

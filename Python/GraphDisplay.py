@@ -14,6 +14,7 @@ import matplotlib.pyplot as plt
 CHAR_ARRAY_SEPARATOR = '|'
 CHAR_LIST_SEPARATOR = '/'
 CHAR_DATA_SEPARATOR =';'
+CHAR_INNER_DATA_SEPARATOR = ','
 
 #%%,        
 def parseGraph(string_graph):
@@ -47,28 +48,135 @@ def parseGraph(string_graph):
     return graph
 
 def parsePetriNetwork(string_graph):
+    '''
+        For a petri net with : 
+	 		n places, marked as p with the index of the place, where M0(pi) is the initial marking of the place i
+			m transitions, markes as t with the index of the transition
+		Then the format of the output is (with no line break : '\n' and with no space ' ') : 
+
+	 	 (p1, M0(pi) CHAR_LIST_SEPARATOR (p2, M0(p2)) ... (pn, M0(pn)) 
+		 CHAR_DATA_SEPARATOR
+		 t1 CHAR_LIST_SEPARATOR t2 CHAR_LIST_SEPARATOR ... tm
+		 CHAR_DATA_SEPARATOR
+		 (input_node, output_node, weigth) CHAR_LIST_SEPARATOR ... where input_node is the label of the node from where
+		 	the link start and output_node the label of the node where it stop (with a weight)
+		 \0
+
+		Example (with CHAR_LIST_SEPARATOR='\' and CHAR_DATA_SEPARATOR=';')
+		(p0,2)/(p1,24)/(p2,22)/(p3,23)/(p4,21);t0/t1/t2/t3/t4;(t4, p4, 63)/(t3, p3, 36)/(t2, p2, 67)/(t1, p1, 26)/(t0, p0, 62)/(p3, t4, 12)/(p2, t4, 54)/(p1, t4, 52)/(p0, t4, 75)
+
+	'''
+        
     s_number = ""
-    places=[]
-    trans=[]
+    tmp = []
+    places = []
+    transitions = []
+    pn = nx.DiGraph()
+    labelNodes = {}
+    labelEdges = {}
+    i = 0
     
-    i=0
+    if(len(s_number)==0):
+        [pn, labelNodes, labelEdges]
     
+    #get places and intial marking
     for c in string_graph:
         if(c==CHAR_DATA_SEPARATOR):
             break
-        elif(c==CHAR_ARRAY_SEPARATOR):
-            if(len(s_number)!=0):
-                places.append(int(s_number))
-            s_number=""
-        else :
-            s_number = s_number + c
-        i = i+1
+        elif(c=='('):
+            i = i + 1
+            continue
+        elif(c==CHAR_INNER_DATA_SEPARATOR):
+            tmp.append(s_number)#add place
+            s_number = ""
+            i = i + 1
+            continue
+        elif(c==')'):
+            tmp.append(s_number)#add place
+            s_number = ""
+            i = i + 1
+            continue
+        elif (c==CHAR_LIST_SEPARATOR):
+            places.append(tmp[0])
+            labelNodes[tmp[0]] = str(tmp[0])+"\n"+str(tmp[1])
+            s_number = ""
+            tmp = []
+            i = i + 1
+            continue
+        
+        s_number = s_number + c
+        i = i + 1
     
-    string_graph=string_graph[(i+1):]
+    string_graph = string_graph[i+1:]
+    print(string_graph)
+    #get last place
+    if(len(tmp)!=0):
+        places.append(tmp[0])
+        labelNodes[tmp[0]] = str(tmp[0])+"\n"+str(tmp[1])
+    s_number = ""
+    tmp = []
     
-    trans=parseGraph(string_graph)
+    #get transitions
+    i = 0
+    for c in string_graph:
+        if(c==CHAR_DATA_SEPARATOR):
+            break
+        elif (c==CHAR_LIST_SEPARATOR):
+            transitions.append(s_number)
+            labelNodes[s_number] = s_number
+            s_number = ""
+            i = i + 1
+            continue
+        
+        s_number = s_number + c
+        i = i + 1
+    
+    string_graph = string_graph[i+1:]
+    #get last element
+    if(len(s_number)!=0):
+        transitions.append(s_number)
+        labelNodes[s_number] = s_number
+    s_number = ""
+    tmp = []
+    print(string_graph)
+    #get links
+    i = 0
+    step  = 0
+    for c in string_graph:
+        if(c=='('):
+            i = i + 1 
+            continue
+        elif(c==CHAR_INNER_DATA_SEPARATOR):
+            if(step==0):
+                tmp.append(s_number)
+            else :
+                tmp.append(s_number)
+            step = step + 1
+            s_number = ""
+            i = i + 1
+            continue
+        elif(c==')'):
+            tmp.append(s_number)
+            s_number = ""
+            i = i + 1
+            continue
+        elif (c==CHAR_LIST_SEPARATOR):
+            pn.add_edge(tmp[0], tmp[1])
+            labelEdges[(tmp[0], tmp[1])] = tmp[2]
+            tmp = []
+            s_number = ""
+            i = i + 1
+            continue
+        
+        s_number = s_number + c
+        i = i + 1
+    
+    if(len(tmp)!=0):
+        pn.add_edge(tmp[0], tmp[1])
+        labelEdges[(tmp[0], tmp[1])] = tmp[2]
+    
             
-    return [places, trans]
+    return [pn, places, transitions, labelNodes, labelEdges]
 #%%
 
 def toNetworkxGraph(graph) :
@@ -109,61 +217,24 @@ def plotGraph(Xgraph, nodeSize, widthArraw):
     return fig
 
 #%%
-def toPetriNetwork(graph):
-    places = graph[0]
-    trans=graph[1]
-    pn = nx.DiGraph()
-    
-    
-    #add links between transition and places
-    labels={}
-    for i in range(len(trans)):
-        for j in range(len(trans[i])):
-            val = trans[i][j]
-            pl = "p"+str(j)+"\n"+str(places[j])
-            tr = "t"+str(i)
-            if(val>0):
-                e = (pl, tr)
-                labels.update({e:str(val)})
-                pn.add_edge(*e)
-            elif(val<0):
-                e = (tr, pl)
-                labels.update({e:str(abs(val))})
-                pn.add_edge(*e)
-            
-                
-    return [pn, labels]
+
+#%%
 
 def drawPetriNetwork(petri, nodeSize, widthArraw):
-    G = petri[0]
-    labels=petri[1]
-    types=[]
-    color_map=[]
-    for node in G:
-        if(node[0]=='p'):
-            color_map.append('red')
-            types.append('p')
-        else:
-            color_map.append('grey')
-            types.append('t')
-    
-    pos = nx.kamada_kawai_layout(G)
+    [G, pl_nodes, tr_nodes, labelNodes, labelEdges] = petri
     
     plt.ioff()#desactive interactive mode (then figure won't pop up directly after plt.figure())
     fig = plt.figure()
     
-    #nx.draw_networkx_nodes(G, pos, node_size = nodeSize, node_color = color_map, alpha=0.5)
-    nx.set_node_attributes(G, "type", types)
-    #set shaphe node
-    pl_nodes = [n for (n,ty) in nx.get_node_attributes(G, 'type').iteritemns() if ty == 'p']
-    tr_nodes = [n for (n,ty) in nx.get_node_attributes(G, 'type').iteritemns() if ty == 't']
     
+    pos = nx.kamada_kawai_layout(G)
+
     nx.draw_networkx_nodes(G, pos, nodelist=pl_nodes, node_color='red', node_shape='o', node_size=nodeSize, alpha=0.5)
     nx.draw_networkx_nodes(G, pos, nodelist=tr_nodes, node_color='grey', node_shape='^', node_size=nodeSize, alpha=0.5)
-    
-    nx.draw_networkx_labels(G, pos)
+
+    nx.draw_networkx_labels(G, pos, labels=labelNodes, font_size=10)
     nx.draw_networkx_edges(G, pos, width= widthArraw, arrows=True)
-    nx.draw_networkx_edge_labels(G,pos,edge_labels=labels,font_color='red')
+    nx.draw_networkx_edge_labels(G,pos,edge_labels=labelEdges,font_color='red')
     
     plt.ion()#active interactive mode
     return fig

@@ -601,10 +601,9 @@ void displayPetriNet(pPetri net)
 /**********************************************************************
  * 
  * 
- * 						XML FUNCTIONS
+ * 						PNML FUNCTIONS
  * 
  **********************************************************************/
- #define BUFFER_SIZE 128
 
  #define PNML_NET_INDENT "\t"
  #define PNML_NET_ELEM_INDENT PNML_NET_INDENT"\t"
@@ -817,4 +816,131 @@ void displayPetriNet(pPetri net)
     _petriToPnml(net, network_name, file);
 
     close(file);
+ }
+
+
+ /**********************************************************************
+ * 
+ * 
+ * 						PETRI FUNCTIONS
+ * 
+ **********************************************************************/
+
+ void petriWrite(pPetri net, int fileDescriptor)
+ {
+	 /* For a petri net with : 
+	 		n places, marked as p with the index of the place, where M0(pi) is the initial marking of the place i
+			m transitions, markes as t with the index of the transition
+		Then the format of the output is (with no line break : '\n' and with no space ' ') : 
+
+	 	 (p1 CHAR_INNER_DATA_SEPARATOR M0(pi) CHAR_LIST_SEPARATOR ... (pn CHAR_INNER_DATA_SEPARATOR M0(pn)) 
+		 CHAR_DATA_SEPARATOR
+		 t1 CHAR_LIST_SEPARATOR t2 CHAR_LIST_SEPARATOR ... tm
+		 CHAR_DATA_SEPARATOR
+		 (input_node CHAR_INNER_DATA_SEPARATOR output_node CHAR_INNER_DATA_SEPARATOR weigth) CHAR_LIST_SEPARATOR ... (input_node CHAR_INNER_DATA_SEPARATOR output_node CHAR_INNER_DATA_SEPARATOR weigth)
+		 	where input_node is the label of the node from where
+		 	the link start and output_node the label of the node where it stop (with a weight)
+		 \0
+
+		Example (with CHAR_LIST_SEPARATOR='\' and CHAR_DATA_SEPARATOR=';' and CHAR_INNER_DATA_SEPARATOR=',')
+		(p0,2)/(p1,24)/(p2,22)/(p3,23)/(p4,21);t0/t1/t2/t3/t4;(t4,p4,63)/(t3,p3,36)/(t2,p2,67)/(t1,p1,26)/(t0,p0,62)/(p3,t4,12)/(p2,t4,54)/(p1,t4,52)/(p0,t4,75)
+
+	*/
+	 if(net==NULL)
+	 {
+	 	write(fileDescriptor, '\0', sizeof(char));
+		return ;
+	 }
+
+	 int i;
+	 int size;
+	 char buffer[BUFFER_SIZE];
+
+	//write places
+	 for(i=0; i<net->nb_pl-1; i++)
+	 {
+		 if(net->pl_elems[i]==NULL)
+			continue;
+		
+		 size = sprintf(buffer, "(p%u%c%u)%c", i, CHAR_INNER_DATA_SEPARATOR, net->pl_elems[i]->val, CHAR_LIST_SEPARATOR);
+		 write(fileDescriptor, buffer, size);
+	 }
+
+	if(net->pl_elems[i]!=NULL)
+	{
+		 size = sprintf(buffer, "(p%u%c%u)", i, CHAR_INNER_DATA_SEPARATOR, net->pl_elems[i]->val);
+		 write(fileDescriptor, buffer, size);
+	}
+	 
+	 //data separator
+	 buffer[0] = CHAR_DATA_SEPARATOR; buffer[1] = '\0';
+	 write(fileDescriptor, buffer, sizeof(char));
+
+	 //write transitions
+	 for(i=0; i<net->nb_tr-1; i++)
+	 {
+		 if(net->tr_elems[i]==NULL)
+			continue;
+		
+		 size = sprintf(buffer, "t%u%c", i, CHAR_LIST_SEPARATOR);
+		 write(fileDescriptor, buffer, size);
+	 }
+
+	if(net->tr_elems[i]!=NULL)
+	{
+		 size = sprintf(buffer, "t%u", i);
+		 write(fileDescriptor, buffer, size);
+	}
+
+	//data separator
+	buffer[0] = CHAR_DATA_SEPARATOR; buffer[1] = '\0';
+	write(fileDescriptor, buffer, sizeof(char));
+
+	//write links
+	pArray2 p = net->links;
+	pPetriLink link;
+	char tmp1, tmp2;
+
+	while(p->next)
+	{
+		link = (pPetriLink)(p->data);
+
+		if(link->input->type==PETRI_PLACE_TYPE)
+			tmp1 = 'p';
+		else
+			tmp1  = 't';
+
+		if(link->output->type==PETRI_TRANSITION_TYPE)
+			tmp2 = 't';
+		else
+			tmp2  = 'p';
+		
+		//(id_input, id_output, weight) ex : (p0, t1, 2) : link from place p0 to transition t1 with a weight of 2
+		size = sprintf(buffer, "(%c%u%c%c%u%c%u)%c", tmp1, link->input->label, CHAR_INNER_DATA_SEPARATOR,
+													 tmp2, link->output->label, CHAR_INNER_DATA_SEPARATOR, 
+													 link->weight, CHAR_LIST_SEPARATOR);
+		write(fileDescriptor, buffer, size);
+		p = p->next;
+	}
+
+	link = (pPetriLink)(p->data);
+
+	if(link->input->type==PETRI_PLACE_TYPE)
+		tmp1 = 'p';
+	else
+		tmp1  = 't';
+
+	if(link->output->type==PETRI_TRANSITION_TYPE)
+		tmp2 = 't';
+	else
+		tmp2  = 'p';
+
+	size = sprintf(buffer, "(%c%u%c%c%u%c%u)", tmp1, link->input->label, CHAR_INNER_DATA_SEPARATOR,
+											   tmp2, link->output->label, CHAR_INNER_DATA_SEPARATOR, link->weight);
+	write(fileDescriptor, buffer, size);
+
+
+	//end of data
+	buffer[0] = '\0';
+	write(fileDescriptor, buffer, sizeof(char));
  }
