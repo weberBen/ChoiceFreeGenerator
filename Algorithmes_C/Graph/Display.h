@@ -22,4 +22,9 @@ int listToFile(char * filename, pArray a[], unsigned int n);
 
 void displayPetriNet(pPetri net);
 void displayPetriLink(pPetriLink p);
+
+
+void petriToPNMLDisplay(pPetri net, char * network_name);
+void petriToPnmlFile(pPetri net, char * network_name, char* filename);
+
 #endif

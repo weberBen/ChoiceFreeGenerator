@@ -1,8 +1,6 @@
 #ifndef _TOOLS_H
 #define _TOOLS_H
 
-#include "Array.h"
-
 #define max(a,b) \
 ({ __typeof__ (a) _a = (a); \
    __typeof__ (b) _b = (b); \
@@ -32,5 +30,6 @@ int getIndexCumulativeProba(double * cumulProba, unsigned int size, double value
 
 unsigned int gcd(unsigned int x, unsigned int y);
 int gcd_array(unsigned int * input, unsigned int size);
+
 
 #endif 

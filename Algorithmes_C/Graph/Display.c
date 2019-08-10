@@ -2,6 +2,11 @@
 #include <stdlib.h>
 #include <math.h>
 #include <assert.h>
+#include <unistd.h>
+#include <sys/stat.h>
+#include <string.h>
+#include <errno.h>
+#include <fcntl.h>
 
 #include "Display.h"
 
@@ -591,3 +596,225 @@ void displayPetriNet(pPetri net)
      printf("------------------------------------------------------------------------\n");
 
 }
+
+
+/**********************************************************************
+ * 
+ * 
+ * 						XML FUNCTIONS
+ * 
+ **********************************************************************/
+ #define BUFFER_SIZE 128
+
+ #define PNML_NET_INDENT "\t"
+ #define PNML_NET_ELEM_INDENT PNML_NET_INDENT"\t"
+ #define PNML_PAGE_INDENT PNML_NET_ELEM_INDENT
+ #define PNML_PAGE_ELEM_INDENT PNML_PAGE_INDENT"\t"
+
+ #define PNML_START_DOC(pnml_version, xml_version) \
+    ("<?xml version=\""#xml_version"\"?>\n" \
+    "<pnml xmlns=\"http://www.pnml.org/version-"#pnml_version"/grammar/pnml\">\n" \
+    PNML_NET_INDENT"<net id=\"net\" type=\"http://www.pnml.org/version-"#pnml_version"/grammar/ptnet\">\n")
+
+#define PNML_END_DOC \
+    PNML_NET_INDENT"</net>\n" \
+    "</pnml>\n" 
+
+#define PNML_END_PAGE \
+    PNML_PAGE_INDENT"</page>\n"
+
+ void pnmlNameNetwork(char * buffer, char * name)
+ {
+    sprintf(buffer, PNML_NET_ELEM_INDENT"<name><text>%s</text></name>\n", name);
+ }
+ void pnmlStartPage(char * buffer, char * id, char * page_name)
+ {
+     sprintf(buffer, PNML_PAGE_INDENT"<page id=\"%s\">\n" \
+                        PNML_PAGE_ELEM_INDENT"<name><text>%s</text></name>\n", id, page_name);
+ }
+
+ void pnmlPLaceId(char * buffer, unsigned int index)
+ {
+      sprintf(buffer, "p%d", index);
+ }
+
+ void pnmlTransitionId(char * buffer, unsigned int index)
+ {
+      sprintf(buffer, "t%d", index);
+ }
+
+ void pnmlLinkId(char * buffer, char * input_id, char * output_id)
+ {
+     sprintf(buffer, "a-%s-to-%s", input_id, output_id);
+ }
+
+ void pnmlPlace(char * buffer, char * id, unsigned int initialMarking)
+ {
+     sprintf(buffer, PNML_PAGE_ELEM_INDENT"<place id=\"%s\">\n" \
+			            PNML_PAGE_ELEM_INDENT"\t""<name><text>%s</text></name>\n" \
+				        PNML_PAGE_ELEM_INDENT"\t""<initialMarking><text>%u</text></initialMarking>\n" \
+	                PNML_PAGE_ELEM_INDENT"</place>\n", id, id, initialMarking);
+
+ }
+
+ void pnmlTransition(char * buffer, char * id)
+ {
+     sprintf(buffer, PNML_PAGE_ELEM_INDENT"<transition id=\"%s\">\n" \
+			            PNML_PAGE_ELEM_INDENT"\t""<name><text>%s</text></name>\n" \
+	                PNML_PAGE_ELEM_INDENT"</transition>\n", id, id);
+ }
+
+ void pnmlLink(char * buffer, char * input_id, char * output_id, int weight)
+ {
+     char id[BUFFER_SIZE];
+     pnmlLinkId(id, input_id, output_id);
+
+     sprintf(buffer, PNML_PAGE_ELEM_INDENT"<arc id=\"%s\" source=\"%s\" target=\"%s\">\n" \
+				        PNML_PAGE_ELEM_INDENT"\t""<inscription><text>%d</text></inscription>\n" \
+	                 PNML_PAGE_ELEM_INDENT"</arc>\n", id, input_id, output_id, weight);
+ }
+
+ void _petriToPnml(pPetri net, char * network_name, int fileDescriptor)
+ {
+    int saved_stdout = dup(1);//save stdout output to re-establish the output as previously later
+    dup2(fileDescriptor, 1);//redirect stdout to the file (more convenient)
+    fflush(stdout);
+    
+
+    char buffer[BUFFER_SIZE];
+    char input_id[BUFFER_SIZE], output_id[BUFFER_SIZE];
+
+    //start document
+    printf("%s", PNML_START_DOC(2009, 1.0));
+    pnmlNameNetwork(buffer, network_name);
+    printf("%s", buffer);
+    pnmlStartPage(buffer, "page-01", "page 1 reseau");
+    printf("%s", buffer);
+
+    if(net!=NULL)
+    {
+        //add places and transitions
+        int i;
+        int limit_inf = min(net->nb_pl, net->nb_tr);
+        int limit_sup = max(net->nb_pl, net->nb_tr);
+        pPetriElem elem;
+
+        for(i=0; i<limit_inf; i++)
+        {
+            //place
+            elem = net->pl_elems[i];
+            if(elem!=NULL)
+            {
+                pnmlPLaceId(input_id, i);
+                pnmlPlace(buffer, input_id, elem->val);
+                printf("%s", buffer);
+            }
+
+            //transition
+            elem = net->tr_elems[i];
+            if(elem!=NULL)
+            {
+                pnmlTransitionId(output_id, i);
+                pnmlTransition(buffer, output_id);
+                printf("%s", buffer);
+            }
+        }
+
+        if(net->nb_pl==limit_inf)
+        {
+            for(i=limit_inf; i<limit_sup; i++)//rest of places
+            {
+                elem = net->pl_elems[i];
+                if(elem!=NULL)
+                {
+                    pnmlPLaceId(input_id, i);
+                    pnmlPlace(buffer, input_id, elem->val);
+                    printf("%s", buffer);
+                }
+            }
+        }else
+        {
+            for(i=limit_inf; i<limit_sup; i++)//rest of transitions
+            {
+                elem = net->tr_elems[i];
+                if(elem!=NULL)
+                {
+                    pnmlTransitionId(output_id, i);
+                    pnmlTransition(buffer, output_id);
+                    printf("%s", buffer);
+                }
+            }
+        }
+
+
+        //add link
+        pArray2 p = net->links;
+        pPetriLink link;
+
+        while(p)
+        {
+            link = (pPetriLink)(p->data);
+            //get input id
+            if(link->input->type==PETRI_PLACE_TYPE)
+                pnmlPLaceId(input_id, link->input->label);
+            else
+                pnmlTransitionId(input_id, link->input->label);
+            //get output id
+            if(link->output->type==PETRI_PLACE_TYPE)
+                pnmlPLaceId(output_id, link->output->label);
+            else
+                pnmlTransitionId(output_id, link->output->label);
+
+
+            pnmlLink(buffer, input_id, output_id, link->weight);
+            printf("%s", buffer);
+            p = p->next;
+        }
+    
+    }//end petri pointer not null
+
+    //end document
+    printf("%s", PNML_END_PAGE);
+    printf("%s", PNML_END_DOC);
+
+    dup2(saved_stdout, 1);//restore stdout to shell
+ }
+ 
+ void petriToPnmlDisplay(pPetri net, char * network_name)
+ {
+     _petriToPnml(net, network_name, dup(1));
+ }
+
+
+ int fileExists(const char * filename)
+ {
+    /* Return 0 if the file given by its path exists, else return not-null value*/
+    struct stat sb;
+	return !(stat(filename,&sb)==-1);
+ }
+
+ void petriToPnmlFile(pPetri net, char * network_name, char* filename)
+ {
+     int file;
+
+    //initial writes to file (create or truncate existing file with new value)
+    if(!fileExists(filename))
+    {//create new file
+        file = open(filename, O_CREAT|O_TRUNC|O_WRONLY, S_IRUSR|S_IWUSR);
+    }else
+    {//truncate file
+        file = open(filename, O_TRUNC | O_WRONLY);
+    }
+
+    if(file==-1)
+    {
+        fprintf(stderr, "Impossible d'ouvrir/de creer le fichier %s\n", filename);
+        return ;
+    }
+
+    //write initial value to the opened file
+
+    _petriToPnml(net, network_name, file);
+
+    close(file);
+ }

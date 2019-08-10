@@ -136,7 +136,7 @@ int getIndexCumulativeProba(double * cumulProba, unsigned int size, double value
 /**********************************************************************
  * 
  * 
- * 						Arithmetic FUNCTIONS
+ * 						ARITHMETIC FUNCTIONS
  * 
  **********************************************************************/
 
