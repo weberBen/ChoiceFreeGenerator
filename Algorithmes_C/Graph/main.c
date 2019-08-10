@@ -32,65 +32,24 @@ void petriFree(pPetri p);
 
 int main(int argc, char ** argv)
 {
-	pPetri net = petriCreate(5, 5);
-	petriAddPlace(net, 0, 2);
-	petriAddPlace(net, 1, 24);
-	petriAddPlace(net, 2, 22);
-	petriAddPlace(net, 3, 23);
-	petriAddPlace(net, 4, 21);
+	unsigned int size = 500;
+	unsigned int Ki = 10;
+	unsigned int Ko = 3;
 
-	petriAddTransition(net, 0);
-	petriAddTransition(net, 1);
-	petriAddTransition(net, 2);
-	petriAddTransition(net, 3);
-	petriAddTransition(net, 4);
-
-	petriAddlink(net, PETRI_PT_LINK, 0, 4, 75);
-	petriAddlink(net, PETRI_PT_LINK, 1, 4, 52);
-	petriAddlink(net, PETRI_PT_LINK, 2, 4, 54);
-	petriAddlink(net, PETRI_PT_LINK, 3, 4, 12);
-
-	petriAddlink(net, PETRI_TP_LINK, 0, 0, 62);
-	petriAddlink(net, PETRI_TP_LINK, 1, 1, 26);
-	petriAddlink(net, PETRI_TP_LINK, 2, 2, 67);
-	petriAddlink(net, PETRI_TP_LINK, 3, 3, 36);
-	petriAddlink(net, PETRI_TP_LINK, 4, 4, 63);
-
-	petriWrite(net, dup(1));
+	pDirectedGraph graph = randomGraph(size, Ki, Ko);
+	stronglyConnectedGraph(graph, 0);
 	
-	int sum, weight1, weight2;
-	
-	sum = 0;
-	weight2 = petriGetWeightLink(net, PETRI_PT_LINK, 0, 4);
-	sum+=weight2;
+	displayGraph(graph->links_list, size);
 
-	weight1 = petriGetWeightLink(net, PETRI_TP_LINK, 1, 1);
-	weight2 = petriGetWeightLink(net, PETRI_PT_LINK, 1, 4);
-	sum+=weight2;
-	petriRemovePlace(net, 1);
-	petriAddlink(net, PETRI_TP_LINK, 1, 0, weight1);
+	pPetri petri = petriTransformation(graph);
 
-	weight1 = petriGetWeightLink(net, PETRI_TP_LINK, 2, 2);
-	weight2 = petriGetWeightLink(net, PETRI_PT_LINK, 2, 4);
-	sum+=weight2;
-	petriRemovePlace(net, 2);
-	petriAddlink(net, PETRI_TP_LINK, 2, 0, weight1);
+	displayPetriNet(petri);
+	printf("\n----------------------------------\n");
 
-	weight1 = petriGetWeightLink(net, PETRI_TP_LINK, 3, 3);
-	weight2 = petriGetWeightLink(net, PETRI_PT_LINK, 3, 4);
-	sum+=weight2;
-	petriRemovePlace(net, 3);
-	petriAddlink(net, PETRI_TP_LINK, 3, 0, weight1);
-
-	printf("sum=%d\n", sum);
-
-	petriToPnmlFile(net, "mon réseau", "test.pnml");
-	printf("oki oki\n");
-
-	petriFree(net);
+	directedGraphFree(graph);
+	petriFree(petri);
 
 	return 0;
-
 
 	/*pArray2 p = NULL;
 	pArray2 data;

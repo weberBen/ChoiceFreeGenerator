@@ -719,33 +719,31 @@ void displayPetriNet(pPetri net)
             }
         }
 
-        if(net->nb_pl==limit_inf)
-        {
-            for(i=limit_inf; i<limit_sup; i++)//rest of places
-            {
-                elem = net->pl_elems[i];
-                if(elem!=NULL)
-                {
-                    pnmlPLaceId(input_id, i);
-                    pnmlPlace(buffer, input_id, elem->val);
-                    printf("%s", buffer);
-                }
-            }
-        }else
-        {
-            for(i=limit_inf; i<limit_sup; i++)//rest of transitions
-            {
-                elem = net->tr_elems[i];
+		for(i=limit_inf; i<limit_sup; i++)//rest of places
+		{
+			if(i<net->nb_pl)
+			{
+				elem = net->pl_elems[i];
+				if(elem!=NULL)
+				{
+					pnmlPLaceId(input_id, i);
+					pnmlPlace(buffer, input_id, elem->val);
+					printf("%s", buffer);
+				}
+			}
+
+			if(i<net->nb_tr)
+			{
+				elem = net->tr_elems[i];
                 if(elem!=NULL)
                 {
                     pnmlTransitionId(output_id, i);
                     pnmlTransition(buffer, output_id);
                     printf("%s", buffer);
                 }
-            }
-        }
-
-
+			}
+		}
+        
         //add link
         pArray2 p = net->links;
         pPetriLink link;

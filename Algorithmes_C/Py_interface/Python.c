@@ -104,6 +104,8 @@ static void sendResponse(request * req, char * buff, int BUFFSIZE, unsigned int 
 			pPetri petriN = petriTransformation(graph1);
 			wrapperAddToList(&_list, wrapperCreateNode(req->newWrapperId, petri_t, (void *)petriN));
 			
+			wrapperRemoveFromList(&_list, req->wrapperId);
+			
 			petriWrite(petriN, csock);//write petri net to the socket
 
 			return ;

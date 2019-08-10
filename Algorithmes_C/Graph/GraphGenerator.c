@@ -572,30 +572,47 @@ void connect(unsigned int u, pDirectedGraph graph, enum colorTag color[], int ar
 
 pPetri petriTransformation(pDirectedGraph graph)
 {
-	pPetri net = petriCreate(5, 5);
-	petriAddPlace(net, 0, 2);
-	petriAddPlace(net, 1, 24);
-	petriAddPlace(net, 2, 22);
-	petriAddPlace(net, 3, 23);
-	petriAddPlace(net, 4, 21);
+	/* edge <-> transition and node <-> place */
+	
+	pPetri net = petriCreate(graph->nb_nodes, graph->nb_edges);
 
-	petriAddTransition(net, 0);
-	petriAddTransition(net, 1);
-	petriAddTransition(net, 2);
-	petriAddTransition(net, 3);
-	petriAddTransition(net, 4);
+	//add nodes and transition
+	int i;
+	int limit_inf = min(net->nb_pl, net->nb_tr);
+	int limit_sup = max(net->nb_pl, net->nb_tr);
 
-	petriAddlink(net, PETRI_PT_LINK, 0, 4, 75);
-	petriAddlink(net, PETRI_PT_LINK, 1, 4, 52);
-	petriAddlink(net, PETRI_PT_LINK, 2, 4, 54);
-	petriAddlink(net, PETRI_PT_LINK, 3, 4, 12);
+	for(i=0; i<limit_inf; i++)
+	{
+		petriAddPlace(net, i, 0);
+		petriAddTransition(net, i);
+	}
 
-	petriAddlink(net, PETRI_TP_LINK, 0, 0, 62);
-	petriAddlink(net, PETRI_TP_LINK, 1, 1, 26);
-	petriAddlink(net, PETRI_TP_LINK, 2, 2, 67);
-	petriAddlink(net, PETRI_TP_LINK, 3, 3, 36);
-	petriAddlink(net, PETRI_TP_LINK, 4, 4, 63);
+	for(i=limit_inf; i<limit_sup; i++)
+	{
+		if(i<net->nb_pl)
+			petriAddPlace(net, i, 0);
+		if(i<net->nb_tr)
+			petriAddTransition(net, i);
+	}
 
+	//add links
+	pArray p;
+	int nb_link;
+
+	nb_link = 0;
+	for(i=0; i<graph->nb_nodes; i++)
+	{
+		p = graph->links_list[i];
+		while(p)
+		{	
+			petriAddlink(net, PETRI_PT_LINK, i, nb_link, 0);
+			petriAddlink(net, PETRI_TP_LINK, nb_link, uIntValue(p) ,0);
+
+			p = p ->next;
+			nb_link++;
+		}
+	}
+	
 	return net;
 }
 

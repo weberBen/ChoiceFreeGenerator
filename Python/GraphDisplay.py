@@ -108,7 +108,7 @@ def parsePetriNetwork(string_graph):
         i = i + 1
     
     string_graph = string_graph[i+1:]
-    print(string_graph)
+    
     #get last place
     if(len(tmp)!=0):
         places.append(tmp[0])
@@ -138,7 +138,7 @@ def parsePetriNetwork(string_graph):
         labelNodes[s_number] = s_number
     s_number = ""
     tmp = []
-    print(string_graph)
+    
     #get links
     i = 0
     step  = 0

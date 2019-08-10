@@ -189,54 +189,6 @@ typedef struct Petri
 	pPetriElem * pl_elems;
 	pPetriElem * tr_elems;
 } petri;
-/* Petri net is represented by :
-
-			places = [*, ...]
-					  |
-					 \/
-					 -------------------------
-					|				 ------>--|------
-					| nb_inputs 	 |		  |		|
-					| input_links = [*, ...]  |		|
-    (Petri node)	| nb_outputs 			  |		|
-					| output_links = [*, ...] |		|
-					|			 	  |		  |		|
-					|			 	  |		  |		|
-					 -----------------|-------		|	
-				 -----------------<---|				|
-				 |		---------------------<-------
-				 |	    |
-				 \/	   \/		
-			links = [* ,  ...]
-					 |
-					\/
-				 -------------------           
-				|   input_elem   *--|--------->--
-  (Petri link)	|   output_elem  *--|-->--      |
-				|	weight          |    |      |
-				 -------------------	 |		|
-				 		------------<-----		|
-						|	---------------<-----
-					    |	|
-						\/  \/
-			elements = [*, ...]
-						|   |
-					   \/	---------->----------------------------
-				 ------------------								  |
-				| type of element  | (Petri element)			  |
-				| label			   |							  |
-				 ------------------								 \/
-														 ------------------								  
-														| type of element  | (Petri element)			  
-														| label			   |							  
-														 ------------------
-
-			transitions = [*, ...] same thing as for places
-
-		The two array places an transitions are not needed but help to quickly find a link based on a place
-		or on a transition. The sharing of the same link element saved in another array allow to edit the weight
-		of a link wihtout having to change that value in both places and transitions arrays.
-*/	
 	
 	// * associated functions * //
 
