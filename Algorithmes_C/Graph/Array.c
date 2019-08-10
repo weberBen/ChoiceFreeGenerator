@@ -94,17 +94,17 @@ void freeArray(pArray p)
 	}
 }
 
-int referenceComparaison(void * data, pArray compareTo)
+int referenceComparaison(void * data, pArray input_to_compare)
 {
-	if(data==NULL || compareTo==NULL)
+	if(data==NULL || input_to_compare==NULL)
 		return 0;//false
 	
 	pArray p = (pArray)data;
 
-	return (p==compareTo);//pointer reference comporaison
+	return (p==input_to_compare);//pointer reference comporaison
 }
 
-pArray getArrayElement(pArray p, void * data, int (* booleanFunction)(void * ref, pArray compareTo))
+pArray getArrayElement(pArray p, void * data, int (* booleanFunction)(void * ref, pArray input_to_compare))
 {
 	//return the corresponding element in the array using a custom comparaison function from a pointer to the desire data to find
 	
@@ -740,7 +740,7 @@ void petriAddTransition(pPetri net, unsigned int index)
 	net->tr_elems[index] = petriElemCreateTransition(index);
 }
 
-void petriAddlink(pPetri net, int input_type, unsigned int input, int output_type, unsigned int output, int weight)
+void _petriAddlink(pPetri net, int input_type, unsigned int input, int output_type, unsigned int output, int weight)
 {
 	if(input_type==output_type)
 	{
@@ -809,6 +809,13 @@ void petriAddlink(pPetri net, int input_type, unsigned int input, int output_typ
 	}
 	petriNodeAddOutput(inputs_node_array[input], plink_in_array);
 	petriNodeAddInput(outputs_node_array[output], plink_in_array);
+}
+
+void petriAddlink(pPetri net, int link_type, unsigned int input, unsigned int output, int weight)
+{
+	int input_type = petri_input_type_link(link_type);
+	int output_type = petri_type_reverse(input_type);
+	_petriAddlink(net, input_type, input, output_type, output, weight);
 }
 
 static void petriLinkRemove(pPetri net, pArray2 plink_array)
@@ -916,20 +923,138 @@ void petriRemoveTransition(pPetri net, unsigned int index)
 	petriRemoveNode(net, PETRI_TRANSITION_TYPE, index);
 }
 
-/*typedef struct Petri * pPetri;
-typedef struct Petri
+
+pPetriLink _petriGetLink(pPetri net, int input_type, unsigned int input, int output_type, unsigned int output)
 {
-	unsigned int nb_pl;
-	petriNode * places;
-	unsigned int nb_tr;
-	petriNode * transitions;
-	unsigned int nb_links;
-	pArray2 links;//linked list of petri links
-	petriElem * pl_elems;
-	petriElem * tr_elems;
-} petri;*/
+	pPetriNode * nodes_array;
+	pPetriElem * i_elems_array, * o_elems_array;
+	unsigned int input_size, output_size;
+
+	if(input_type==PETRI_PLACE_TYPE)
+	{
+		nodes_array = net->places;
+		i_elems_array = net->pl_elems;
+		o_elems_array = net->tr_elems;
+		input_size  = net->nb_pl;
+		output_size  = net->nb_tr;
+	}else
+	{
+		nodes_array = net->transitions;
+		i_elems_array = net->tr_elems;
+		o_elems_array = net->pl_elems;
+		input_size  = net->nb_tr;
+		output_size  = net->nb_pl;
+	}
+
+	if(input>=input_size || output>=output_size)
+	{
+		fprintf(stderr, "Index hors limite lors de la recuperation du poids dans le reseau de Petri\n");
+		return NULL;
+	}
+
+	if(i_elems_array[input]==NULL || o_elems_array[output]==NULL)
+	{
+		fprintf(stderr, "element inexistant lors de la recuperation du poids dans le reseau de Petri\n");
+		return NULL;
+	}
+
+	pPetriNode node = nodes_array[input];
+	int comparaisonFunction(void * ref, pArray input_to_compare)
+	{
+		if(ref==NULL || input_to_compare==NULL)
+			return 0;//false
+		
+		pPetriElem elem = (pPetriElem)ref;
+		pArray2 p_link = (pArray2)(input_to_compare->data);
+
+		if(p_link==NULL)
+			return 0;//false
+		
+		pPetriLink link = (pPetriLink)(p_link->data);
+
+		return (link->output==elem);
+	}
+	pArray elem = getArrayElement(node->output_links, o_elems_array[output] , comparaisonFunction);
+	if(elem==NULL)
+		return NULL;
+	
+	return petriNodeGetLinkFromArrayNode(elem);
+}
+
+pPetriLink petriGetLink(pPetri net, int link_type, unsigned int input, unsigned int output)
+{
+	int input_type = petri_input_type_link(link_type);
+	int output_type = petri_type_reverse(input_type);
+	return _petriGetLink(net, input_type, input, output_type, output);
+}
+
+int _petriGetWeightLink(pPetri net, int input_type, unsigned int input, int output_type, unsigned int output)
+{
+	pPetriLink link = _petriGetLink(net, input_type, input, output_type, output);
+	if(link==NULL)
+		return -1;
+	
+	return link->weight;
+}
+
+int petriGetWeightLink(pPetri net, int link_type, unsigned int input, unsigned int output)
+{
+	int input_type = petri_input_type_link(link_type);
+	int output_type = petri_type_reverse(input_type);
+	return _petriGetWeightLink(net, input_type, input, output_type, output);
+}
+
+pPetriElem petriGetElem(pPetri net, int type, unsigned int index)
+{
+	pPetriElem * elems_array;
+	unsigned int size;
+
+	if(type==PETRI_PLACE_TYPE)
+	{
+		elems_array = net->pl_elems;
+		size  = net->nb_pl;
+	}else
+	{
+		elems_array = net->tr_elems;
+		size  = net->nb_tr;
+	}
+
+	if(index>=size)
+	{
+		fprintf(stderr, "Index hors limite lors de la recuperation de l'element dans le reseau de Petri\n");
+		return NULL;
+	}
+
+	if(elems_array[index]==NULL)
+	{
+		fprintf(stderr, "element inexistant lors de la recuperation de l'element  dans le reseau de Petri\n");
+		return NULL;
+	}
+
+	return elems_array[index];
+}
+
+pPetriElem petriGetPlace(pPetri net, unsigned int index)
+{
+	return petriGetElem(net, PETRI_PLACE_TYPE, index);
+}
+
+pPetriElem petriGetTransition(pPetri net, unsigned int index)
+{
+	return petriGetElem(net, PETRI_TRANSITION_TYPE, index);
+}
 
 
+int petriGetInitialMarking(pPetri net, unsigned int index)
+{
+	pPetriElem elem = petriGetElem(net, PETRI_PLACE_TYPE, index);
+	if(elem==NULL)
+		return -1;
+	if(elem->val<=0)
+		return -1;
+	
+	return elem->val;
+}
 
 void petriFree(pPetri p)
 {

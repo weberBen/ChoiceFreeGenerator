@@ -76,45 +76,61 @@ int main(int argc, char ** argv)
 
 	
 
-	pPetri net = petriCreate(5, 3);
+	pPetri net = petriCreate(5, 5);
 	petriAddPlace(net, 0, 2);
-	petriAddPlace(net, 1, 2);
-	petriAddPlace(net, 3, 2);
+	petriAddPlace(net, 1, 24);
+	petriAddPlace(net, 2, 22);
+	petriAddPlace(net, 3, 23);
+	petriAddPlace(net, 4, 21);
 
 	petriAddTransition(net, 0);
 	petriAddTransition(net, 1);
 	petriAddTransition(net, 2);
+	petriAddTransition(net, 3);
+	petriAddTransition(net, 4);
 
-	petriAddlink(net, PETRI_PLACE_TYPE, 0, PETRI_TRANSITION_TYPE, 0, 5);
-	petriAddlink(net, PETRI_PLACE_TYPE, 0, PETRI_TRANSITION_TYPE, 1, 4);
-	petriAddlink(net, PETRI_PLACE_TYPE, 1, PETRI_TRANSITION_TYPE, 1, 4);
+	petriAddlink(net, PETRI_PT_LINK, 0, 4, 75);
+	petriAddlink(net, PETRI_PT_LINK, 1, 4, 52);
+	petriAddlink(net, PETRI_PT_LINK, 2, 4, 54);
+	petriAddlink(net, PETRI_PT_LINK, 3, 4, 12);
 
-	petriAddlink(net, PETRI_TRANSITION_TYPE, 1, PETRI_PLACE_TYPE, 3, 6);
-	petriAddlink(net, PETRI_TRANSITION_TYPE, 2, PETRI_PLACE_TYPE, 1, 6);
-	petriAddlink(net, PETRI_TRANSITION_TYPE, 2, PETRI_PLACE_TYPE, 3, 6);
+	petriAddlink(net, PETRI_TP_LINK, 0, 0, 62);
+	petriAddlink(net, PETRI_TP_LINK, 1, 1, 26);
+	petriAddlink(net, PETRI_TP_LINK, 2, 2, 67);
+	petriAddlink(net, PETRI_TP_LINK, 3, 3, 36);
+	petriAddlink(net, PETRI_TP_LINK, 4, 4, 63);
 
 	displayPetriNet(net);
 
+	int sum=0;
+	int weight1, weight2;
+	
+	weight2 = petriGetWeightLink(net, PETRI_PT_LINK, 0, 4);
+	sum+=weight2;
+
+	weight1 = petriGetWeightLink(net, PETRI_TP_LINK, 1, 1);
+	weight2 = petriGetWeightLink(net, PETRI_PT_LINK, 1, 4);
+	sum+=weight2;
 	petriRemovePlace(net, 1);
-	petriRemoveTransition(net, 1);
+	petriAddlink(net, PETRI_TP_LINK, 1, 0, weight1);
 
-	/*pArray2 p1, p2;
+	weight1 = petriGetWeightLink(net, PETRI_TP_LINK, 2, 2);
+	weight2 = petriGetWeightLink(net, PETRI_PT_LINK, 2, 4);
+	sum+=weight2;
+	petriRemovePlace(net, 2);
+	petriAddlink(net, PETRI_TP_LINK, 2, 0, weight1);
 
-	p1 = (pArray2)((net->places[0]->output_links)->data);
-	p2 = (pArray2)(((net->transitions[1]->input_links)->next)->data);
+	weight1 = petriGetWeightLink(net, PETRI_TP_LINK, 3, 3);
+	weight2 = petriGetWeightLink(net, PETRI_PT_LINK, 3, 4);
+	sum+=weight2;
+	petriRemovePlace(net, 3);
+	petriAddlink(net, PETRI_TP_LINK, 3, 0, weight1);
 
-	printf("p1 = ");
-	displayPetriLink(p1->data);
-	printf("\n");
-	printf("p2 = ");
-	displayPetriLink(p2->data);
-	printf("\n");
-
-	printf("p1==p2 ? %d\n", (p1==p2));
-
-	petriNodeRemoveOutput(net->places[0], p2);*/
+	printf("sum=%d\n", sum);
+	//petriRemovePlace()
 	displayPetriNet(net);
-
+	
+	printf("initial marking =%d\n", petriGetInitialMarking(net, 0));
 	petriFree(net);
 
 

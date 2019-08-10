@@ -36,7 +36,7 @@ pArray removeElemArray(pArray previous_elem);
 pArray removeFirstElemArray(pArray * pp);
 pArray removeCustomElemArray(pArray * pp, int (* booleanFunction)(void * data, pArray input_to_compare), void * data);
 void freeType(types type, void (* freeFunction)(void * pData), void * pData);
-pArray getArrayElement(pArray p, void * data, int (* booleanFunction)(void * ref, pArray compareTo));
+pArray getArrayElement(pArray p, void * data, int (* booleanFunction)(void * ref, pArray input_to_compare));
 
 
 /*********************************************************************
@@ -119,8 +119,21 @@ void directedGraphFree(pDirectedGraph p);
  * 							Petri Type
  *********************************************************************/
 	// * struct * //
+
 #define PETRI_PLACE_TYPE 1
 #define PETRI_TRANSITION_TYPE 0
+#define PETRI_PT_LINK 2
+#define PETRI_TP_LINK 3
+
+#define petri_type_reverse(type) \
+({ __typeof__ (type) _type = (type); \
+(_type==PETRI_PLACE_TYPE) ? PETRI_TRANSITION_TYPE : PETRI_PLACE_TYPE; })
+
+
+#define petri_input_type_link(link_type) \
+({ __typeof__ (link_type) _link_type = (link_type); \
+(_link_type==PETRI_PT_LINK) ? PETRI_PLACE_TYPE : PETRI_TRANSITION_TYPE; })
+
 
 typedef struct PetriElem * pPetriElem;
 typedef struct PetriElem
@@ -230,9 +243,14 @@ typedef struct Petri
 pPetri petriCreate(unsigned int nb_pl, unsigned int nb_tr);
 void petriAddPlace(pPetri net, unsigned int index, unsigned int initial_marking);
 void petriAddTransition(pPetri net, unsigned int index);
-void petriAddlink(pPetri net, int input_type, unsigned int input, int output_type, unsigned int output, int weight);
+void petriAddlink(pPetri net, int link_type, unsigned int input, unsigned int output, int weight);
 void petriRemovePlace(pPetri net, unsigned int index);
 void petriRemoveTransition(pPetri net, unsigned int index);
+pPetriLink petriGetLink(pPetri net, int link_type, unsigned int input, unsigned int output);
+int petriGetWeightLink(pPetri net, int link_type, unsigned int input, unsigned int output);
+pPetriElem petriGetPlace(pPetri net, unsigned int index);
+pPetriElem petriGetTransition(pPetri net, unsigned int index);
+int petriGetInitialMarking(pPetri net, unsigned int index);
 
 void petriFree(pPetri p);
 
