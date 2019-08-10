@@ -38,20 +38,81 @@ int main(int argc, char ** argv)
 	freeNodeArray2(tmp);
 	freeArray2(p);*/
 
-	pPetri net = petriCreate(5, 2);
+	/*pPetriNode node = petriNodeCreate();
+	pArray2 p1, p2, p, tmp;
+	p = NULL;
+	p = add2(p, uInt_t, uIntCreateNode(1));
+	p1 = p;
+	p = add2(p, uInt_t, uIntCreateNode(2));
+	p2 = p;
+
+	petriNodeAddInput(node, p1);
+	petriNodeAddInput(node, p2);
+
+	void displayNode(pPetriNode node)
+	{
+		pArray l;
+		l = node->input_links;
+		while(l)
+		{
+			tmp = (pArray2)(l->data);
+			printf("{%d} - ", ((pInt)tmp->data)->data);
+			l = l->next;
+		}
+		printf("\n");
+	}
+
+	displayNode(node);
+
+	petriNodeRemoveInput(node, p1);
+
+	displayNode(node);
+
+	petriNodeFree(node);
+
+	
+	freeArray2(p);*/
+
+
+	
+
+	pPetri net = petriCreate(5, 3);
 	petriAddPlace(net, 0, 2);
 	petriAddPlace(net, 1, 2);
 	petriAddPlace(net, 3, 2);
 
 	petriAddTransition(net, 0);
 	petriAddTransition(net, 1);
+	petriAddTransition(net, 2);
 
 	petriAddlink(net, PETRI_PLACE_TYPE, 0, PETRI_TRANSITION_TYPE, 0, 5);
 	petriAddlink(net, PETRI_PLACE_TYPE, 0, PETRI_TRANSITION_TYPE, 1, 4);
 	petriAddlink(net, PETRI_PLACE_TYPE, 1, PETRI_TRANSITION_TYPE, 1, 4);
 
 	petriAddlink(net, PETRI_TRANSITION_TYPE, 1, PETRI_PLACE_TYPE, 3, 6);
+	petriAddlink(net, PETRI_TRANSITION_TYPE, 2, PETRI_PLACE_TYPE, 1, 6);
+	petriAddlink(net, PETRI_TRANSITION_TYPE, 2, PETRI_PLACE_TYPE, 3, 6);
 
+	displayPetriNet(net);
+
+	petriRemovePlace(net, 1);
+	petriRemoveTransition(net, 1);
+
+	/*pArray2 p1, p2;
+
+	p1 = (pArray2)((net->places[0]->output_links)->data);
+	p2 = (pArray2)(((net->transitions[1]->input_links)->next)->data);
+
+	printf("p1 = ");
+	displayPetriLink(p1->data);
+	printf("\n");
+	printf("p2 = ");
+	displayPetriLink(p2->data);
+	printf("\n");
+
+	printf("p1==p2 ? %d\n", (p1==p2));
+
+	petriNodeRemoveOutput(net->places[0], p2);*/
 	displayPetriNet(net);
 
 	petriFree(net);

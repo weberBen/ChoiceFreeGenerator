@@ -231,6 +231,9 @@ pPetri petriCreate(unsigned int nb_pl, unsigned int nb_tr);
 void petriAddPlace(pPetri net, unsigned int index, unsigned int initial_marking);
 void petriAddTransition(pPetri net, unsigned int index);
 void petriAddlink(pPetri net, int input_type, unsigned int input, int output_type, unsigned int output, int weight);
+void petriRemovePlace(pPetri net, unsigned int index);
+void petriRemoveTransition(pPetri net, unsigned int index);
+
 void petriFree(pPetri p);
 
 /*********************************************************************

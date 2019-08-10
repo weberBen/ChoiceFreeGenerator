@@ -21,5 +21,5 @@ unsigned int petriToString(char ** output, pPetri p);
 int listToFile(char * filename, pArray a[], unsigned int n);
 
 void displayPetriNet(pPetri net);
-
+void displayPetriLink(pPetriLink p);
 #endif

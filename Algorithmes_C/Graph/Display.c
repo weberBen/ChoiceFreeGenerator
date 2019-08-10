@@ -492,7 +492,8 @@ void displayPetriLink(pPetriLink p)
         printf("Place");
     else
         printf("Transition");
-    printf("(%d)]", p->output->label);
+    printf("(%d)", p->output->label);
+    printf(", poids=%d]", p->weight);
 }
 
 void displayPetriNode(pPetriNode p, unsigned int index)

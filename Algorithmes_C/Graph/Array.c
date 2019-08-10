@@ -616,7 +616,7 @@ void petriNodeRemoveInput(pPetriNode node, pArray2 plink_in_array)
 	pArray tmp = removeCustomElemArray(&(node->input_links), petriLinkComparaison, plink_in_array);
 	if(tmp!=NULL)//occurence found
 		node->nb_inputs--;
-	free(tmp);//does not free the data inside
+	freeNodeArray(tmp);//does not free the data inside
 }
 
 void petriNodeRemoveOutput(pPetriNode node, pArray2 plink_in_array)
@@ -624,7 +624,7 @@ void petriNodeRemoveOutput(pPetriNode node, pArray2 plink_in_array)
 	pArray tmp = removeCustomElemArray(&(node->output_links), petriLinkComparaison, plink_in_array);
 	if(tmp!=NULL)//occurence found
 		node->nb_outputs--;
-	free(tmp);//does not free the data inside
+	freeNodeArray(tmp);//does not free the data inside
 }
 
 pPetriLink petriNodeGetLinkFromArrayNode(pArray node)
@@ -811,32 +811,111 @@ void petriAddlink(pPetri net, int input_type, unsigned int input, int output_typ
 	petriNodeAddInput(outputs_node_array[output], plink_in_array);
 }
 
-
-void petriRemovePlace(pPetri net, unsigned int index)
+static void petriLinkRemove(pPetri net, pArray2 plink_array)
 {
-	if(index>=net->nb_pl)
+	if(plink_array==NULL)
+		return;
+	
+	pArray2 tmp = removeElemArray2(&(net->links), plink_array);
+	net->nb_links--;
+	freeNodeArray2(tmp);
+}
+
+static void petriNodeRemoveArray(pPetri net, pArray * p_array, int input)
+{
+	if(p_array==NULL || *p_array==NULL)
+		return;
+	
+
+	pArray links_array = *p_array;
+	pArray cursor;
+	pPetriLink link;
+	pArray2 plink_array;
+	unsigned int o_index;
+	int type;
+	
+	void (* petriNodeRemoveFunction)(pPetriNode node, pArray2 plink_in_array);
+	if(input)//remove output for the element linked with the current one (which is an output for the other element)
+		petriNodeRemoveFunction = petriNodeRemoveOutput;
+	else//remove input for the element linked with the current one (which is an input for the other element)
+		petriNodeRemoveFunction = petriNodeRemoveInput;
+
+	while(links_array)
+	{
+		plink_array = (pArray2)(links_array->data);
+		link = petriNodeGetLinkFromArrayNode(links_array);
+		//if we check the inputs of the element, then we know that this element is an output inside the link
+		o_index = (input)?(link->input->label):(link->output->label);
+		type = (input)?(link->input->type):(link->output->type);
+
+		if(type==PETRI_PLACE_TYPE)
+		{
+			petriNodeRemoveFunction(net->places[o_index], plink_array);
+		}else
+		{
+			petriNodeRemoveFunction(net->transitions[o_index], plink_array);
+		}
+
+		cursor = links_array->next;
+
+		freeNodeArray(links_array);
+		petriLinkRemove(net, plink_array);
+
+		links_array = cursor;
+	}
+
+	*p_array = NULL;
+}
+
+void petriRemoveNode(pPetri net, int type, unsigned int index)
+{
+	pPetriNode * nodes_array;
+	pPetriElem * elems_array;
+	unsigned int size;
+
+	if(type==PETRI_PLACE_TYPE)
+	{
+		nodes_array = net->places;
+		size = net->nb_pl;
+		elems_array = net->pl_elems;
+	}else
+	{
+		nodes_array = net->transitions;
+		size = net->nb_tr;
+		elems_array = net->tr_elems;
+	}
+
+	if(index>=size)
 	{
 		fprintf(stderr,"Suppression d'un element hors index dans le reseau de Petri\n");
 		return;
 	}
 
-	if(net->places[index]==NULL)
+	if(nodes_array[index]==NULL)
 		return;
 
-	pPetriNode node = net->places[index];
-	pArray links_array = node->input_links;
-	pPetriLink link;
+	pPetriNode node = nodes_array[index];
 
-	while(links_array)
-	{
-		link = petriNodeGetLinkFromArrayNode(links_array);
+	petriNodeRemoveArray(net, &(node->input_links), 1);//remove all the inputs of that element (which is an output for the other linked with that one)
+	petriNodeRemoveArray(net, &(node->output_links), 0);//remove all the outputs of that element (which is an input for the other linked with that one)
 
-		freeNodeArray(links_array);
+	petriNodeFree(node);
+	nodes_array[index] = NULL;
 
-		
-		links_array = links_array->next;
-	}
+	petriElemFree(elems_array[index]);
+	elems_array[index] = NULL;
 }
+
+void petriRemovePlace(pPetri net, unsigned int index)
+{
+	petriRemoveNode(net, PETRI_PLACE_TYPE, index);
+}
+
+void petriRemoveTransition(pPetri net, unsigned int index)
+{
+	petriRemoveNode(net, PETRI_TRANSITION_TYPE, index);
+}
+
 /*typedef struct Petri * pPetri;
 typedef struct Petri
 {
