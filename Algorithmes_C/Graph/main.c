@@ -173,12 +173,11 @@ int main(int argc, char ** argv)
 	petriAddlink(net, PETRI_TP_LINK, 3, 3, 36);
 	petriAddlink(net, PETRI_TP_LINK, 4, 4, 63);
 
-	pFixedSizeList vect = weightsComputation(net->nb_tr, 10);
+	pFixedSizeList vect =  weightsComputation(net->nb_tr, 10);
 	normalizationPetriNetwork(net, vect);
-
-
+	sdfToFreeChoice(net);
 	displayPetriNet(net);
-
+	
 	fixedSizeListFree(vect);
 	petriFree(net);
 	return 0;

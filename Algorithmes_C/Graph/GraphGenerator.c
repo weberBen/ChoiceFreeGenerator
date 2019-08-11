@@ -563,58 +563,6 @@ void connect(unsigned int u, pDirectedGraph graph, enum colorTag color[], int ar
 }
 
 
-/**********************************************************************
- * 
- * 						PETRI FUNCTIONS
- * 
- * 
- * *******************************************************************/
-
-pPetri petriTransformation(pDirectedGraph graph)
-{
-	/* edge <-> transition and node <-> place */
-	
-	pPetri net = petriCreate(graph->nb_nodes, graph->nb_edges);
-
-	//add nodes and transition
-	int i;
-	int limit_inf = min(net->nb_pl, net->nb_tr);
-	int limit_sup = max(net->nb_pl, net->nb_tr);
-
-	for(i=0; i<limit_inf; i++)
-	{
-		petriAddPlace(net, i, 0);
-		petriAddTransition(net, i);
-	}
-
-	for(i=limit_inf; i<limit_sup; i++)
-	{
-		if(i<net->nb_pl)
-			petriAddPlace(net, i, 0);
-		if(i<net->nb_tr)
-			petriAddTransition(net, i);
-	}
-
-	//add links
-	pArray p;
-	int nb_link;
-
-	nb_link = 0;
-	for(i=0; i<graph->nb_nodes; i++)
-	{
-		p = graph->links_list[i];
-		while(p)
-		{	
-			petriAddlink(net, PETRI_PT_LINK, i, nb_link, 0);
-			petriAddlink(net, PETRI_TP_LINK, nb_link, uIntValue(p) ,0);
-
-			p = p ->next;
-			nb_link++;
-		}
-	}
-	
-	return net;
-}
 
 /**********************************************************************
  * 
@@ -667,18 +615,12 @@ pFixedSizeList weightsComputation(unsigned int nb_transition, unsigned int repet
 void normalizationPetriNetwork(pPetri net, pFixedSizeList repetition_vect)
 {
 	unsigned int * vect = (unsigned int *)(fixedSizeListGetData(repetition_vect));
-	int o;
-	for(o=0; o<repetition_vect->size; o++)
-	{
-		printf("%u * ", vect[o]);
-	}
 	int lcm_val = lcm_array(vect, repetition_vect->size);
 	if(lcm_val==-1)
 	{
 		fprintf(stderr, "Impossible de generer un vecteur repetition (revoir les parametres fournis)\n");
 		return ;
 	}
-	printf("ppcm=%d\n", lcm_val);
 	
 	int i;
 	pPetriNode node;
@@ -713,3 +655,193 @@ void normalizationPetriNetwork(pPetri net, pFixedSizeList repetition_vect)
 		}
 	}
 }
+
+/**********************************************************************
+ * 
+ * 						PETRI FUNCTIONS
+ * 
+ * 
+ * *******************************************************************/
+
+pPetri _petriTransformation(pDirectedGraph graph, int normalize, unsigned int reptition_vect_norm)
+{
+	/* edge <-> transition and node <-> place */
+	pPetri net = petriCreate(graph->nb_nodes, graph->nb_edges);
+
+	unsigned int * vect = NULL;
+	int lcm_val = -1;
+	if(normalize)
+	{
+		pFixedSizeList repetition_vect = weightsComputation(net->nb_tr, reptition_vect_norm);
+		vect = (unsigned int *)(fixedSizeListGetData(repetition_vect));
+		lcm_val = lcm_array(vect, repetition_vect->size);
+		if(lcm_val==-1)
+		{
+			fprintf(stderr, "Impossible de generer un vecteur repetition (revoir les parametres fournis)\n");
+			petriFree(net);
+			return NULL;
+		}
+		petriSetRepetitionVect(net, vect);
+	}
+
+	//add nodes and transition
+	int i;
+	int limit_inf = min(net->nb_pl, net->nb_tr);
+	int limit_sup = max(net->nb_pl, net->nb_tr);
+
+	for(i=0; i<limit_inf; i++)
+	{
+		petriAddPlace(net, i, 0);
+		petriAddTransition(net, i);
+	}
+
+	for(i=limit_inf; i<limit_sup; i++)
+	{
+		if(i<net->nb_pl)
+			petriAddPlace(net, i, 0);
+		if(i<net->nb_tr)
+			petriAddTransition(net, i);
+	}
+
+	//add links
+	pArray p;
+	int nb_link;
+	int normalized_value;
+
+	nb_link = 0;
+	for(i=0; i<graph->nb_nodes; i++)
+	{	
+		normalized_value = (normalize)?(lcm_val/vect[nb_link]):0;
+
+		p = graph->links_list[i];
+		while(p)
+		{	
+			petriAddlink(net, PETRI_PT_LINK, i, nb_link, normalized_value);
+			petriAddlink(net, PETRI_TP_LINK, nb_link, uIntValue(p), normalized_value);
+
+			p = p ->next;
+			nb_link++;
+		}
+	}
+	
+	return net;
+}
+
+
+pPetri petriTransformation(pDirectedGraph graph)
+{
+	return _petriTransformation(graph, 0, 0);
+}
+
+pPetri petriNormalizedTransformation(pDirectedGraph graph, unsigned int reptition_vect_norm)
+{
+	return _petriTransformation(graph, 1, reptition_vect_norm);
+}
+
+/**********************************************************************
+ * 
+ * 						INITIAL MARKING COMPUTATION
+ * 
+ * 
+ * *******************************************************************/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ /**********************************************************************
+ * 
+ * 						FREE CHOICE
+ * 
+ * 
+ * *******************************************************************/
+
+ void sdfToFreeChoice(pPetri net)
+ {
+	 int i;
+	 int i_weight;
+	 int m0;
+	 pPetriNode node, input_node_pl;
+	 pPetriLink link_pt, link_tr;
+	 pPetriElem input_pl, init_input_pl;
+	 unsigned int id_tr;
+	 pArray p, cursor;
+
+	 for(i=0; i<net->nb_tr; i++)
+	 {
+		node = net->transitions[i];
+		if(node==NULL)
+			continue; 
+		if(node->nb_inputs<=1)
+			continue;
+		
+
+		p = node->input_links;
+
+		//manage the first place
+		link_pt = petriNodeGetLinkFromArrayNode(p);
+		init_input_pl = link_pt->input;
+		if(init_input_pl->type!=PETRI_PLACE_TYPE)
+		{
+			fprintf(stderr, "Le reseau de petri n'est pas conforme au standard (lien Transition-Transition trouvé)");
+			return ;
+		}
+
+
+		link_pt->weight = (node->nb_inputs)*(link_pt->weight);//set weight of the place-transition link
+		m0 = init_input_pl->val;//initialize initial marking
+
+		p = p->next;
+
+		//apply the transformation on the other nodes
+		cursor = p;
+		while(cursor)
+		{
+			/* Because at the end of the loop the element referenced by the pointer on array, p, will be removed
+			   we could not check the following element in the array based on that reference (because it will no longer exist).
+			   Thus we save the reference to the next element before the removal of the current one
+			 */
+			cursor = p->next;
+			
+			link_pt = petriNodeGetLinkFromArrayNode(p);
+			input_pl = link_pt->input;
+			if(input_pl->type!=PETRI_PLACE_TYPE)
+			{
+				fprintf(stderr, "Le reseau de petri n'est pas conforme au standard (lien Transition-Transition trouvé)");
+				return ;
+			}
+
+			m0 += input_pl->val;//get initial marking of the input node
+			
+			//get weight of the links
+			input_node_pl = net->places[input_pl->label];//get input node from the current transition
+			if(input_node_pl->nb_inputs!=1)
+			{
+				fprintf(stderr, "Le reseau de petri n'est pas conforme pour la transformation");
+				return ;
+			}
+
+			link_tr = petriNodeGetLinkFromArrayNode(input_node_pl->input_links);//get the only transition from the input node
+			id_tr = link_tr->input->label;
+			i_weight = link_tr->weight;
+
+			petriRemovePlace(net, input_pl->label);
+			//after the removal the link betwwen the input place and its transition does not exists anymore (link_tr does reference nothing)
+			petriAddlink(net, PETRI_TP_LINK, id_tr, init_input_pl->label, i_weight);
+		}
+
+		init_input_pl->val = m0;//set final initial marking
+
+	 }
+ }

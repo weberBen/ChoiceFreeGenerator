@@ -206,11 +206,13 @@ typedef struct Petri
 	pArray2 links;//linked list of petri links
 	pPetriElem * pl_elems;
 	pPetriElem * tr_elems;
+	unsigned int * repetition_vector;
 } petri;
 	
 	// * associated functions * //
 
 pPetri petriCreate(unsigned int nb_pl, unsigned int nb_tr);
+void petriSetRepetitionVect(pPetri net, unsigned int * vect);
 void petriAddPlace(pPetri net, unsigned int index, unsigned int initial_marking);
 void petriAddTransition(pPetri net, unsigned int index);
 void petriAddlink(pPetri net, int link_type, unsigned int input, unsigned int output, int weight);
