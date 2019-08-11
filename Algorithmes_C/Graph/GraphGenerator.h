@@ -12,8 +12,9 @@ pDirectedGraph buildTree(unsigned int n, unsigned int D);
 
 void stronglyConnectedGraph(pDirectedGraph graph, int isTree);
 
-unsigned int * weightsComputation(unsigned int nb_transition, unsigned int repetition_vect_norm);
-
 pPetri petriTransformation(pDirectedGraph graph);
+
+pFixedSizeList weightsComputation(unsigned int nb_transition, unsigned int repetition_vect_norm);
+void normalizationPetriNetwork(pPetri net, pFixedSizeList repetition_vect);
 
 #endif 

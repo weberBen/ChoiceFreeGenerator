@@ -3,7 +3,7 @@
 
 #include "Tools.h"
 
-typedef enum Types {custom_t=-1, uInt_t, petri_t, petriElem_t, petriNode_t, petriLink_t, wrapper_t, array_t, list_t, directedGraph_t} types;
+typedef enum Types {custom_t=-1, uInt_t, petri_t, petriElem_t, petriNode_t, petriLink_t, wrapper_t, array_t, list_t, fixedSizeList_t, directedGraph_t} types;
 
 /*********************************************************************
  * 							SIMPLE LINKED LIST
@@ -79,6 +79,22 @@ typedef struct List
 	// * associated functions * //
 pList listCreate(pArray * p, unsigned int size);
 void listFree(list * g);
+
+
+/*********************************************************************
+ * 						 FIXED SIZE LIST 
+ *********************************************************************/
+	// * struct * //
+typedef struct FixedSizeList * pFixedSizeList;
+typedef struct FixedSizeList
+{
+	pArray data;
+	unsigned int size;
+} fixedSizeList;
+
+	// * associated functions * //
+pFixedSizeList fixedSizeListCreate(pArray p, unsigned int size);
+void fixedSizeListFree(pFixedSizeList p);
 
 
 /*********************************************************************

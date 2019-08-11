@@ -622,7 +622,7 @@ pPetri petriTransformation(pDirectedGraph graph)
  * 
  * 
  * *******************************************************************/
-unsigned int * weightsComputation(unsigned int nb_transition, unsigned int repetition_vect_norm)
+pFixedSizeList weightsComputation(unsigned int nb_transition, unsigned int repetition_vect_norm)
 {
 	/* Fist the function generate an array of n integers, where n is the number of transitions in the Petri net, such as
 		the sum of each element of the array is approximativly equal to the nomr of the T-semiflow.
@@ -659,6 +659,12 @@ unsigned int * weightsComputation(unsigned int nb_transition, unsigned int repet
 		random_weights[1]=temp[2];
 	}
 
-	return random_weights;
+	pArray node = createCustomNode(free, random_weights);
+	return fixedSizeListCreate(node, repetition_vect_norm);//avoid having a variable for the array and another for the size
 }
 
+
+void normalizationPetriNetwork(pPetri net, pFixedSizeList repetition_vect)
+{
+	
+}

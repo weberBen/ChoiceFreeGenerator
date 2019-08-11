@@ -151,6 +151,9 @@ void freeType(types type, void (* freeFunction)(void * pData), void * pData)
 		case list_t:
 			listFree((pList)(pData));
 			break;
+		case fixedSizeList_t:
+			fixedSizeListFree((pFixedSizeList)(pData));
+			break;
 		case custom_t:
 			if(freeFunction==NULL)
 			{
@@ -366,6 +369,36 @@ void freeArray2(pArray2 p)
 		cursor = p;
 	}
 }
+
+/*********************************************************************
+ * 
+ * 					
+ * 						FIXED SIZE LIST FUNCTIONS
+ * 
+ * 
+ *********************************************************************/
+ 
+
+pFixedSizeList fixedSizeListCreate(pArray p, unsigned int size)
+{
+	pFixedSizeList output = (pFixedSizeList)malloc(sizeof(fixedSizeList));
+	assert(output);
+
+	output->data = p;
+	output->size = size;
+
+	return output;
+}
+
+void fixedSizeListFree(pFixedSizeList p)
+{
+	if(p==NULL)
+		return;
+	
+	freeNodeArray(p->data);
+	free(p);
+}
+
 
 /*********************************************************************
  * 
