@@ -756,17 +756,7 @@ pPetri petriCreate(unsigned int nb_pl, unsigned int nb_tr)
 		tmp_elem[i] = NULL;
 	}
 
-	output->repetition_vector = NULL;
-
 	return output;
-}
-
-void petriSetRepetitionVect(pPetri net, unsigned int * vect)
-{
-	if(net==NULL)
-		return;
-	
-	net->repetition_vector = vect;
 }
 
 void petriAddPlace(pPetri net, unsigned int index, unsigned int initial_marking)
@@ -1148,7 +1138,6 @@ void petriFree(pPetri p)
 	free(p->transitions);
 	free(p->pl_elems);
 	free(p->tr_elems);
-	free(p->repetition_vector);
 
 	freeArray2(p->links);
 

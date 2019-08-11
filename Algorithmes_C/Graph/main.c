@@ -149,6 +149,13 @@ int main(int argc, char ** argv)
 	petriFree(net);
 	return 0;*/
 
+	pDirectedGraph temp = randomGraph(5, 2,  1);//create graph
+	stronglyConnectedGraph(temp, 0);
+	petriFree(petriNormalizedTransformation(temp, 10));
+	directedGraphFree(temp);
+
+	return 0;
+
 	pPetri net = petriCreate(5, 5);
 	petriAddPlace(net, 0, 2);
 	petriAddPlace(net, 1, 24);
@@ -173,12 +180,12 @@ int main(int argc, char ** argv)
 	petriAddlink(net, PETRI_TP_LINK, 3, 3, 36);
 	petriAddlink(net, PETRI_TP_LINK, 4, 4, 63);
 
-	pFixedSizeList vect =  weightsComputation(net->nb_tr, 10);
+	unsigned int * vect =  weightsComputation(net->nb_tr, 10);
 	normalizationPetriNetwork(net, vect);
 	sdfToFreeChoice(net);
 	displayPetriNet(net);
 	
-	fixedSizeListFree(vect);
+	free(vect);
 	petriFree(net);
 	return 0;
 

@@ -570,7 +570,7 @@ void connect(unsigned int u, pDirectedGraph graph, enum colorTag color[], int ar
  * 
  * 
  * *******************************************************************/
-pFixedSizeList weightsComputation(unsigned int nb_transition, unsigned int repetition_vect_norm)
+unsigned int * weightsComputation(unsigned int nb_transition, unsigned int repetition_vect_norm)
 {
 	/* Fist the function generate an array of n integers, where n is the number of transitions in the Petri net, such as
 		the sum of each element of the array is approximativly equal to the nomr of the T-semiflow.
@@ -607,15 +607,13 @@ pFixedSizeList weightsComputation(unsigned int nb_transition, unsigned int repet
 		random_weights[1]=temp[2];
 	}
 
-	pArray node = createCustomNode(free, random_weights);
-	return fixedSizeListCreate(node, nb_transition);//avoid having a variable for the array and another for the size
+	return random_weights;
 }
 
 
-void normalizationPetriNetwork(pPetri net, pFixedSizeList repetition_vect)
+void normalizationPetriNetwork(pPetri net, unsigned int * repetition_vect)
 {
-	unsigned int * vect = (unsigned int *)(fixedSizeListGetData(repetition_vect));
-	int lcm_val = lcm_array(vect, repetition_vect->size);
+	int lcm_val = lcm_array(repetition_vect, net->nb_tr);
 	if(lcm_val==-1)
 	{
 		fprintf(stderr, "Impossible de generer un vecteur repetition (revoir les parametres fournis)\n");
@@ -634,7 +632,7 @@ void normalizationPetriNetwork(pPetri net, pFixedSizeList repetition_vect)
 		if(node==NULL)
 			continue;
 		
-		normalized_value = lcm_val/vect[i];
+		normalized_value = lcm_val/repetition_vect[i];
 		
 		pi = node->input_links;
 		po = node->output_links;
@@ -663,25 +661,23 @@ void normalizationPetriNetwork(pPetri net, pFixedSizeList repetition_vect)
  * 
  * *******************************************************************/
 
-pPetri _petriTransformation(pDirectedGraph graph, int normalize, unsigned int reptition_vect_norm)
+pPetri _petriTransformation(pDirectedGraph graph, int normalize, unsigned int repetition_vect_norm)
 {
 	/* edge <-> transition and node <-> place */
-	pPetri net = petriCreate(graph->nb_nodes, graph->nb_edges);
+	pPetri net = petriCreate(graph->nb_edges, graph->nb_nodes);
 
-	unsigned int * vect = NULL;
 	int lcm_val = -1;
+	unsigned int * repetition_vect = NULL;
 	if(normalize)
 	{
-		pFixedSizeList repetition_vect = weightsComputation(net->nb_tr, reptition_vect_norm);
-		vect = (unsigned int *)(fixedSizeListGetData(repetition_vect));
-		lcm_val = lcm_array(vect, repetition_vect->size);
+		repetition_vect =  weightsComputation(net->nb_tr, repetition_vect_norm);
+		lcm_val = lcm_array(repetition_vect, net->nb_tr);
 		if(lcm_val==-1)
 		{
 			fprintf(stderr, "Impossible de generer un vecteur repetition (revoir les parametres fournis)\n");
 			petriFree(net);
 			return NULL;
 		}
-		petriSetRepetitionVect(net, vect);
 	}
 
 	//add nodes and transition
@@ -706,36 +702,46 @@ pPetri _petriTransformation(pDirectedGraph graph, int normalize, unsigned int re
 	//add links
 	pArray p;
 	int nb_link;
-	int normalized_value;
+	unsigned int id_tr;
+	int normalized_value_i, normalized_value_o;
 
 	nb_link = 0;
 	for(i=0; i<graph->nb_nodes; i++)
 	{	
-		normalized_value = (normalize)?(lcm_val/vect[nb_link]):0;
+		normalized_value_i = (normalize)?(lcm_val/repetition_vect[i]):0;
 
 		p = graph->links_list[i];
 		while(p)
 		{	
-			petriAddlink(net, PETRI_PT_LINK, i, nb_link, normalized_value);
-			petriAddlink(net, PETRI_TP_LINK, nb_link, uIntValue(p), normalized_value);
+			//i : index of the current transition
+			//nb_link : index of the current place
+
+			//add link between the current transition and a "random" place
+			petriAddlink(net, PETRI_TP_LINK, i, nb_link, normalized_value_i);
+			//add link the place and the output of the current node in the graph (which is the destination transition for the link)
+			id_tr = uIntValue(p);//get id of the transition which is an output of the current node of the graph
+			normalized_value_o = (normalize)?(lcm_val/repetition_vect[id_tr]):0;
+			petriAddlink(net, PETRI_PT_LINK, nb_link, id_tr, normalized_value_o);
 
 			p = p ->next;
 			nb_link++;
 		}
 	}
 	
+	if(repetition_vect!=NULL)
+		free(repetition_vect);
+
 	return net;
 }
-
 
 pPetri petriTransformation(pDirectedGraph graph)
 {
 	return _petriTransformation(graph, 0, 0);
 }
 
-pPetri petriNormalizedTransformation(pDirectedGraph graph, unsigned int reptition_vect_norm)
+pPetri petriNormalizedTransformation(pDirectedGraph graph, unsigned int repetition_vect_norm)
 {
-	return _petriTransformation(graph, 1, reptition_vect_norm);
+	return _petriTransformation(graph, 1, repetition_vect_norm);
 }
 
 /**********************************************************************
@@ -745,7 +751,10 @@ pPetri petriNormalizedTransformation(pDirectedGraph graph, unsigned int reptitio
  * 
  * *******************************************************************/
 
-
+void initialMarking(pPetri net)
+{
+	
+}
 
 
 
