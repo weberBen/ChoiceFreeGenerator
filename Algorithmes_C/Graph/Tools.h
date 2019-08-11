@@ -30,6 +30,7 @@ int getIndexCumulativeProba(double * cumulProba, unsigned int size, double value
 
 unsigned int gcd(unsigned int x, unsigned int y);
 int gcd_array(unsigned int * input, unsigned int size);
-
+int lcm(unsigned int x, unsigned int y);
+int lcm_array(unsigned int * input, unsigned int size);
 
 #endif 

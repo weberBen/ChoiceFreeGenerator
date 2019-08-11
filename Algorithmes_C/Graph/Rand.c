@@ -403,10 +403,10 @@ unsigned int * randomFixedSum(unsigned int n, int sum){
 	assert(output);
 	
 	unsigned int i;
-	int count =0;
+	int count = 0;
 	
 	for(i=0; i<n; i++){
-		output[i]= rand()%(sum-n+1);
+		output[i] = 1 + rand()%(sum-n+1);
 		count+=output[i];
 	}
 	

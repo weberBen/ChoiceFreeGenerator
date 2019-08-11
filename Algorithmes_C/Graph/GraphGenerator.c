@@ -660,11 +660,56 @@ pFixedSizeList weightsComputation(unsigned int nb_transition, unsigned int repet
 	}
 
 	pArray node = createCustomNode(free, random_weights);
-	return fixedSizeListCreate(node, repetition_vect_norm);//avoid having a variable for the array and another for the size
+	return fixedSizeListCreate(node, nb_transition);//avoid having a variable for the array and another for the size
 }
 
 
 void normalizationPetriNetwork(pPetri net, pFixedSizeList repetition_vect)
 {
+	unsigned int * vect = (unsigned int *)(fixedSizeListGetData(repetition_vect));
+	int o;
+	for(o=0; o<repetition_vect->size; o++)
+	{
+		printf("%u * ", vect[o]);
+	}
+	int lcm_val = lcm_array(vect, repetition_vect->size);
+	if(lcm_val==-1)
+	{
+		fprintf(stderr, "Impossible de generer un vecteur repetition (revoir les parametres fournis)\n");
+		return ;
+	}
+	printf("ppcm=%d\n", lcm_val);
 	
+	int i;
+	pPetriNode node;
+	pPetriLink link;
+	pArray pi, po;
+	int normalized_value;
+
+	for(i=0; i<net->nb_tr; i++)
+	{
+		node = net->transitions[i];
+		if(node==NULL)
+			continue;
+		
+		normalized_value = lcm_val/vect[i];
+		
+		pi = node->input_links;
+		po = node->output_links;
+		while(pi || po)
+		{
+			if(pi)
+			{
+				link = petriNodeGetLinkFromArrayNode(pi);
+				link->weight = normalized_value;
+				pi = pi->next;
+			}
+			if(po)
+			{
+				link = petriNodeGetLinkFromArrayNode(po);
+				link->weight = normalized_value;
+				po = po->next;
+			}
+		}
+	}
 }

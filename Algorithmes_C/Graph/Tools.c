@@ -3,7 +3,6 @@
 #include <math.h>
 #include <assert.h>
 
-
 #include "Tools.h"
 
  
@@ -174,3 +173,31 @@ int gcd_array(unsigned int * input, unsigned int size)
 
 	return gcd_val;
 }
+
+int lcm(unsigned int x, unsigned int y)
+{
+	int gcd_val = gcd(x, y);
+	if(gcd_val==-1)
+		return -1;
+	
+	return (x*y)/gcd_val;
+}
+
+int lcm_array(unsigned int * input, unsigned int size) 
+{ 
+    // Initialize result 
+    unsigned int lcm_val = input[0]; 
+	int gcd_val;
+    int i;
+    for (i=1; i < size; i++) 
+	{
+		gcd_val = gcd(input[i], lcm_val);
+		if(gcd_val==-1)
+			return -1;
+        lcm_val = ((input[i] * lcm_val)) / gcd_val; 
+	}
+  
+    return lcm_val; 
+} 
+
+

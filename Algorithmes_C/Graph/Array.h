@@ -91,9 +91,11 @@ typedef struct FixedSizeList
 	pArray data;
 	unsigned int size;
 } fixedSizeList;
+//allow to gather an array (with its type and its free function through the node array pArray) and its size
 
 	// * associated functions * //
 pFixedSizeList fixedSizeListCreate(pArray p, unsigned int size);
+void * fixedSizeListGetData(pFixedSizeList p);
 void fixedSizeListFree(pFixedSizeList p);
 
 

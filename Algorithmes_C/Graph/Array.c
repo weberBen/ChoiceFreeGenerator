@@ -390,6 +390,16 @@ pFixedSizeList fixedSizeListCreate(pArray p, unsigned int size)
 	return output;
 }
 
+void * fixedSizeListGetData(pFixedSizeList p)
+{
+	if(p==NULL)
+		return NULL;
+	if(p->data==NULL)
+		return NULL;
+	
+	return (p->data)->data;
+}
+
 void fixedSizeListFree(pFixedSizeList p)
 {
 	if(p==NULL)

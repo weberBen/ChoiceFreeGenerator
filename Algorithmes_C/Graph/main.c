@@ -32,7 +32,7 @@ void petriFree(pPetri p);
 
 int main(int argc, char ** argv)
 {
-	unsigned int size = 500;
+	/*unsigned int size = 500;
 	unsigned int Ki = 10;
 	unsigned int Ko = 3;
 
@@ -47,9 +47,8 @@ int main(int argc, char ** argv)
 	printf("\n----------------------------------\n");
 
 	directedGraphFree(graph);
-	petriFree(petri);
+	petriFree(petri);*/
 
-	return 0;
 
 	/*pArray2 p = NULL;
 	pArray2 data;
@@ -150,7 +149,7 @@ int main(int argc, char ** argv)
 	petriFree(net);
 	return 0;*/
 
-	/*pPetri net = petriCreate(5, 5);
+	pPetri net = petriCreate(5, 5);
 	petriAddPlace(net, 0, 2);
 	petriAddPlace(net, 1, 24);
 	petriAddPlace(net, 2, 22);
@@ -174,7 +173,16 @@ int main(int argc, char ** argv)
 	petriAddlink(net, PETRI_TP_LINK, 3, 3, 36);
 	petriAddlink(net, PETRI_TP_LINK, 4, 4, 63);
 
+	pFixedSizeList vect = weightsComputation(net->nb_tr, 10);
+	normalizationPetriNetwork(net, vect);
+
+
 	displayPetriNet(net);
+
+	fixedSizeListFree(vect);
+	petriFree(net);
+	return 0;
+
 	int sum, weight1, weight2;
 	
 	weight2 = petriGetWeightLink(net, PETRI_PT_LINK, 0, 4);
@@ -203,7 +211,7 @@ int main(int argc, char ** argv)
 	//displayPetriNet(net);
 
 	printf("initial marking =%d\n", petriGetInitialMarking(net, 0));
-	petriFree(net);*/
+	petriFree(net);
 
 
 	//test functions
