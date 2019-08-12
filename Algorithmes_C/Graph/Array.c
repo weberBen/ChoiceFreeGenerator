@@ -1098,6 +1098,91 @@ int petriGetInitialMarking(pPetri net, unsigned int index)
 	return elem->val;
 }
 
+void petriClearNodesArray(pPetri net, int type_array)
+{
+	if(net==NULL)
+		return ;
+	
+	pPetriNode * nodes;
+	pPetriElem * elems;
+	unsigned int size, current_index, index;
+	int i;
+
+	if(type_array==PETRI_PLACE_TYPE)
+	{
+		nodes =  net->places;
+		elems = net->pl_elems;
+		size = net->nb_pl;
+	}else
+	{
+		nodes =  net->transitions;
+		elems = net->tr_elems;
+		size = net->nb_tr;
+	}
+	current_index = 0;
+
+	//get actual size
+	for(i=0; i<size; i++)
+	{
+		if(elems[i]!=NULL)
+			current_index++;
+	}
+
+	//allocate memory for the new arrays
+	pPetriNode * new_nodes = (pPetriNode *)malloc(sizeof(pPetriNode)*current_index);
+	assert(new_nodes);
+	pPetriElem * new_elems = (pPetriElem *)malloc(sizeof(pPetriElem)*current_index);
+	assert(new_elems);
+
+	//initialize new array
+	index = 0;
+	for(i=0; i<size; i++)
+	{
+		if(elems[i]==NULL)
+			continue;
+		if(nodes[i]==NULL)
+		{
+			fprintf(stderr, "Gestion de la memoire corrompu pour le reseau de petri\n");
+			free(new_nodes);
+			free(new_elems);
+			return ;
+		}
+		
+		new_nodes[index] = nodes[i];
+		new_elems[index] = elems[i];
+		elems[i]->label = index;
+		index++;
+	}
+
+	//free old arrays
+	free(nodes);
+	free(elems);
+
+	//set new arrays
+	if(type_array==PETRI_PLACE_TYPE)
+	{
+		net->places = new_nodes;
+		net->pl_elems = new_elems;
+		net->nb_pl = current_index;
+	}else
+	{
+		net->transitions = new_nodes;
+		net->tr_elems = new_elems;
+		net->nb_tr = current_index;
+	}
+
+}
+
+void petriClearPlaces(pPetri net)
+{
+	petriClearNodesArray(net, PETRI_PLACE_TYPE);
+}
+
+void petriClearTransitions(pPetri net)
+{
+	petriClearNodesArray(net, PETRI_TRANSITION_TYPE);
+}
+
 void petriFree(pPetri p)
 {
 	if(p==NULL)

@@ -40,7 +40,7 @@ f2 = gd.drawPetriNetwork(graph2.obj, 500, 1.5)
 f2.show()
 
 c.free(graph2)'''
-net = c.freeChoice(n=10, Ki=4, Ko=2, rep_vect_norm=50)
+net = c.freeChoice(n=5, Ki=2, Ko=2, rep_vect_norm=10, cleanExtraMemSpace=True)
 f_net = gd.drawPetriNetwork(net.obj, 500, 1.5)
 f_net.show()
 
@@ -51,7 +51,7 @@ graph = "4|3/3|0/4|0/2|1/2|1/"
 f = gd.drawGraphFromString(graph, nodeSize=200, widthArraw=1.5)
 f.show()
 
-petri = "(p0,3)/(p1,1)/(p2,1)/(p3,2)/(p4,3)/(p5,0)/(p6,2)/(p7,0)/(p8,0)/(p9,1);t0/t1/t2/t3/t4;(p9,t1,1)/(t4,p9,3)/(p8,t2,3)/(t4,p8,3)/(p7,t1,1)/(t3,p7,1)/(p6,t2,3)/(t3,p6,1)/(p5,t0,3)/(t2,p5,3)/(p4,t4,3)/(t2,p4,3)/(p3,t0,3)/(t1,p3,1)/(p2,t3,1)/(t1,p2,1)/(p1,t3,1)/(t0,p1,3)/(p0,t4,3)/(t0,p0,3)"
+petri = "(p0,10)/(p1,7)/(p2,0)/(p3,6)/(p4,0);t0/t1/t2/t3/t4;(t2,p1,3)/(t0,p3,6)/(t0,p0,6)/(t2,p4,3)/(t1,p2,2)/(p4,t1,4)/(t4,p4,3)/(p3,t3,4)/(t4,p3,3)/(p2,t0,12)/(t3,p2,2)/(p1,t4,6)/(t3,p1,2)/(p0,t2,6)/(t1,p0,2)"
 fp = gd.drawPetriFromString(petri, nodeSize=500, widthArraw=1.5)
 fp.show()'''
 

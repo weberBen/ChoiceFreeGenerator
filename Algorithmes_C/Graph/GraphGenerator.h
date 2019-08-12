@@ -24,9 +24,9 @@ void normalizationPetriNetwork(pPetri net, unsigned int * repetition_vect);
 
 void setInitialMarking(pPetri net);
 
-void sdfToFreeChoice(pPetri net);
+void sdfToFreeChoice(pPetri net, int resizeNetAfter);
 
-pPetri generateRandomFreeChoice(unsigned int nb_transition, unsigned int nb_input_tr, unsigned int nb_output_tr, unsigned int repetition_vect_norm);
-pPetri generateFreeChoiceWithVector(unsigned int nb_transition, unsigned int nb_input_tr, unsigned int nb_output_tr, unsigned int * repetition_vect);
+pPetri generateRandomFreeChoice(unsigned int nb_transition, unsigned int nb_input_tr, unsigned int nb_output_tr, unsigned int repetition_vect_norm, int cleanExtraMemSpace);
+pPetri generateFreeChoiceWithVector(unsigned int nb_transition, unsigned int nb_input_tr, unsigned int nb_output_tr, unsigned int * repetition_vect, int cleanExtraMemSpace);
 
 #endif 

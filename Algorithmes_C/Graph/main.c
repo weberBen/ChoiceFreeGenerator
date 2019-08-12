@@ -34,7 +34,8 @@ void petriFree(pPetri p);
 
 int main(int argc, char ** argv)
 {
-pPetri net1 = generateRandomFreeChoice(5, 2, 2, 10);
+pPetri net1 = generateRandomFreeChoice(10, 3, 3, 10, 0);
+displayPetriNet(net1);
 /*unsigned int * vect = weightsComputation(5, 4);
 pPetri net1 = generateFreeChoiceWithVector(5,2,2,vect);
 free(vect);*/

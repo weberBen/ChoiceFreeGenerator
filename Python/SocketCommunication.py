@@ -49,11 +49,13 @@ class Request(ctypes.Structure):
                 ("Ki", ctypes.c_int),
                 ("Ko", ctypes.c_int),
                 ("isTree", ctypes.c_uint),
-                ("rep_vect_norm", ctypes.c_uint)
+                ("rep_vect_norm", ctypes.c_uint),
+                ("cleanExtraMemSpace", ctypes.c_int)
                ]
     ''' must be at the same order than the field of the c structure'''
     
-def createRequest(task, n=None, D=None, wrapperId=None, isTree=None, newWrapperId=None, Ki=None, Ko=None, rep_vect_norm=None):
+def createRequest(task, n=None, D=None, wrapperId=None, isTree=None, newWrapperId=None, Ki=None, Ko=None, rep_vect_norm=None,
+                  cleanExtraMemSpace=None):
     '''create request with the correct format for the arguments'''
     frame = inspect.currentframe()
     args, _, _, values = inspect.getargvalues(frame)#get arguments of the function
@@ -104,8 +106,13 @@ def createRequest(task, n=None, D=None, wrapperId=None, isTree=None, newWrapperI
                 rep_vect_norm = ctypes.c_uint(0)
             else :
                 rep_vect_norm = ctypes.c_uint(value)
-        
-    return Request(task, n, D, wrapperId, newWrapperId, Ki, Ko, isTree, rep_vect_norm)
+        elif(name_args=="cleanExtraMemSpace"):
+            if(value is None):
+                cleanExtraMemSpace = ctypes.c_int(0)
+            else :
+                cleanExtraMemSpace = ctypes.c_int(value)
+    
+    return Request(task, n, D, wrapperId, newWrapperId, Ki, Ko, isTree, rep_vect_norm, cleanExtraMemSpace)
 
 #%%
 class Server:
@@ -121,7 +128,7 @@ class Server:
         self.NAME_MAIN_SERVER_C = Directories.NAME_MAIN_SERVER_C
         
         #start C server
-        self.openCServerSide()
+        #self.openCServerSide()
     
     @staticmethod
     def findFreePort():

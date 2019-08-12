@@ -10,7 +10,7 @@ import SocketCommunication as sc
 
 #%%
 _id = 0
-srv = sc.Server()
+srv = sc.Server(1436, 512)
 
 def showErrors():
     print(srv.getTerminalErros())
@@ -41,7 +41,7 @@ def buildTree(n, D):
     return Graph(id, gd.parseGraph(response))
 
 #%%
-def stronglyConnectedGraph(graph, isTree):
+def stronglyConnectedGraph(graph, isTree=False):
     tree=None
     if(isTree==True):
         tree = 1
@@ -75,9 +75,15 @@ def petriTransformation(graph):
     return Graph(id, gd.parsePetriNetwork(response))
 
 #%%
-def freeChoice(n, Ki, Ko, rep_vect_norm):
+def freeChoice(n, Ki, Ko, rep_vect_norm, cleanExtraMemSpace=False):
+    memClean=None
+    if(cleanExtraMemSpace==True):
+        memClean = 1
+    else:
+        memClean = 0
+    
     id = getnewId()
-    request = sc.createRequest(task = sc.Task.t_freeChoice, n=n, wrapperId = id, Ki=Ki, Ko=Ko, rep_vect_norm=rep_vect_norm)
+    request = sc.createRequest(task = sc.Task.t_freeChoice, n=n, wrapperId = id, Ki=Ki, Ko=Ko, rep_vect_norm=rep_vect_norm, cleanExtraMemSpace=memClean)
     response =  srv.getResponse(request)
     return Graph(id, gd.parsePetriNetwork(response))
 

@@ -221,6 +221,8 @@ int petriGetWeightLink(pPetri net, int link_type, unsigned int input, unsigned i
 pPetriElem petriGetPlace(pPetri net, unsigned int index);
 pPetriElem petriGetTransition(pPetri net, unsigned int index);
 int petriGetInitialMarking(pPetri net, unsigned int index);
+void petriClearPlaces(pPetri net);
+void petriClearTransitions(pPetri net);
 
 void petriFree(pPetri p);
 
