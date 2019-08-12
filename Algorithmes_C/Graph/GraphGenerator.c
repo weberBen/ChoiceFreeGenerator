@@ -3,6 +3,12 @@
 #include <assert.h>
 #include <math.h>
 
+
+#include <sys/types.h>
+#include <unistd.h>
+#include <sys/resource.h>
+
+
 #include "GraphGenerator.h"
 
 /**********************************************************************
@@ -578,6 +584,13 @@ unsigned int * weightsComputation(unsigned int nb_transition, unsigned int repet
 		Then to make sure there is no useless tokens we ensure that the gcm of the array is 1
 	*/
 
+	if(repetition_vect_norm<nb_transition)
+	{
+		fprintf(stderr, "Norme du vecteur incompatible avec le nombre de transition dans la generation de poids\n" \
+						"\tNombre de transitions : %u    | Norme du vecteur : %u\n", nb_transition, repetition_vect_norm);
+		return NULL;
+	}
+
 	//generate array of random integers with a fixed sum
 	unsigned int * random_weights = randomFixedSum(nb_transition, repetition_vect_norm);
 
@@ -984,7 +997,7 @@ pPetri _generateFreeChoice(unsigned int nb_transition, unsigned int nb_input_tr,
 	
 	printf("Transformation en graphe fortement connexe...\n");
 	stronglyConnectedGraph(graph, 0);
-
+	
 	printf("Transformation en SDF...\n");
 	pPetri net;
 	if(repetition_vect==NULL)

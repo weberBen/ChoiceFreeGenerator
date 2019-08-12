@@ -35,6 +35,9 @@ void petriFree(pPetri p);
 int main(int argc, char ** argv)
 {
 pPetri net1 = generateRandomFreeChoice(5, 2, 2, 10);
+/*unsigned int * vect = weightsComputation(5, 4);
+pPetri net1 = generateFreeChoiceWithVector(5,2,2,vect);
+free(vect);*/
 petriFree(net1);
 return 0;
 /*glp_prob *lp;

@@ -238,3 +238,14 @@ def drawPetriNetwork(petri, nodeSize, widthArraw):
     
     plt.ion()#active interactive mode
     return fig
+
+#%%
+def drawGraphFromString(graph_string,nodeSize, widthArraw):
+    Xgraph = toNetworkxGraph(parseGraph(graph_string))
+    f = plotGraph(Xgraph, nodeSize=nodeSize, widthArraw=widthArraw)
+    return f
+
+def drawPetriFromString(petri_string, nodeSize, widthArraw ):
+    Xpetri = parsePetriNetwork(petri_string)
+    f = drawPetriNetwork(Xpetri, nodeSize = nodeSize, widthArraw = widthArraw)
+    return f

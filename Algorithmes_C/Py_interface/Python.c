@@ -4,10 +4,10 @@
 #include <unistd.h>
 #include <string.h>
 #include <assert.h>
-
+#include <unistd.h>
 #include "Python.h"
 
-typedef enum Tasks {t_closeServer=-1, t_buildTree = 0, t_stronglyConnectedGraph=1, t_randomGraph=2, t_free=3, t_petri=4} tasks;
+typedef enum Tasks {t_closeServer=-1, t_buildTree = 0, t_stronglyConnectedGraph=1, t_randomGraph=2, t_free=3, t_petri=4, t_freeChoice=5} tasks;
 
 typedef struct Request 
 {
@@ -19,6 +19,7 @@ typedef struct Request
 	int Ki;
 	int Ko;
 	int isTree;
+	unsigned int rep_vect_norm;
 } request;
 
 /**********************************************************************
@@ -100,9 +101,8 @@ static void sendResponse(request * req, char * buff, int BUFFSIZE, unsigned int 
 			
 			pWrapper p = wrapperGetElem(_list, req->wrapperId);
 			pDirectedGraph graph1 = (pDirectedGraph)(p->data);
-
-			pPetri petriN = petriNormalizedTransformation(graph1, 10);
-			setInitialMarking(petriN);
+			
+			pPetri petriN = petriTransformation(graph1);
 			wrapperAddToList(&_list, wrapperCreateNode(req->newWrapperId, petri_t, (void *)petriN));
 			
 			wrapperRemoveFromList(&_list, req->wrapperId);
@@ -110,6 +110,16 @@ static void sendResponse(request * req, char * buff, int BUFFSIZE, unsigned int 
 			petriWrite(petriN, csock);//write petri net to the socket
 
 			return ;
+		}
+			break;
+		case t_freeChoice:
+		{
+			printf("Creation d'un Free-choice aleatoirement\n");
+			
+			pPetri graph1 = generateRandomFreeChoice(req->n, req->Ki, req->Ko, req->rep_vect_norm);//create graph
+			wrapperAddToList(&_list, wrapperCreateNode(req->wrapperId, petri_t, (void *)graph1));
+			
+			petriWrite(graph1, csock);//write petri net to the socket
 		}
 			break;
 		default :

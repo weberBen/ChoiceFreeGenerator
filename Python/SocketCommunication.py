@@ -36,6 +36,7 @@ class Task:
     t_randomGraph=2
     t_free=3
     t_petri=4
+    t_freeChoice=5
 
 
 #%%
@@ -47,11 +48,12 @@ class Request(ctypes.Structure):
                 ("newWrapperId", ctypes.c_uint),
                 ("Ki", ctypes.c_int),
                 ("Ko", ctypes.c_int),
-                ("isTree", ctypes.c_uint)
+                ("isTree", ctypes.c_uint),
+                ("rep_vect_norm", ctypes.c_uint)
                ]
     ''' must be at the same order than the field of the c structure'''
     
-def createRequest(task, n=None, D=None, wrapperId=None, isTree=None, newWrapperId=None, Ki=None, Ko=None):
+def createRequest(task, n=None, D=None, wrapperId=None, isTree=None, newWrapperId=None, Ki=None, Ko=None, rep_vect_norm=None):
     '''create request with the correct format for the arguments'''
     frame = inspect.currentframe()
     args, _, _, values = inspect.getargvalues(frame)#get arguments of the function
@@ -97,8 +99,13 @@ def createRequest(task, n=None, D=None, wrapperId=None, isTree=None, newWrapperI
                 Ko = ctypes.c_int(-1)
             else :
                 Ko = ctypes.c_int(value)
+        elif(name_args=="rep_vect_norm"):
+            if(value is None):
+                rep_vect_norm = ctypes.c_uint(0)
+            else :
+                rep_vect_norm = ctypes.c_uint(value)
         
-    return Request(task, n, D, wrapperId, newWrapperId, Ki, Ko, isTree)
+    return Request(task, n, D, wrapperId, newWrapperId, Ki, Ko, isTree, rep_vect_norm)
 
 #%%
 class Server:

@@ -75,6 +75,13 @@ def petriTransformation(graph):
     return Graph(id, gd.parsePetriNetwork(response))
 
 #%%
+def freeChoice(n, Ki, Ko, rep_vect_norm):
+    id = getnewId()
+    request = sc.createRequest(task = sc.Task.t_freeChoice, n=n, wrapperId = id, Ki=Ki, Ko=Ko, rep_vect_norm=rep_vect_norm)
+    response =  srv.getResponse(request)
+    return Graph(id, gd.parsePetriNetwork(response))
+
+#%%
 def exit():
     srv.close()
 #%%
