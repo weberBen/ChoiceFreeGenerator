@@ -16,6 +16,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <sys/resource.h>
+#include <glpk.h> 
 
 /*
 pPetri petriCreate(unsigned int nb_pl, unsigned int nb_tr);
@@ -30,24 +31,114 @@ void petriFree(pPetri p);
  	if (setrlimit(RLIMIT_STACK, &lim) == -1)
   		return 1;*/
 
+
 int main(int argc, char ** argv)
 {
-	/*unsigned int size = 500;
+
+/*glp_prob *lp;
+  int ia[1+1000], ja[1+1000];
+  double ar[1+1000], z, x1, x2, x3;
+  
+  lp = glp_create_prob();
+  glp_set_prob_name(lp, "short");
+  glp_set_obj_dir(lp, GLP_MAX);
+
+  const double epsilon = 1./10;
+  glp_add_rows(lp, 3);
+  glp_set_row_name(lp, 1, "e1");
+  glp_set_row_bnds(lp, 1, GLP_LO, 5-1+epsilon, 0.0);
+  glp_set_row_name(lp, 2, "e2");
+  glp_set_row_bnds(lp, 2, GLP_LO, 6-1+epsilon, 0.0);
+   glp_set_row_name(lp, 3, "e3");
+  glp_set_row_bnds(lp, 3, GLP_LO, 3-3+epsilon, 0.0);
+
+	int col_count = 1;
+  glp_add_cols(lp, 2);
+  glp_set_col_name(lp, col_count, "x1");//1
+  glp_set_col_bnds(lp, col_count, GLP_LO, 0.0, 0.0);
+  glp_set_obj_coef(lp, col_count, 1);
+  col_count++;
+  glp_set_col_name(lp, col_count, "t1");//2
+  glp_set_col_bnds(lp, col_count, GLP_FR, 0.0, 0.0);
+  glp_set_obj_coef(lp, col_count, 0);
+  col_count++;
+
+  glp_add_cols(lp, 2);
+  glp_set_col_name(lp, col_count, "x2");//3
+  glp_set_col_bnds(lp, col_count, GLP_LO, 0.0, 0.0);
+  glp_set_obj_coef(lp, col_count, 1);
+  col_count++;
+  glp_set_col_name(lp, col_count, "t2");//4
+  glp_set_col_bnds(lp, col_count, GLP_FR, 0.0, 0.0);
+  glp_set_obj_coef(lp, col_count, 0);
+  col_count++;
+
+  glp_add_cols(lp, 2);
+  glp_set_col_name(lp, col_count, "x3");//5
+  glp_set_col_bnds(lp, col_count, GLP_LO, 0.0, 0.0);
+  glp_set_obj_coef(lp, col_count, 1);
+  col_count++;
+  glp_set_col_name(lp, col_count, "t3");//6
+  glp_set_col_bnds(lp, col_count, GLP_FR, 0.0, 0.0);
+  glp_set_obj_coef(lp, col_count, 0);
+
+
+  unsigned int k=1;
+
+int input, output;
+  input=1; output=2;
+  ia[k] = 1, ja[k] = 2*output-1+1, ar[k] = 1.0;k++;
+  ia[k] = 1, ja[k] = 2*input-1+1, ar[k] = -1.0; k++;
+  ia[k] = 1, ja[k] = 2*input-1, ar[k] = 1.0;k++; 
+
+  input=2; output=3;
+  ia[k] = 2, ja[k] = 2*output-1+1, ar[k] = 1.0;k++; 
+  ia[k] = 2, ja[k] = 2*input-1+1, ar[k] = -1.0; k++;
+  ia[k] = 2, ja[k] = 2*input-1, ar[k] = 1.0;k++; 
+
+  input=3; output=1;
+  ia[k] = 3, ja[k] = 2*output-1+1, ar[k] = 1.0;k++; 
+  ia[k] = 3, ja[k] = 2*input-1+1, ar[k] = -1.0; k++;
+  ia[k] = 3, ja[k] = 2*input-1, ar[k] = 1.0;k++; 
+
+
+
+  glp_load_matrix(lp, k-1, ia, ja, ar);
+
+  glp_simplex(lp, NULL);
+
+  z = glp_get_obj_val(lp);
+  input=1;
+  x1 = glp_get_col_prim(lp, 2*input-1);
+  input=2;
+  x2 = glp_get_col_prim(lp, 2*input-1);
+  input=3;
+  x3 = glp_get_col_prim(lp, 2*input-1);
+  printf("z = %g; x1 = %g; x2 = %g; x3=%g\n", z, x1, x2, x3);
+
+  glp_delete_prob(lp);
+  glp_free_env();
+  return 0;*/
+
+
+	/*unsigned int size = 5;
 	unsigned int Ki = 10;
 	unsigned int Ko = 3;
 
 	pDirectedGraph graph = randomGraph(size, Ki, Ko);
 	stronglyConnectedGraph(graph, 0);
 	
-	displayGraph(graph->links_list, size);
+	//displayGraph(graph->links_list, size);
 
-	pPetri petri = petriTransformation(graph);
+	pPetri petri = petriNormalizedTransformation(graph, 10);
+	setInitialMarking(petri);
 
-	displayPetriNet(petri);
-	printf("\n----------------------------------\n");
-
+	//displayPetriNet(petri);
+	
 	directedGraphFree(graph);
-	petriFree(petri);*/
+	petriFree(petri);
+
+	return 0;*/
 
 
 	/*pArray2 p = NULL;
@@ -149,43 +240,33 @@ int main(int argc, char ** argv)
 	petriFree(net);
 	return 0;*/
 
+	/*
 	pDirectedGraph temp = randomGraph(5, 2,  1);//create graph
 	stronglyConnectedGraph(temp, 0);
 	petriFree(petriNormalizedTransformation(temp, 10));
-	directedGraphFree(temp);
+	directedGraphFree(temp);*/
 
-	return 0;
-
-	pPetri net = petriCreate(5, 5);
-	petriAddPlace(net, 0, 2);
-	petriAddPlace(net, 1, 24);
-	petriAddPlace(net, 2, 22);
-	petriAddPlace(net, 3, 23);
-	petriAddPlace(net, 4, 21);
+	pPetri net = petriCreate(3, 3);
+	petriAddPlace(net, 0, 0);
+	petriAddPlace(net, 1, 0);
+	petriAddPlace(net, 2, 0);
 
 	petriAddTransition(net, 0);
 	petriAddTransition(net, 1);
 	petriAddTransition(net, 2);
-	petriAddTransition(net, 3);
-	petriAddTransition(net, 4);
 
-	petriAddlink(net, PETRI_PT_LINK, 0, 4, 75);
-	petriAddlink(net, PETRI_PT_LINK, 1, 4, 52);
-	petriAddlink(net, PETRI_PT_LINK, 2, 4, 54);
-	petriAddlink(net, PETRI_PT_LINK, 3, 4, 12);
+	petriAddlink(net, PETRI_PT_LINK, 0, 1, 5);
+	petriAddlink(net, PETRI_TP_LINK, 1, 1, 5);
 
-	petriAddlink(net, PETRI_TP_LINK, 0, 0, 62);
-	petriAddlink(net, PETRI_TP_LINK, 1, 1, 26);
-	petriAddlink(net, PETRI_TP_LINK, 2, 2, 67);
-	petriAddlink(net, PETRI_TP_LINK, 3, 3, 36);
-	petriAddlink(net, PETRI_TP_LINK, 4, 4, 63);
+	petriAddlink(net, PETRI_PT_LINK, 1, 2, 6);
+	petriAddlink(net, PETRI_TP_LINK, 2, 2, 6);
 
-	unsigned int * vect =  weightsComputation(net->nb_tr, 10);
-	normalizationPetriNetwork(net, vect);
-	sdfToFreeChoice(net);
-	displayPetriNet(net);
+	petriAddlink(net, PETRI_PT_LINK, 2, 0, 3);
+	petriAddlink(net, PETRI_TP_LINK, 0, 0, 3);
+
+	setInitialMarking(net);
 	
-	free(vect);
+	
 	petriFree(net);
 	return 0;
 

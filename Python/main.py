@@ -28,7 +28,7 @@ f.show()'''
 f = gd.plotGraph(Xgraph2, nodeSize=200, widthArraw=1.5)
 f.show()'''
 
-graph2 = c.randomGraph(n=5,Ki=3,Ko=2)
+graph2 = c.randomGraph(n=3,Ki=2,Ko=2)
 graph2 = c.stronglyConnectedGraph(graph2, False)
 Xgraph2 = gd.toNetworkxGraph(graph2.obj)
 f1 = gd.plotGraph(Xgraph2, nodeSize=200, widthArraw=1.5)

@@ -101,7 +101,8 @@ static void sendResponse(request * req, char * buff, int BUFFSIZE, unsigned int 
 			pWrapper p = wrapperGetElem(_list, req->wrapperId);
 			pDirectedGraph graph1 = (pDirectedGraph)(p->data);
 
-			pPetri petriN = petriTransformation(graph1);
+			pPetri petriN = petriNormalizedTransformation(graph1, 10);
+			setInitialMarking(petriN);
 			wrapperAddToList(&_list, wrapperCreateNode(req->newWrapperId, petri_t, (void *)petriN));
 			
 			wrapperRemoveFromList(&_list, req->wrapperId);

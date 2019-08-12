@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
+#include <math.h>
 
 #include "GraphGenerator.h"
 
@@ -751,20 +752,137 @@ pPetri petriNormalizedTransformation(pDirectedGraph graph, unsigned int repetiti
  * 
  * *******************************************************************/
 
-void initialMarking(pPetri net)
+void setInitialMarking(pPetri net)
 {
+	glp_prob *lp;
+	int ia[GLPK_SIZE], ja[GLPK_SIZE];
+	double ar[GLPK_SIZE];
+	const double epsilon = 1./(net->nb_pl);
+
+	//create variables
+	char id[128];
+	int i, k;
+	int row_count, col_count;
+	int pos_xi, pos_ti, pos_to;
+	pPetriNode node;
+	pPetriLink i_link, o_link;
+	double bound;
+
+	// create problem 
+	lp = glp_create_prob();
+	glp_set_prob_name(lp, "short");
+	glp_set_obj_dir(lp, GLP_MIN);
+	// fill problem 
+	glp_add_cols(lp, 2*net->nb_pl);
+
+
+	k = 1;
+	row_count = 1;
+	col_count = 1;
+	for(i=0; i<net->nb_pl; i++)
+	{
+		node = net->places[i];
+		if(node==NULL)
+			continue;
+		if(node->nb_inputs!=1 || node->nb_outputs!=1)
+		{
+			fprintf(stderr, "Transformation petri en Free choice impossible (format du SDF non valide)\n");
+			return;
+		}
+		/*
+			Add the following euquation :
+				transition(ti) -------> place(pi) -------> transition(to)
+								  Zi    M0(pi)=xi	 Zk
+			
+			to - tj + xi >= Zo - gcd(Zo, Zi) + epsilon
+	    */
+
+		//set equation row
+		sprintf(id, "e%d", row_count);
+		glp_add_rows(lp, 1);
+		glp_set_row_name(lp, row_count, id);
+
+		//set bounds equation
+		i_link = petriNodeGetLinkFromArrayNode(node->input_links);
+		o_link = petriNodeGetLinkFromArrayNode(node->output_links);
+
+		bound = o_link->weight - gcd(i_link->weight, o_link->weight) + epsilon;//Zo - gcd(Zo, Zi) + epsilon
+		glp_set_row_bnds(lp, row_count, GLP_LO, bound, 0.0);
+
+		//set variables
+
+		//add to column xi | ti (for i starting at 1)
+		//to get the column index of a place i : 2*i-1
+		//to get the column index of a transition i : (2*i-1)+1=2*i
+		sprintf(id, "x%d", col_count);
+		pos_xi = 2*(o_link->input->label+1)-1;
+		glp_set_col_name(lp, pos_xi, id);
+		glp_set_col_bnds(lp, pos_xi, GLP_LO, 0.0, 0.0);
+		glp_set_obj_coef(lp, pos_xi, 1);
+
+		sprintf(id, "t%d", col_count);
+		pos_to = 2*(o_link->output->label+1);
+		glp_set_col_name(lp, pos_to, id);
+		glp_set_col_bnds(lp, pos_to, GLP_FR, 0.0, 0.0);
+		glp_set_obj_coef(lp, pos_to, 0);
+
+		pos_ti = 2*(i_link->input->label+1);//+1 because label start to 0
+
+		//set other coefficient
+		ia[k] = row_count, ja[k] = pos_ti, ar[k] = -1.0; k++; // a[row_count, pos_ti] = -1
+		ia[k] = row_count, ja[k] = pos_to, ar[k] = 1.0; k++; // a[row_count, pos_to] = 1
+		ia[k] = row_count, ja[k] = pos_xi, ar[k] = 1.0; k++; // a[row_count, pos_xi] = 1
+
+		row_count++;
+	}
+
 	
+	glp_load_matrix(lp, k-1, ia, ja, ar);
+	// solve problem 
+	if(glp_simplex(lp, NULL)!=0)//fail to solve
+	{
+		fprintf(stderr, "Echec du solveur dans le resolution du marquage initial\n");
+		// housekeeping
+		glp_delete_prob(lp);
+		glp_free_env();
+
+		return;
+	}
+
+	// recover and display results
+	if(row_count>=1)
+	{
+		double xi;
+		int gcd_val;
+		int m0;
+
+		col_count = 1;
+		for(i=0; i<net->nb_pl; i++)
+		{
+			if(net->places[i]==NULL)
+				continue;
+
+			node = net->places[i];
+			i_link = petriNodeGetLinkFromArrayNode(node->input_links);
+			o_link = petriNodeGetLinkFromArrayNode(node->output_links);
+			gcd_val = gcd(i_link->weight, o_link->weight);//gcd(to, ti)
+
+			xi = glp_get_col_prim(lp, 2*col_count-1);
+			m0 = ceil(xi/gcd_val)*gcd_val;//initial marking
+
+			i_link->output->val = m0;
+
+
+			col_count++;
+		}
+	}else
+	{
+		fprintf(stderr,"Aucune variable trouvé pour le calcul du marquage intial\n");
+	}
+	// housekeeping
+	glp_delete_prob(lp);
+	glp_free_env();
 }
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -814,8 +932,7 @@ void initialMarking(pPetri net)
 		p = p->next;
 
 		//apply the transformation on the other nodes
-		cursor = p;
-		while(cursor)
+		while(p)
 		{
 			/* Because at the end of the loop the element referenced by the pointer on array, p, will be removed
 			   we could not check the following element in the array based on that reference (because it will no longer exist).
@@ -848,9 +965,11 @@ void initialMarking(pPetri net)
 			petriRemovePlace(net, input_pl->label);
 			//after the removal the link betwwen the input place and its transition does not exists anymore (link_tr does reference nothing)
 			petriAddlink(net, PETRI_TP_LINK, id_tr, init_input_pl->label, i_weight);
+
+			
+			p = cursor;
 		}
 
 		init_input_pl->val = m0;//set final initial marking
-
 	 }
  }
