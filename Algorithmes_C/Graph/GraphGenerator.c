@@ -973,3 +973,58 @@ void setInitialMarking(pPetri net)
 		init_input_pl->val = m0;//set final initial marking
 	 }
  }
+
+
+
+pPetri _generateFreeChoice(unsigned int nb_transition, unsigned int nb_input_tr, unsigned int nb_output_tr, unsigned int repetition_vect_norm, unsigned int * repetition_vect)
+{
+
+	printf("Génération du graphe orienté...\n");
+	pDirectedGraph graph = randomGraph(nb_transition, nb_input_tr, nb_output_tr);
+	
+	printf("Transformation en graphe fortement connexe...\n");
+	stronglyConnectedGraph(graph, 0);
+
+	printf("Transformation en SDF...\n");
+	pPetri net;
+	if(repetition_vect==NULL)
+	{
+		net = petriNormalizedTransformation(graph, repetition_vect_norm);
+	}else
+	{
+		net = petriTransformation(graph);
+		normalizationPetriNetwork(net, repetition_vect);
+	}
+	directedGraphFree(graph);
+
+	printf("Calcul du marquage initial...\n");
+	setInitialMarking(net);
+
+	printf("Transformation en Free-choice...\n");
+	sdfToFreeChoice(net);
+
+	return net;
+}
+
+
+pPetri generateRandomFreeChoice(unsigned int nb_transition, unsigned int nb_input_tr, unsigned int nb_output_tr, unsigned int repetition_vect_norm)
+{
+	if(repetition_vect_norm<nb_transition)
+	{
+		fprintf(stderr, "Norme du vecteur incompatible avec le nombre de transition dans la generation du Free-choice\n" \
+						"\tNombre de transitions : %u    | Norme du vecteur : %u\n", nb_transition, repetition_vect_norm);
+		return NULL;
+	}
+	return _generateFreeChoice(nb_transition, nb_input_tr, nb_output_tr, repetition_vect_norm, NULL);
+}
+
+
+pPetri generateFreeChoiceWithVector(unsigned int nb_transition, unsigned int nb_input_tr, unsigned int nb_output_tr, unsigned int * repetition_vect)
+{
+	if(repetition_vect==NULL)
+	{
+		fprintf(stderr, "Impossible de generer un Free-choice a partir d'un vecteur de repetition NULL\n");
+		return NULL;
+	}
+	return _generateFreeChoice(nb_transition, nb_input_tr, nb_output_tr, 0, repetition_vect);
+}

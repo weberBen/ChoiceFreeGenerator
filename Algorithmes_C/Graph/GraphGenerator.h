@@ -26,4 +26,7 @@ void setInitialMarking(pPetri net);
 
 void sdfToFreeChoice(pPetri net);
 
+pPetri generateRandomFreeChoice(unsigned int nb_transition, unsigned int nb_input_tr, unsigned int nb_output_tr, unsigned int repetition_vect_norm);
+pPetri generateFreeChoiceWithVector(unsigned int nb_transition, unsigned int nb_input_tr, unsigned int nb_output_tr, unsigned int * repetition_vect);
+
 #endif 

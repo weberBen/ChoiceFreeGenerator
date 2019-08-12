@@ -34,7 +34,9 @@ void petriFree(pPetri p);
 
 int main(int argc, char ** argv)
 {
-
+pPetri net1 = generateRandomFreeChoice(5, 2, 2, 10);
+petriFree(net1);
+return 0;
 /*glp_prob *lp;
   int ia[1+1000], ja[1+1000];
   double ar[1+1000], z, x1, x2, x3;
