@@ -10,7 +10,15 @@ import SocketCommunication as sc
 
 #%%
 _id = 0
-srv = sc.Server(1436, 512)
+srv = sc.Server()
+'''  
+Run main_py at port x with a buffersize of l
+srv = sc.Server(x, l)
+and comment the line "self.openCServerSide()" in the Server function
+
+Then it allow you to start the main_py from a terminal get all the message error and run valgrind
+while manupiling functions from python to test them
+'''
 
 def showErrors():
     print(srv.getTerminalErros())

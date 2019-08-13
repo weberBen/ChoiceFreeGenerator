@@ -677,7 +677,7 @@ void normalizationPetriNetwork(pPetri net, unsigned int * repetition_vect)
 
 pPetri _petriTransformation(pDirectedGraph graph, int normalize, unsigned int repetition_vect_norm)
 {
-	/* edge <-> transition and node <-> place */
+	/* edge <-> place and node <-> transition */
 	pPetri net = petriCreate(graph->nb_edges, graph->nb_nodes);
 
 	int lcm_val = -1;
@@ -987,10 +987,7 @@ void setInitialMarking(pPetri net)
 	 }
 
 	 if(resizeNetAfter)
-	 {
-		 fprintf(stderr," !!!!!!!!!!!!!!!!! CLEAN  !!!!!!!!!!!!!!! \n");
 	 	petriClearPlaces(net);//optionnal (can be remove to optimize computation time)
-	 }
  }
 
 

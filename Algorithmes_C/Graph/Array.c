@@ -889,6 +889,7 @@ static void petriNodeRemoveArray(pPetri net, pArray * p_array, int input)
 	else//remove input for the element linked with the current one (which is an input for the other element)
 		petriNodeRemoveFunction = petriNodeRemoveInput;
 
+	//remove all links from the current node
 	while(links_array)
 	{
 		plink_array = (pArray2)(links_array->data);
@@ -897,6 +898,7 @@ static void petriNodeRemoveArray(pPetri net, pArray * p_array, int input)
 		o_index = (input)?(link->input->label):(link->output->label);
 		type = (input)?(link->input->type):(link->output->type);
 
+		//remove the link from the other element connect to the current onne
 		if(type==PETRI_PLACE_TYPE)
 		{
 			petriNodeRemoveFunction(net->places[o_index], plink_array);
@@ -1140,13 +1142,6 @@ void petriClearNodesArray(pPetri net, int type_array)
 	{
 		if(elems[i]==NULL)
 			continue;
-		if(nodes[i]==NULL)
-		{
-			fprintf(stderr, "Gestion de la memoire corrompu pour le reseau de petri\n");
-			free(new_nodes);
-			free(new_elems);
-			return ;
-		}
 		
 		new_nodes[index] = nodes[i];
 		new_elems[index] = elems[i];

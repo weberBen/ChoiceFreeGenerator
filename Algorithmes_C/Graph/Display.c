@@ -359,49 +359,6 @@ unsigned int matrixToString(char ** output, int * matrix, unsigned int num_l, un
 	return count;
 }
 
-unsigned int petriToString(char ** output, pPetri p)
-{/*
-	char * places;
-	char * trans;
-	unsigned int count =0;
-	
-	count+= matrixToString(&places, p->places, 1, p->num_pl);
-	count++;//for the separator char
-	count+= matrixToString(&trans, p->trans, p->num_tr, p->num_pl);
-	
-	char * _output = (char *)malloc(sizeof(char)*(count+1));//+1 for the end char '\0'
-	assert(output);
-	char * cursor, *temp_cursor;
-	
-	cursor = _output;
-	
-	temp_cursor = places;
-	while(*temp_cursor)
-	{
-		*cursor = *temp_cursor;
-		temp_cursor++;cursor++;
-	}
-	*cursor = CHAR_DATA_SEPARATOR;
-	cursor++;
-	
-	temp_cursor = trans;
-	while(*temp_cursor)
-	{
-		*cursor = *temp_cursor;
-		temp_cursor++;cursor++;
-	}
-	*cursor='\0';
-	
-	//free
-	free(places);
-	free(trans);
-	
-	//return results
-	*output=_output;
-	return count;*/
-    return 0;
-}
-
 
 
 /**********************************************************************
@@ -466,7 +423,10 @@ int listToFile(char * filename, pArray a[], unsigned int n)
 void displayPetriElem(pPetriElem p)
 {
     if(p==NULL)
-        return;
+	{
+		printf("Elem[NULL]");
+		return;
+	}
 
     if(p->type==PETRI_PLACE_TYPE)
         printf("Place");
@@ -484,7 +444,10 @@ void displayPetriElem(pPetriElem p)
 void displayPetriLink(pPetriLink p)
 {
     if(p==NULL)
-        return;
+	{
+		printf("Link[NULL]");
+		return;
+	}
 
     printf("Lien[");
     if(p->input->type==PETRI_PLACE_TYPE)
@@ -504,7 +467,10 @@ void displayPetriLink(pPetriLink p)
 void displayPetriNode(pPetriNode p, unsigned int index)
 {
     if(p==NULL)
-        return;
+	{
+		printf("Node[NULL]");
+		return;
+	}
     
     printf("Noeud %d : \n", index);
     printf("\tnb_input=%d\n", p->nb_inputs);
