@@ -19,6 +19,8 @@ A free choice graph is a subclass of petri net where each place has exactly one 
     - libglpk-dev (version 4.61-1)
     - gcc (version 4:6.3.0-4)
     
+## Description <a name="Requires"/>
+
 *NAME*
 
 freeChoiceGenerator - a random generator of living Free-choice
