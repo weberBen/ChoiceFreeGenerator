@@ -8,6 +8,7 @@ Created on Sat Mar 23 17:31:35 2019
 import CFunctions as c
 import GraphDisplay as gd
 
+''' need to compile C source (main_py) '''
 
 #%%
 
