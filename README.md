@@ -364,23 +364,25 @@ The module *GraphDisplay* takes the formatted response of the server and convert
   - *ParseGraph* (function) that takes the formatted string of the server response and converts it into an iterable object  The graph is sent back as an array of array of child for each node. For example, if the array is graphed, the graph[0] = [...] contains all the successors of the node 0
   - *toNetworkxGraph* (function) converts the graph (following the previous format) into an object usable by the library networkx
   - *plotGraph* (function) plot into a figure a networkx graph
-  - *createStronglyConnectedGraph* (function) takes two main arguments *n* which is the desired number of nodes and *D* which is the maximum number of successors allowed for a node. The other arguments are for the graphical display.
-  The function return a n-uplet (figure, graph, networkx graph) where figure is the figure where the networkx graph was plot
-  
-An example of the use of the functions :
-``` 
-import SocketCommunication as sc
 
-srv = sc.Server()
+## Example <a name="ExamplePy"/>
 
-res = createStringlyConnectedGraph(n=7,D=3, nodeSize=200, widthArraw=1.5)
-f=res[0]
-graph = res[1]
-networkx_graph = res[2]
-f.show()
+An example of use :
 
-srv.close()
+```python 
+import CFunctions as c
+import GraphDisplay as gd
+
+#%%
+
+numberNode = 5
+numberInputNode = 2
+NumberOutputNode = 2
+
+net = c.freeChoice(n=numberNode, Ki=numberInputNode, Ko=NumberOutputNode, rep_vect_norm=10, cleanExtraMemSpace=False)
+f_net = gd.drawPetriNetwork(net.obj, 500, 1.5)
+f_net.show()
+
+c.free(net)
+c.exit()#free all the non-free object
 ```
-
- ### About the tasks value
-...later
