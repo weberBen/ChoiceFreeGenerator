@@ -16,12 +16,15 @@ A free choice graph is a subclass of petri net where each place has exactly one 
 # Main script <a name="MainScript"/>
 
 *NAME*
+
 	freeChoiceGenerator - a random generator of living Free-choice
 
 *SYNOPSIS*
+
 	freeChoiceGenerator ```[nb_transition]``` ```[nb_input_node]``` ```[vect_norm]``` -OPTIONS
 
 *DESCRIPTION*
+
 	freeChoiceGenerator allows user to generate random living Free-choice network given the desired number of transitions ```[nb_transition]``` 
 	in the final petri network. The generation of the final network is based uppon the one of a strongly connected 
 	graph where the number of input ```[nb_input_node]``` and output ```[nb_output_node]``` per node is set by
@@ -29,6 +32,7 @@ A free choice graph is a subclass of petri net where each place has exactly one 
 	The ```[vect_norm]``` is the desired norm of the repetition vector to get during the generation of a random one for the SDF
 
 *OPTIONS*
+
 	-o ```[nb_output_node]```   set ```[nb_output_node]```
 	-c   resize the petri net after the transformation from SDF to Free-choice (can be time consuming)
 	-f ```[filename]```   save the Free-choice to a file to ```[filename]``` as PNML format
