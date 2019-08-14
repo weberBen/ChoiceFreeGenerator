@@ -16,6 +16,7 @@ A ramdon generator of living Free-choice
 - [Simple Python interface](#Interface)
   - [Requires](#Requires)
   - [Commands](#Commands)
+  - [Example](#ExamplePy)
 
 # Project description <a name="ProjetcDescription"/>
 
@@ -359,11 +360,7 @@ The module *SocketCommunication* contains all the needed classes and functions t
   For example, to start the server side use ```src=Server(port=5112, buffersize=512)``` or ```src=Server()``` to fill automatically the arguments. Port is the communication port (which can be found automatically if not specified) and buffersize is the size of the buffer used between the clent and the server to transmit data.
   Be aware of the closing of the server : at the end of the script the server need to be closed. For that purpose,use the command *srv.close()*
  
-The module *GraphDisplay* takes the formatted response of the server and convert it into a usable graph. The module contains :
-  
-  - *ParseGraph* (function) that takes the formatted string of the server response and converts it into an iterable object  The graph is sent back as an array of array of child for each node. For example, if the array is graphed, the graph[0] = [...] contains all the successors of the node 0
-  - *toNetworkxGraph* (function) converts the graph (following the previous format) into an object usable by the library networkx
-  - *plotGraph* (function) plot into a figure a networkx graph
+The module *GraphDisplay* takes the formatted response of the server and convert it into a usable graph.
 
 ## Example <a name="ExamplePy"/>
 
@@ -380,7 +377,7 @@ numberInputNode = 2
 NumberOutputNode = 2
 
 net = c.freeChoice(n=numberNode, Ki=numberInputNode, Ko=NumberOutputNode, rep_vect_norm=10, cleanExtraMemSpace=False)
-f_net = gd.drawPetriNetwork(net.obj, 500, 1.5)
+f_net = gd.drawPetriNetwork(net.obj, nodeSize=500, widthArraw=1.5)
 f_net.show()
 
 c.free(net)
