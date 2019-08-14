@@ -10,14 +10,13 @@ import GraphDisplay as gd
 
 
 #%%
-#create graph 1 (as tree)
 
 numberNode = 5
 numberInputNode = 2
 NumberOutputNode = 2
 
 net = c.freeChoice(n=numberNode, Ki=numberInputNode, Ko=NumberOutputNode, rep_vect_norm=10, cleanExtraMemSpace=False)
-f_net = gd.drawPetriNetwork(net.obj, 500, 1.5)
+f_net = gd.drawPetriNetwork(net.obj, nodeSize=500, widthArraw=1.5)
 f_net.show()
 
 c.free(net)
