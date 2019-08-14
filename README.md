@@ -13,6 +13,31 @@ A free choice graph is a subclass of petri net where each place has exactly one 
 
 <img src="Annexes/Images/FreeChoiceDef.png" width="70%"  align="middle">
 
+# Main script <a name="MainScript"/>
+
+*NAME*
+	freeChoiceGenerator - a random generator of living Free-choice
+
+*SYNOPSIS*
+	freeChoiceGenerator ```[nb_transition]``` ```[nb_input_node]``` ```[vect_norm]``` -OPTIONS
+
+*DESCRIPTION*
+	freeChoiceGenerator allows user to generate random living Free-choice network given the desired number of transitions ```[nb_transition]``` 
+	in the final petri network. The generation of the final network is based uppon the one of a strongly connected 
+	graph where the number of input ```[nb_input_node]``` and output ```[nb_output_node]``` per node is set by
+	the user (with the following constraint ```[nb_input_node]>=[nb_output_node]```). By default ```[nb_input_node]=[nb_output_node]```.
+	The ```[vect_norm]``` is the desired norm of the repetition vector to get during the generation of a random one for the SDF
+
+*OPTIONS*
+	-o ```[nb_output_node]```   set ```[nb_output_node]```
+	-c   resize the petri net after the transformation from SDF to Free-choice (can be time consuming)
+	-f ```[filename]```   save the Free-choice to a file to ```[filename]``` as PNML format
+	-s ```[stack_size]```   set the new stack size to use
+	-h   get help
+
+## Example
+```freeChoiceGenerator 10 5 20 -f output.pnml``` produce a ramdom Free-choice with 10 transitions in which the norm of the repetiton vector is equal to 20 and then write the net into the file *output.pnml*
+
 # API <a name="Api"/>
 
   ## Requires <a name="Requires"/>
@@ -55,8 +80,10 @@ free(vect);
 petriFree(net2);
 ```
 
-  ## Create a Petri net
-  
+  ## Petri net strcuture
+ A simple tutorial to understand how the structure used to save Free-choice works
+ 
+  ## Creation of a Petri net
  ```C
 unsigned int nb_place = 5;
 unsigned int nb_transitions = 5;
@@ -94,7 +121,8 @@ pPetriLink link = petriGetLink(net3, PETRI_PT_LINK, 0, 1);//get link between the
 printf("Weight of link between place 0 and transition 1 : %d\n", link->weight);
 printf("Weight of link between transition 4 and place 3 : %d\n", petriGetWeightLink(net3, PETRI_TP_LINK, 4, 3));
 ```
-## Getter functions
+### Getter functions
+
 ```C
 pPetriElem elem = petriGetPlace(net3, 0);//get place 0
 printf("Initial marking of place %u : %d\n", elem->label, elem->val);
