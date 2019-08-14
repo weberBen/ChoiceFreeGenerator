@@ -13,6 +13,14 @@ A free choice graph is a subclass of petri net where each place has exactly one 
 
 <img src="Annexes/Images/FreeChoiceDef.png" width="70%"  align="middle">
 
+The generator convert a living and normalized SDF to a Free-choice. That transformation is apply on each transition in the SDF that have more than 1 input as shown below.
+
+<img src="Annexes/Images/SdfTransformation.png" width="70%"  align="middle">
+
+Then the process gather all the places to have a unique input into the transition.
+To achieve that goal the SDF is generated from a strongly conected graph where a node is then convert into a transition and an edge into a place. To ensure that there is enough transition with multiple input (to the directed graph that implies to have multiple input per node) user have to select the 
+
+
 # Main script <a name="MainScript"/>
 
 ## Requires <a name="Requires"/>
