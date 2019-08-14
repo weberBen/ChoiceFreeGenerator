@@ -27,11 +27,7 @@ A free choice graph is a subclass of petri net where each place has exactly one 
 ```
 
 ``` C
-  srand(time(NULL));
-
-	//-----------------------------------------------------------------------------------------------------------------
-	//										GENERATE RANDOM FREE CHOICE 
-	//-----------------------------------------------------------------------------------------------------------------
+  	srand(time(NULL));
 
 	unsigned int nb_transition = 10;//number of desired transition in the result Free-choice
 	unsigned int nb_input_node = 3;//average (and maximum) number of inputs for each transition
@@ -43,8 +39,8 @@ A free choice graph is a subclass of petri net where each place has exactly one 
 	pPetri net1 = generateRandomFreeChoice(nb_transition, nb_input_node, nb_output_node vect_norm, cleanExtraMem);
 	//write Free-choice named "net1" to file "net1.pnml"
 	petriToPnmlFile(net1, "net1", "net1.pnml");
-  //displat Free-choice to the shell
-  petriToPnmlDisplay(net1, "net1");
+  	//displat Free-choice to the shell
+ 	 petriToPnmlDisplay(net1, "net1");
 	petriFree(net1);
 ```
   ## Create a random Free-choice based on repetition vector
@@ -62,7 +58,7 @@ A free choice graph is a subclass of petri net where each place has exactly one 
   ## Create a Petri net
   
  ```C
-  unsigned int nb_place = 5;
+  	unsigned int nb_place = 5;
 	unsigned int nb_transitions = 5;
 	int i;
 
@@ -97,8 +93,9 @@ A free choice graph is a subclass of petri net where each place has exactly one 
 	pPetriLink link = petriGetLink(net3, PETRI_PT_LINK, 0, 1);//get link between the place 0 and the transition 1
 	printf("Weight of link between place 0 and transition 1 : %d\n", link->weight);
 	printf("Weight of link between transition 4 and place 3 : %d\n", petriGetWeightLink(net3, PETRI_TP_LINK, 4, 3));
-
-
+```
+## Getter functions
+```C
 	pPetriElem elem = petriGetPlace(net3, 0);//get place 0
 	printf("Initial marking of place %u : %d\n", elem->label, elem->val);
 	printf("Initial marking of place 4 : %d\n", petriGetInitialMarking(net3, 4));
@@ -138,6 +135,9 @@ A free choice graph is a subclass of petri net where each place has exactly one 
 		p = p->next;
 	}
 
+```
+### Manipulation of the Petri net
+```C
 	//remove place 3
 	petriRemovePlace(net3, 3);
 	printf("Places : { ");
