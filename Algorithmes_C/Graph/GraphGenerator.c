@@ -586,8 +586,9 @@ unsigned int * weightsComputation(unsigned int nb_transition, unsigned int repet
 
 	if(repetition_vect_norm<nb_transition)
 	{
-		fprintf(stderr, "Norme du vecteur incompatible avec le nombre de transition dans la generation de poids\n" \
-						"\tNombre de transitions : %u    | Norme du vecteur : %u\n", nb_transition, repetition_vect_norm);
+		fprintf(stderr, "Norm of the vector does not match the constraint of number of transition in the petri net" \
+						"Number of transitions : %u   | Vector nomr : %u\n", nb_transition, repetition_vect_norm);
+		
 		return NULL;
 	}
 
@@ -598,7 +599,7 @@ unsigned int * weightsComputation(unsigned int nb_transition, unsigned int repet
 	int gcd_val = gcd_array(random_weights, nb_transition);//get gcm of the array
 	if(gcd_val<=0)
 	{
-		fprintf(stderr, "Erreur calcul pgcd des poids\n");
+		fprintf(stderr, "Error during the computation of the gcd for the repetition vector\n");
 		exit(EXIT_FAILURE);
 	}
 
@@ -630,7 +631,7 @@ void normalizationPetriNetwork(pPetri net, unsigned int * repetition_vect)
 	int lcm_val = lcm_array(repetition_vect, net->nb_tr);
 	if(lcm_val==-1)
 	{
-		fprintf(stderr, "Impossible de generer un vecteur repetition (revoir les parametres fournis)\n");
+		fprintf(stderr, "Cannot generate a correct repetition vector (check the given arguments)\n");
 		return ;
 	}
 	
@@ -688,7 +689,7 @@ pPetri _petriTransformation(pDirectedGraph graph, int normalize, unsigned int re
 		lcm_val = lcm_array(repetition_vect, net->nb_tr);
 		if(lcm_val==-1)
 		{
-			fprintf(stderr, "Impossible de generer un vecteur repetition (revoir les parametres fournis)\n");
+			fprintf(stderr, "Cannot generate a correct repetition vector (check the given arguments)\n");
 			petriFree(net);
 			return NULL;
 		}
@@ -799,7 +800,7 @@ void setInitialMarking(pPetri net)
 			continue;
 		if(node->nb_inputs!=1 || node->nb_outputs!=1)
 		{
-			fprintf(stderr, "Transformation petri en Free choice impossible (format du SDF non valide)\n");
+			fprintf(stderr, "Error during the transformation from SDF to Free-choice (SDF format incorect)\n");
 			return;
 		}
 		/*
@@ -854,7 +855,7 @@ void setInitialMarking(pPetri net)
 	// solve problem 
 	if(glp_simplex(lp, NULL)!=0)//fail to solve
 	{
-		fprintf(stderr, "Echec du solveur dans le resolution du marquage initial\n");
+		fprintf(stderr, "Fail to solve the initial marking problem\n");
 		// housekeeping
 		glp_delete_prob(lp);
 		glp_free_env();
@@ -890,7 +891,7 @@ void setInitialMarking(pPetri net)
 		}
 	}else
 	{
-		fprintf(stderr,"Aucune variable trouvé pour le calcul du marquage intial\n");
+		fprintf(stderr, "No variable founded for the initial marking computation\n");
 	}
 	// housekeeping
 	glp_delete_prob(lp);
@@ -934,7 +935,7 @@ void setInitialMarking(pPetri net)
 		init_input_pl = link_pt->input;
 		if(init_input_pl->type!=PETRI_PLACE_TYPE)
 		{
-			fprintf(stderr, "Le reseau de petri n'est pas conforme au standard (lien Transition-Transition trouvé)");
+			fprintf(stderr, "The petri net does not follow the standards (link Transition-Transition founded)\n");
 			return ;
 		}
 
@@ -957,7 +958,7 @@ void setInitialMarking(pPetri net)
 			input_pl = link_pt->input;
 			if(input_pl->type!=PETRI_PLACE_TYPE)
 			{
-				fprintf(stderr, "Le reseau de petri n'est pas conforme au standard (lien Transition-Transition trouvé)");
+				fprintf(stderr, "The petri net does not follow the standards (link Transition-Transition founded)\n");
 				return ;
 			}
 
@@ -967,7 +968,7 @@ void setInitialMarking(pPetri net)
 			input_node_pl = net->places[input_pl->label];//get input node from the current transition
 			if(input_node_pl->nb_inputs!=1)
 			{
-				fprintf(stderr, "Le reseau de petri n'est pas conforme pour la transformation");
+				fprintf(stderr, "The petri net is not correct for the transformation from SDF to Free-Choice\n");
 				return ;
 			}
 
@@ -992,26 +993,27 @@ void setInitialMarking(pPetri net)
 
 
 
-pPetri _generateFreeChoice(unsigned int nb_transition, unsigned int nb_input_tr, unsigned int nb_output_tr, unsigned int repetition_vect_norm, unsigned int * repetition_vect, int cleanExtraMemSpace)
+pPetri _generateFreeChoice(unsigned int nb_transition, unsigned int nb_input_node, unsigned int nb_output_node, unsigned int repetition_vect_norm, unsigned int * repetition_vect, int cleanExtraMemSpace)
 {
 	if(nb_transition<2)
 	{
-		fprintf(stderr, "Le nombre de transitions doit être superieur ou egale a 2\n");
+		fprintf(stderr, "The number of transitions must be superior or equal to 2\n");
 		return NULL;
 	}
-	if(nb_input_tr>nb_output_tr)
+	if(nb_input_node>nb_output_node)
 	{
-		fprintf(stderr, "Le nombre d'entree par noeud (%u) ne peut pas être superieur au nombre de sortie (%u) pour generer un Free-choice\n",nb_input_tr, nb_output_tr);
+		fprintf(stderr, "The number of input per node (%u) cannot be greater than the one " \
+						"for the output (%u) to generate a Free-choice\n", nb_input_node, nb_output_node);
 		return NULL;
 	}
 
-	printf("Génération du graphe orienté...\n");
-	pDirectedGraph graph = randomGraph(nb_transition, nb_input_tr, nb_output_tr);
+	printf("Generation of a random oriented graph...\n");
+	pDirectedGraph graph = randomGraph(nb_transition, nb_input_node, nb_output_node);
 	
-	printf("Transformation en graphe fortement connexe...\n");
+	printf("Conversion to strongly connected graph...\n");
 	stronglyConnectedGraph(graph, 0);
 
-	printf("Transformation en SDF...\n");
+	printf("Conversion to SDF...\n");
 	pPetri net;
 	if(repetition_vect==NULL)
 	{
@@ -1023,34 +1025,34 @@ pPetri _generateFreeChoice(unsigned int nb_transition, unsigned int nb_input_tr,
 	}
 	directedGraphFree(graph);
 
-	printf("Calcul du marquage initial...\n");
+	printf("Computation of the initial marking...\n");
 	setInitialMarking(net);
 
-	printf("Transformation en Free-choice...\n");
+	printf("Conversion to Free-choice...\n");
 	sdfToFreeChoice(net, cleanExtraMemSpace);
 
 	return net;
 }
 
 
-pPetri generateRandomFreeChoice(unsigned int nb_transition, unsigned int nb_input_tr, unsigned int nb_output_tr, unsigned int repetition_vect_norm, int cleanExtraMemSpace)
+pPetri generateRandomFreeChoice(unsigned int nb_transition, unsigned int nb_input_node, unsigned int nb_output_node, unsigned int repetition_vect_norm, int cleanExtraMemSpace)
 {
 	if(repetition_vect_norm<nb_transition)
 	{
-		fprintf(stderr, "Norme du vecteur incompatible avec le nombre de transition dans la generation du Free-choice\n" \
-						"\tNombre de transitions : %u    | Norme du vecteur : %u\n", nb_transition, repetition_vect_norm);
+		fprintf(stderr, "Norm of the vector does not match the constraint of number of transition in the petri net" \
+						"Number of transitions : %u   | Vector nomr : %u\n", nb_transition, repetition_vect_norm);
 		return NULL;
 	}
-	return _generateFreeChoice(nb_transition, nb_input_tr, nb_output_tr, repetition_vect_norm, NULL, cleanExtraMemSpace);
+	return _generateFreeChoice(nb_transition, nb_input_node, nb_output_node, repetition_vect_norm, NULL, cleanExtraMemSpace);
 }
 
 
-pPetri generateFreeChoiceWithVector(unsigned int nb_transition, unsigned int nb_input_tr, unsigned int nb_output_tr, unsigned int * repetition_vect, int cleanExtraMemSpace)
+pPetri generateFreeChoiceWithVector(unsigned int nb_transition, unsigned int nb_input_node, unsigned int nb_output_node, unsigned int * repetition_vect, int cleanExtraMemSpace)
 {
 	if(repetition_vect==NULL)
 	{
-		fprintf(stderr, "Impossible de generer un Free-choice a partir d'un vecteur de repetition NULL\n");
+		fprintf(stderr, "cannot generate a normalized SDF from a NULL repetition vector\n");
 		return NULL;
 	}
-	return _generateFreeChoice(nb_transition, nb_input_tr, nb_output_tr, 0, repetition_vect, cleanExtraMemSpace);
+	return _generateFreeChoice(nb_transition, nb_input_node, nb_output_node, 0, repetition_vect, cleanExtraMemSpace);
 }

@@ -1,7 +1,7 @@
 GCC_FLAGS=-Wall -g 
 
 FOLDER_GRAPH = Graph
-EXEC= main
+EXEC= freeChoiceGenerator
 FOLDER_PY = Py_interface
 EXEC_PY = main_py
 
@@ -9,7 +9,7 @@ OBJDIR=obj
 vpath %.c src
 vpath %.h src
 
-all: $(EXEC) $(EXEC_PY)
+all: main $(EXEC_PY)
 
 
 #Lib for generating graph
@@ -50,7 +50,7 @@ PythonMain.o : $(FOLDER_PY)/PythonMain.c
 	gcc ${GCC_FLAGS} -I$(FOLDER_GRAPH) -c $(FOLDER_PY)/PythonMain.c
 	#-I -> specify header path (for include)
 
-main_py : Array.o GraphGenerator.o Tools.o Rand.o Python.o Server.o PythonMain.o Display.o
+$(EXEC_PY) : Array.o GraphGenerator.o Tools.o Rand.o Python.o Server.o PythonMain.o Display.o
 	gcc ${GCC_FLAGS} -o $(EXEC_PY) PythonMain.o Python.o Server.o  Array.o GraphGenerator.o Tools.o Rand.o Display.o -lm -lglpk
 
 
@@ -59,4 +59,4 @@ open :
 	geany $(FOLDER_GRAPH)/*c $(FOLDER_GRAPH)/*h
 
 clean:
-	rm -f *.o
+	rm -f *.o $(EXEC) $(EXEC_PY) 

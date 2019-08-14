@@ -34,7 +34,7 @@ void sdfToFreeChoice(pPetri net, int resizeNetAfter);
    the fixed size arrays inside the petri structure will be set to NULL)
    Else the petri net will be resized, which can take extra time
 */
-pPetri generateRandomFreeChoice(unsigned int nb_transition, unsigned int nb_input_tr, unsigned int nb_output_tr, unsigned int repetition_vect_norm, int cleanExtraMemSpace);//Free-choice from its repetition vector norm
-pPetri generateFreeChoiceWithVector(unsigned int nb_transition, unsigned int nb_input_tr, unsigned int nb_output_tr, unsigned int * repetition_vect, int cleanExtraMemSpace);//Free-choice from its repetition vector
+pPetri generateRandomFreeChoice(unsigned int nb_transition, unsigned int nb_input_node, unsigned int nb_output_node, unsigned int repetition_vect_norm, int cleanExtraMemSpace);//Free-choice from its repetition vector norm
+pPetri generateFreeChoiceWithVector(unsigned int nb_transition, unsigned int nb_input_node, unsigned int nb_output_node, unsigned int * repetition_vect, int cleanExtraMemSpace);//Free-choice from its repetition vector
 
 #endif 

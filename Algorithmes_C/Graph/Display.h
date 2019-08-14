@@ -29,7 +29,8 @@ void petriWrite(pPetri net, int fileDescriptor);
 
 
 //PNML function
-void petriToPNMLDisplay(pPetri net, char * network_name);
+void petriToPnmlDisplay(pPetri net, char * network_name);
 void petriToPnmlFile(pPetri net, char * network_name, char* filename);
 
+void test(pPetri net);
 #endif

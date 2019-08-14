@@ -1,54 +1,183 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include <time.h>
 #include <sys/resource.h>
+#include <string.h>
 
 #include "GraphGenerator.h"
-#include "Tools.h"
-#include "Rand.h"
 #include "Display.h"
 
+#define NAME "freeChoiceGenerator"
+#define NUMBER_ARGS 3
+
+void printHelp()
+{
+	printf("NAME\n" \
+			NAME " - a random generator of living Free-choice\n" \
+			"\n" \
+			"SYNOPSIS\n" \
+			"\t" NAME " [nb_transition] [nb_input_node] [vect_norm] -OPTIONS\n" \
+			"\n" \
+			"DESCRIPTION\n" \
+			"\t" NAME " allow user to generate random living Free-choice network given the desired number of transitions [nb_transition] " \
+			"\t" "in the final petri network. The generation of the final network is based uppon the one of a strongly connected " \
+			"\t" "graph where the number of input [nb_input_node] and output [nb_output_node] per node is set by " \
+			"\t" "the user (with the following constraint [nb_input_node]>=[nb_output_node]). By default [nb_input_node]=[nb_output_node].\n" \
+			"\t" "The [vect_norm] is the desired norm of the repetition vector to get during the generation of a random one for the SDF\n" \
+			"\n" \
+			"OPTIONS\n" \
+			"\t" "-o [nb_output_node]   " "set [nb_output_node]" "\n" \
+			"\t" "-c   " "resize the petri net after the transformation from SDF to Free-choice (can be time consuming)" "\n" \
+			"\t" "-f [filename]   " "save the Free-choice to a file to [filename] as PNML format" "\n" \
+			"\t" "-s [stack_size]   " "set the new stack size to use" "\n" \
+			"\t" "-h   " "get help" "\n");
+}
 
 int main(int argc, char ** argv)
 {
+	unsigned int nb_transition = 0;//number of desired transition in the result Free-choice
+	unsigned int nb_input_node = 0;//average (and maximum) number of inputs for each transition
+	unsigned int nb_output_node = 0;//average (and maximum) number of outputs for each transition
+	unsigned int vect_norm = 0;//norm of the repetition vector to generate
+	unsigned int stack_size = 0;
+	int cleanExtraMem = 0;//the transformation from SDF to Free-choice leaves extra empty memory space, the cleaning process is optional because it's time consuming
+	char * filename = NULL;
+	unsigned int nb_regular_arg = 0;
+	int c;
+
+    while((c = getopt(argc, argv, "o:cf:s:h")) != -1) 
+	{
+		// Option argument
+		switch (c) 
+		{
+			case 'o': 
+				nb_output_node = (int)atol(optarg);
+				break;
+			case 'c': 
+				cleanExtraMem = 1;
+				break;
+			case 'f':
+				filename = optarg;
+				break;
+			case 'h':
+			{	
+				printHelp();
+				return 0;
+			}
+				break;
+			case 's':
+				stack_size = (int)atol(optarg);
+				break;
+			default:
+				break;
+		}
+	}
+
+	int index;
+ 	for (index = optind; index < argc; index++)
+	{
+		if(nb_regular_arg==0)
+			nb_transition = (int)atol(argv[index]);
+		else if (nb_regular_arg==1)
+			nb_input_node = (int)atol(argv[index]);
+		else if (nb_regular_arg==2)
+			vect_norm = (int)atol(argv[index]);
+		
+		nb_regular_arg++;
+	}
+	
+
+	if(nb_regular_arg != NUMBER_ARGS)
+	{
+		printf("Wrong arguments !\n-h to get help\n");
+		return 1;
+	}
+
+
 	/* The structure used to store petri net is heavy in memory (to make the transformation easier)
 	   For a lot of elements inside the petri net the default allocate stack memory must be increased
-	struct rlimit lim = {100000000, 100000000};
-
- 	if (setrlimit(RLIMIT_STACK, &lim) == -1)
-  		return 1;
 	*/
+	if(stack_size!=0)
+	{
+		struct rlimit lim = {stack_size, stack_size};
+
+		if (setrlimit(RLIMIT_STACK, &lim) == -1)
+			return 1;
+
+		printf("Increase stack size to %u\n", stack_size);
+	}
+	
+
+	if(nb_output_node==0)
+		nb_output_node = nb_input_node;
+	
+
+	//create random Free-choice from its repetition vector norm
+	printf("Generation of a random Free-choice with : \n"\
+		   "\t" "[nb_transition] = %u \n" \
+		   "\t" "[nb_input_node] = %u \n" \
+		   "\t" "[nb_output_node] = %u \n" \
+		   "\t" "[vect_norm] = %u \n" \
+		   "\t" "[cleanExtraMem] = %s \n" \
+		   , nb_transition, nb_input_node, nb_output_node, vect_norm, (cleanExtraMem)?"yes":"no");
+	
+	//create Free-choice
+	srand(time(NULL));
+	
+	pPetri net = generateRandomFreeChoice(nb_transition, nb_input_node, nb_output_node, vect_norm, cleanExtraMem);
+	//write Free-choice named "net1" to file "net1.pnml"
+	if(filename!=NULL)
+	{	printf("Save generated Free-choice to %s\n", filename);
+		petriToPnmlFile(net, "Free-choice", filename);
+	}else
+	{
+		petriToPnmlDisplay(net, "Free-choice");
+	}
+	//free memory
+	petriFree(net);
+
+	return 0;
+}
+
+/*
+	//-----------------------------------------------------------------------------------------------------------------
+	//										
+	//											SIMPLE TUTORIAL
+	//
+	//-----------------------------------------------------------------------------------------------------------------
+
 
 	srand(time(NULL));
 
-	/*******************************************************************************************************************
-											GENERATE RANDOM FREE CHOICE 
-	******************************************************************************************************************/
+	//-----------------------------------------------------------------------------------------------------------------
+	//										GENERATE RANDOM FREE CHOICE 
+	//-----------------------------------------------------------------------------------------------------------------
 
 	unsigned int nb_transition = 10;//number of desired transition in the result Free-choice
-	unsigned int nb_input_transition = 3;//average (and maximum) number of inputs for each transition
-	unsigned int nb_output_transition = 3;//average (and maximum) number of outputs for each transition
+	unsigned int nb_input_node = 3;//average (and maximum) number of inputs for each transition
+	unsigned int nb_output_node = 3;//average (and maximum) number of outputs for each transition
 	unsigned int vect_norm = 10;//norm of the repetition vector to generate
 	int cleanExtraMem = 0;//the transformation from SDF to Free-choice leaves extra empty memory space, the cleaning process is optional because it's time consuming
 
 	//create random Free-choice from its repetition vector norm
-	pPetri net1 = generateRandomFreeChoice(nb_transition, nb_input_transition, nb_output_transition, vect_norm, cleanExtraMem);
+	pPetri net1 = generateRandomFreeChoice(nb_transition, nb_input_node, nb_output_node vect_norm, cleanExtraMem);
 	//write Free-choice named "net1" to file "net1.pnml"
 	petriToPnmlFile(net1, "net1", "net1.pnml");
 	petriFree(net1);
 
 	//create random Free-choice from a given repetition vector
 	unsigned int * vect = weightsComputation(nb_transition, vect_norm);
-	pPetri net2 = generateFreeChoiceWithVector(nb_transition, nb_input_transition, nb_output_transition, vect, cleanExtraMem);
+	pPetri net2 = generateFreeChoiceWithVector(nb_transition, nb_input_node, nb_output_node, vect, cleanExtraMem);
 	//write Free-choice named "net2" to file "net2.pnml"
 	petriToPnmlFile(net2, "net2", "net2.pnml");
 	free(vect);
 	petriFree(net2);
 
 
-	/*******************************************************************************************************************
-											CREATE A PETRI NET
-	******************************************************************************************************************/
+	//-----------------------------------------------------------------------------------------------------------------
+	//										CREATE A PETRI NET
+	//-----------------------------------------------------------------------------------------------------------------
 
 	unsigned int nb_place = 5;
 	unsigned int nb_transitions = 5;
@@ -149,8 +278,5 @@ int main(int argc, char ** argv)
 
 	//free memory
 	petriFree(net3);
-
-	return 0;
-}
-
+*/
 
