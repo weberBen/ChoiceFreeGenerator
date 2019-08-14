@@ -1,5 +1,6 @@
 # Creation of random free choice graph generator
 
+A ramdon generator of living Free-choice
 
 # Sommaire
 - [Project description](#ProjetcDescription)
