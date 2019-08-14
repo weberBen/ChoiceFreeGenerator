@@ -1,4 +1,4 @@
-# Creation of random free choice graph generator
+# Creation of a random Free-choice generator
 
 A ramdon generator of living Free-choice
 
