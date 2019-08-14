@@ -40,7 +40,7 @@ pPetri net1 = generateRandomFreeChoice(nb_transition, nb_input_node, nb_output_n
 //write Free-choice named "net1" to file "net1.pnml"
 petriToPnmlFile(net1, "net1", "net1.pnml");
 //displat Free-choice to the shell
- petriToPnmlDisplay(net1, "net1");
+petriToPnmlDisplay(net1, "net1");
 petriFree(net1);
 ```
   ## Create a random Free-choice based on repetition vector
