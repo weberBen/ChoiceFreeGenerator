@@ -15,6 +15,10 @@ A free choice graph is a subclass of petri net where each place has exactly one 
 
 # Main script <a name="MainScript"/>
 
+## Requires <a name="Requires"/>
+    - libglpk-dev (version 4.61-1)
+    - gcc (version 4:6.3.0-4)
+    
 *NAME*
 
 freeChoiceGenerator - a random generator of living Free-choice
@@ -47,10 +51,6 @@ The ```[vect_norm]``` is the desired norm of the repetition vector to get during
 ```freeChoiceGenerator 10 5 20 -f output.pnml``` produce a ramdom Free-choice with 10 transitions in which the norm of the repetiton vector is equal to 20 and then write the net into the file *output.pnml*
 
 # API <a name="Api"/>
-
-  ## Requires <a name="Requires"/>
-    - libglpk-dev (version 4.61-1)
-    - gcc (version 4:6.3.0-4)
   
   ## Create a random Free-choice based on repetition vector norm
   
