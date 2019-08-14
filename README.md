@@ -109,7 +109,7 @@ petriFree(net2);
 
   ## Petri net strcuture <a name="PetriStructure"/>
   
-  ### Definition
+  ### Definition <a name="PetriStructDef"/>
    ```C
   /* The following substructure are not meant to be stand alone one 
    Memory management are made within the global petri structure and not individually 
@@ -221,10 +221,11 @@ typedef struct Petri
 	pPetriElem * tr_elems;
 } petri;
 ```
-
- A simple tutorial to understand how the structure used to save Free-choice works
  
   ## Creation of a Petri net <a name="PetriExample"/>
+  
+ A simple tutorial to understand how the structure used to save Free-choice works
+ 
  ```C
 unsigned int nb_place = 5;
 unsigned int nb_transitions = 5;
