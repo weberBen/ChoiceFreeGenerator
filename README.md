@@ -3,11 +3,11 @@
 
 # Sommaire
 - [Project description](#ProjetcDescription)
-- [Script] (#MainScript)
-	- [Requires] (#RequiresMain)
-	- [Description] (#DescriptionFunctionsMain)
-	- [Exampe of use] (#MainExample)
-- [API] (#Api)
+- [Script](#MainScript)
+	- [Requires](#RequiresMain)
+	- [Description](#DescriptionFunctionsMain)
+	- [Exampe of use](#MainExample)
+- [API](#Api)
 	- [Generate Free-choice](#FreeChoiceApi)
 	- [Petri Structure](#PetriStructure)
 		- [Definition](#PetriStructDef)
