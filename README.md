@@ -4,6 +4,7 @@ A ramdon generator of living Free-choice
 
 # Sommaire
 - [Project description](#ProjetcDescription)
+- [Compile sources](#Compile)
 - [Script](#MainScript)
 	- [Requires](#RequiresMain)
 	- [Description](#DescriptionFunctionsMain)
@@ -31,6 +32,9 @@ The generator convert a living and normalized SDF to a Free-choice. That transfo
 Then the process gather all the places to have a unique input into the transition.
 To achieve that goal the SDF is generated from a strongly conected graph where a node is converted into a transition and an edge into a place. To ensure that there is enough transitions with multiple inputs (thus, for the directed graph that implies to have multiple inputs per node) user have to select the number of desired input for the strongly connected graph (and can also select the number of outputs which need to be at least equal to the number of input to ensure that there no transition (no node in the graph) without any input.
 
+# Compile sources <a name="Compile"/>
+
+Execute the Makefile inside *Algorithme_C*. That produces two executables *freeChoiceGenerator* (the generator itself) and *main_py* the script used by Python for the graphical interface. The Python graphical interface scripts are saved under *Python*.
 
 # Script <a name="MainScript"/>
 
