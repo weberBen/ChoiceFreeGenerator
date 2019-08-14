@@ -222,7 +222,7 @@ typedef struct Petri
 } petri;
 ```
  
-  ## Creation of a Petri net <a name="PetriExample"/>
+  ## Creation of a Petri net <a name="PetriStructExample"/>
   
  A simple tutorial to understand how the structure used to save Free-choice works
  
