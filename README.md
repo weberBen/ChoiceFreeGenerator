@@ -2,12 +2,21 @@
 
 
 # Sommaire
-- [Description](#description)
+- [Project description](#ProjetcDescription)
+- [Script] (#MainScript)
+	- [Requires] (#RequiresMain)
+	- [Description] (#DescriptionFunctionsMain)
+	- [Exampe of use] (#MainExample)
+- [API] (#Api)
+	- [Generate Free-choice](#FreeChoiceApi)
+	- [Petri Structure](#PetriStructure)
+		- [Definition](#PetriStructDef)
+		- [Example](#PetriStructExample)
 - [Interface](#Interface)
   - [Requires](#Requires)
   - [Commands](#Commands)
 
-# Description <a name="Description"/>
+# Project description <a name="ProjetcDescription"/>
 
 A free choice graph is a subclass of petri net where each place has exactly one output and transitions have one input and multiple outputs as shown in the following figure
 
@@ -18,16 +27,16 @@ The generator convert a living and normalized SDF to a Free-choice. That transfo
 <img src="Annexes/Images/SdfTransformation.png" width="70%"  align="middle">
 
 Then the process gather all the places to have a unique input into the transition.
-To achieve that goal the SDF is generated from a strongly conected graph where a node is then convert into a transition and an edge into a place. To ensure that there is enough transition with multiple input (to the directed graph that implies to have multiple input per node) user have to select the 
+To achieve that goal the SDF is generated from a strongly conected graph where a node is converted into a transition and an edge into a place. To ensure that there is enough transitions with multiple inputs (thus, for the directed graph that implies to have multiple inputs per node) user have to select the number of desired input for the strongly connected graph (and can also select the number of outputs which need to be at least equal to the number of input to ensure that there no transition (no node in the graph) without any input.
 
 
-# Main script <a name="MainScript"/>
+# Script <a name="MainScript"/>
 
-## Requires <a name="Requires"/>
+## Requires <a name="RequiresMain"/>
     - libglpk-dev (version 4.61-1)
     - gcc (version 4:6.3.0-4)
     
-## Description <a name="Requires"/>
+## Description <a name="DescriptionFunctionsMain"/>
 
 *NAME*
 
@@ -57,12 +66,12 @@ The ```[vect_norm]``` is the desired norm of the repetition vector to get during
 
 **-h**  : get help
 
-## Example
+## Example <a name="MainExample"/>
 ```freeChoiceGenerator 10 5 20 -f output.pnml``` produce a ramdom Free-choice with 10 transitions in which the norm of the repetiton vector is equal to 20 and then write the net into the file *output.pnml*
 
 # API <a name="Api"/>
   
-  ## Create a random Free-choice based on repetition vector norm
+  ## Create a random Free-choice based on repetition vector norm <a name="FreeChoiceApi"/>
   
 ``` C 
 #include "GraphGenerator.h"
@@ -98,10 +107,10 @@ free(vect);
 petriFree(net2);
 ```
 
-  ## Petri net strcuture
+  ## Petri net strcuture <a name="PetriStructure"/>
  A simple tutorial to understand how the structure used to save Free-choice works
  
-  ## Creation of a Petri net
+  ## Creation of a Petri net <a name="PetriExample"/>
  ```C
 unsigned int nb_place = 5;
 unsigned int nb_transitions = 5;
@@ -156,7 +165,7 @@ printf("}\n");
 
 //get all the link for a node
 pPetriNode node = net3->places[0];
-pArray p = node->input_links;
+pArray p = node->input_links; //simple linked list
 printf("Inputs of node 0 : \n");
 while(p)
 {
