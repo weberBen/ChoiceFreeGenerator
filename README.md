@@ -12,7 +12,7 @@
 	- [Petri Structure](#PetriStructure)
 		- [Definition](#PetriStructDef)
 		- [Example](#PetriStructExample)
-- [Interface](#Interface)
+- [Simple Python interface](#Interface)
   - [Requires](#Requires)
   - [Commands](#Commands)
 
@@ -332,7 +332,7 @@ printf("}\n");
 //free memory
 petriFree(net3);
 ```
-# Interface <a name="Interface"/>
+# Simple Python interface <a name="Interface"/>
 
 All the functions about generating and modifying graph are written in C. But all the display parts are python scripts (because python can use networkx for oriented graph and SNAKES for petri net). Thus, we had to connect C functions with python. So the simplest solution for now is to create a server socket in C that collects python request, process the request and send back the result to python; ctypes was kind of unsatisfying. All the described process can be visualized on the following figure :
 
@@ -345,7 +345,6 @@ All the functions about generating and modifying graph are written in C. But all
 **Used modules** :
   - ctypes
   - networkx
-  - [SNAKES](https://snakes.ibisc.univ-evry.fr/)
   - graphviz (pay attention that you probably will need to install it for python and for the OS)
 
   ## Commands to use python interface <a name="Commands"/>
