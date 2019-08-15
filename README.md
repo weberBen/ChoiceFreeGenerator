@@ -265,13 +265,14 @@ petriAddlink(net3, PETRI_TP_LINK, 3, 0, 5);//add link between the transition 3 a
 petriAddlink(net3, PETRI_PT_LINK, 2, 1, 12);//not possible because place 2 does not exists
 petriAddlink(net3, PETRI_TP_LINK, 3, 2, 12);//not possible because place 2 does not exists
 
-pPetriLink link = petriGetLink(net3, PETRI_PT_LINK, 0, 1);//get link between the place 0 and the transition 1
-printf("Weight of link between place 0 and transition 1 : %d\n", link->weight);
-printf("Weight of link between transition 4 and place 3 : %d\n", petriGetWeightLink(net3, PETRI_TP_LINK, 4, 3));
 ```
 ### Getter functions
 
 ```C
+pPetriLink link = petriGetLink(net3, PETRI_PT_LINK, 0, 1);//get link between the place 0 and the transition 1
+printf("Weight of link between place 0 and transition 1 : %d\n", link->weight);
+printf("Weight of link between transition 4 and place 3 : %d\n", petriGetWeightLink(net3, PETRI_TP_LINK, 4, 3));
+
 pPetriElem elem = petriGetPlace(net3, 0);//get place 0
 printf("Initial marking of place %u : %d\n", elem->label, elem->val);
 printf("Initial marking of place 4 : %d\n", petriGetInitialMarking(net3, 4));
