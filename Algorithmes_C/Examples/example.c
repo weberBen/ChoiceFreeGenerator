@@ -40,7 +40,7 @@ int main()
 	}
 	printf("Real repetition vector norm : %u\n", real_vect_norm);
 	pPetri net2 = generateFreeChoiceWithVector(nb_transition, nb_input_node, nb_output_node, vect, cleanExtraMem);
-	if(net1==NULL)
+	if(net2==NULL)
 	{
 		printf("Error during the generation of a random Free-choice\n");
 		free(vect);
