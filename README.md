@@ -36,6 +36,11 @@ To achieve that goal the SDF is generated from a strongly conected graph where a
 
 Execute the Makefile inside *Algorithme_C*. That produces two executables *freeChoiceGenerator* (the generator itself) and *main_py* the script used by Python for the graphical interface. The Python graphical interface scripts are saved under *Python*.
 
+# Link library <a name="Library"/>
+The needed library, *FreeChoiceGeneratorLib.a*, is saved into *Library* with the header file named *freeChoiceGenerator.h*. To link that library to another program :
+
+```gcc -o example example.c -lm -lglpk /pathToMakeFileFolder/Library/FreeChoiceGeneratorLib.a -I/pathToMakeFileFolder/Library```
+
 # Script <a name="MainScript"/>
 
 ## Requires <a name="RequiresMain"/>
@@ -76,12 +81,13 @@ The ```[vect_norm]``` is the desired norm of the repetition vector to get during
 ```freeChoiceGenerator 10 5 20 -f output.pnml``` produce a ramdom Free-choice with 10 transitions in which the norm of the repetiton vector is equal to 20 and then write the net into the file *output.pnml*
 
 # API <a name="Api"/>
-  
+
+The following example can be found under the direction *Examples*
+
   ## Create a random Free-choice based on repetition vector norm <a name="FreeChoiceApi"/>
   
 ``` C 
-#include "GraphGenerator.h"
-#include "Display.h"
+#include "freeChoiceGenerator.h" //use header file of the static library
 ```
 
 ``` C
@@ -94,7 +100,7 @@ unsigned int vect_norm = 10;//norm of the repetition vector to generate
 int cleanExtraMem = 0;//the transformation from SDF to Free-choice leaves extra empty memory space, the cleaning process is optional because it's time consuming
 
 //create random Free-choice from its repetition vector norm
-pPetri net1 = generateRandomFreeChoice(nb_transition, nb_input_node, nb_output_node vect_norm, cleanExtraMem);
+pPetri net1 = generateRandomFreeChoice(nb_transition, nb_input_node, nb_output_node, vect_norm, cleanExtraMem);
 //write Free-choice named "net1" to file "net1.pnml"
 petriToPnmlFile(net1, "net1", "net1.pnml");
 //displat Free-choice to the shell
