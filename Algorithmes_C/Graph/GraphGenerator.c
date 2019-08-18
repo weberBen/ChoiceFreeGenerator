@@ -93,7 +93,8 @@ pDirectedGraph randomGraph(unsigned int n, int Ki,  int Ko)
 	 * a parent of j (or in other words, if j is a child of i)
 	*/
 	unsigned int size = n*n;
-	int network[size];
+	int * network = (int *)malloc(sizeof(int)*size);//not needed to malloc for the code but for the memory during runing time (for large size)
+	assert(network);
 	initializeIntArray(network, size, 0);//set all the value to 0 (no links)
 	 
 	 /*****************************************************************
@@ -286,11 +287,15 @@ pDirectedGraph randomGraph(unsigned int n, int Ki,  int Ko)
 	 /*****************************************************************
 	  * 				FREE MEMORY
 	  ****************************************************************/
+	
 	 //stop the random cumulative probability generator
 	 randCumulProbaEnd(idRandVertexO);
 	 randCumulProbaEnd(idRandVertexI);
 	 
-	 return matrixIntoList(network, n);//convert the network matrix into a list of list of children
+	 pDirectedGraph graph = matrixIntoList(network, n);//convert the network matrix into a list of list of children
+	 free(network);
+
+	 return graph;
  }
  
  

@@ -185,7 +185,7 @@ void petriFree(pPetri p);//only that function must be used to free a petri net
 /*********************************************************************
  * 							GENERATOR
  *********************************************************************/
-
+ 
 //Initialization of SDF
 unsigned int * weightsComputation(unsigned int * real_vect_norm,
                                   unsigned int nb_transition, unsigned int repetition_vect_norm);//create random repetition vector (where the gcd of the array is 1)
