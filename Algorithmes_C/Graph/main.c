@@ -33,7 +33,7 @@
 	int cleanExtraMem = 0;//the transformation from SDF to Free-choice leaves extra empty memory space, the cleaning process is optional because it's time consuming
 
 	//create random Free-choice from its repetition vector norm
-	pPetri net1 = generateRandomFreeChoice(nb_transition, nb_input_node, nb_output_node vect_norm, cleanExtraMem);
+	pPetri net1 = generateRandomFreeChoice(nb_transition, nb_input_node, nb_output_node, vect_norm, cleanExtraMem);
 	//write Free-choice named "net1" to file "net1.pnml"
 	petriToPnmlFile(net1, "net1", "net1.pnml");
 	petriFree(net1);
