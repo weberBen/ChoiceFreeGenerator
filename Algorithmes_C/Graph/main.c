@@ -182,6 +182,7 @@ int main(int argc, char ** argv)
 	unsigned int nb_input_node = 0;//average (and maximum) number of inputs for each transition
 	unsigned int nb_output_node = 0;//average (and maximum) number of outputs for each transition
 	unsigned int vect_norm = 0;//norm of the repetition vector to generate
+	unsigned int real_vect_norm;
 	unsigned int stack_size = 0;
 	int cleanExtraMem = 0;//the transformation from SDF to Free-choice leaves extra empty memory space, the cleaning process is optional because it's time consuming
 	char * filename = NULL;
@@ -267,7 +268,7 @@ int main(int argc, char ** argv)
 	//create Free-choice
 	srand(time(NULL));
 	
-	pPetri net = generateRandomFreeChoice(nb_transition, nb_input_node, nb_output_node, vect_norm, cleanExtraMem);
+	pPetri net = generateRandomFreeChoice(&real_vect_norm, nb_transition, nb_input_node, nb_output_node, vect_norm, cleanExtraMem);
 	//write Free-choice named "net1" to file "net1.pnml"
 	if(filename!=NULL)
 	{	printf("Save generated Free-choice to %s\n", filename);

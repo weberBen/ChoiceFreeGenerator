@@ -117,7 +117,8 @@ static void sendResponse(request * req, char * buff, int BUFFSIZE, unsigned int 
 		{
 			printf("Creation d'un Free-choice aleatoirement\n");
 			
-			pPetri graph1 = generateRandomFreeChoice(req->n, req->Ki, req->Ko, req->rep_vect_norm, req->cleanExtraMemSpace);//create graph
+			unsigned int real_rep_vect_norm;
+			pPetri graph1 = generateRandomFreeChoice(&real_rep_vect_norm, req->n, req->Ki, req->Ko, req->rep_vect_norm, req->cleanExtraMemSpace);//create graph
 			wrapperAddToList(&_list, wrapperCreateNode(req->wrapperId, petri_t, (void *)graph1));
 			
 			petriWrite(graph1, csock);//write petri net to the socket

@@ -997,7 +997,8 @@ void setInitialMarking(pPetri net)
 
 
 
-pPetri _generateFreeChoice(unsigned int nb_transition, unsigned int nb_input_node, unsigned int nb_output_node, unsigned int repetition_vect_norm, unsigned int * repetition_vect, int cleanExtraMemSpace)
+pPetri _generateFreeChoice(unsigned int * real_vect_norm, 
+						   unsigned int nb_transition, unsigned int nb_input_node, unsigned int nb_output_node, unsigned int repetition_vect_norm, unsigned int * repetition_vect, int cleanExtraMemSpace)
 {
 	if(nb_transition<2)
 	{
@@ -1021,9 +1022,8 @@ pPetri _generateFreeChoice(unsigned int nb_transition, unsigned int nb_input_nod
 	pPetri net;
 	if(repetition_vect==NULL)
 	{
-		unsigned int real_vect_norm = 0;
-		net = petriNormalizedTransformation(&real_vect_norm, graph, repetition_vect_norm);
-		printf("\tReal norm of the repetition vector : %u\n", real_vect_norm);
+		net = petriNormalizedTransformation(real_vect_norm, graph, repetition_vect_norm);
+		printf("\tReal norm of the repetition vector : %u\n", *real_vect_norm);
 	}else
 	{
 		net = petriTransformation(graph);
@@ -1041,7 +1041,8 @@ pPetri _generateFreeChoice(unsigned int nb_transition, unsigned int nb_input_nod
 }
 
 
-pPetri generateRandomFreeChoice(unsigned int nb_transition, unsigned int nb_input_node, unsigned int nb_output_node, unsigned int repetition_vect_norm, int cleanExtraMemSpace)
+pPetri generateRandomFreeChoice(unsigned int * real_vect_norm, 
+								unsigned int nb_transition, unsigned int nb_input_node, unsigned int nb_output_node, unsigned int repetition_vect_norm, int cleanExtraMemSpace)
 {
 	if(repetition_vect_norm<nb_transition)
 	{
@@ -1049,7 +1050,7 @@ pPetri generateRandomFreeChoice(unsigned int nb_transition, unsigned int nb_inpu
 						"Number of transitions : %u   | Vector nomr : %u\n", nb_transition, repetition_vect_norm);
 		return NULL;
 	}
-	return _generateFreeChoice(nb_transition, nb_input_node, nb_output_node, repetition_vect_norm, NULL, cleanExtraMemSpace);
+	return _generateFreeChoice(real_vect_norm, nb_transition, nb_input_node, nb_output_node, repetition_vect_norm, NULL, cleanExtraMemSpace);
 }
 
 
@@ -1060,5 +1061,5 @@ pPetri generateFreeChoiceWithVector(unsigned int nb_transition, unsigned int nb_
 		fprintf(stderr, "cannot generate a normalized SDF from a NULL repetition vector\n");
 		return NULL;
 	}
-	return _generateFreeChoice(nb_transition, nb_input_node, nb_output_node, 0, repetition_vect, cleanExtraMemSpace);
+	return _generateFreeChoice(NULL, nb_transition, nb_input_node, nb_output_node, 0, repetition_vect, cleanExtraMemSpace);
 }
