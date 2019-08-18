@@ -93,7 +93,7 @@ pDirectedGraph randomGraph(unsigned int n, int Ki,  int Ko)
 	 * a parent of j (or in other words, if j is a child of i)
 	*/
 	unsigned int size = n*n;
-	int * network = (int *)malloc(sizeof(int)*size);//not needed to malloc for the code but for the memory during runing time (for large size)
+	int * network = (int *)malloc(sizeof(int)*size);//dynamic allocation to exclude cases of big size graph from the limited stack of the program (else seg fault occurs)
 	assert(network);
 	initializeIntArray(network, size, 0);//set all the value to 0 (no links)
 	 
@@ -778,8 +778,15 @@ pPetri petriNormalizedTransformation(unsigned int * real_vect_norm,
 void setInitialMarking(pPetri net)
 {
 	glp_prob *lp;
-	int ia[GLPK_SIZE], ja[GLPK_SIZE];
-	double ar[GLPK_SIZE];
+
+	//dynamic allocations to exclude variables with big size from the limited stack of the program (else seg fault occurs)
+	int * ia = (int *)malloc(sizeof(int)*(1+3*net->nb_pl));//for each equation there is 3 members (+1 because glpk index start to 1)
+	assert(ia);
+	int * ja = (int *)malloc(sizeof(int)*(1+3*net->nb_pl));//for each equation there is 3 members (+1 because glpk index start to 1)
+	assert(ja);
+	double * ar = (double *)malloc(sizeof(double)*(1+3*net->nb_pl));//for each equation there is 3 members (+1 because glpk index start to 1)
+	assert(ar);
+
 	const double epsilon = 1./(net->nb_pl);
 
 	//create variables
@@ -796,7 +803,7 @@ void setInitialMarking(pPetri net)
 	glp_set_prob_name(lp, "short");
 	glp_set_obj_dir(lp, GLP_MIN);
 	// fill problem 
-	glp_add_cols(lp, 2*net->nb_pl);
+	glp_add_cols(lp, 2*net->nb_pl);//need to declare all the needed column before because the order (column 1, column 2, etc) cannot be followed in the loop
 
 
 	k = 1;
@@ -903,6 +910,9 @@ void setInitialMarking(pPetri net)
 		fprintf(stderr, "No variable founded for the initial marking computation\n");
 	}
 	// housekeeping
+	free(ia);
+	free(ja);
+	free(ar);
 	glp_delete_prob(lp);
 	glp_free_env();
 }

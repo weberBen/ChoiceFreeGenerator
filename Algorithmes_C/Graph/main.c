@@ -31,7 +31,6 @@ void printHelp()
 			"\t" "-o [nb_output_node]   " "set [nb_output_node]" "\n" \
 			"\t" "-c   " "resize the petri net after the transformation from SDF to Free-choice (can be time consuming)" "\n" \
 			"\t" "-f [filename]   " "save the Free-choice to a file to [filename] as PNML format" "\n" \
-			"\t" "-s [stack_size]   " "set the new stack size to use" "\n" \
 			"\t" "-h   " "get help" "\n");
 }
 
@@ -42,7 +41,6 @@ int main(int argc, char ** argv)
 	unsigned int nb_output_node = 0;//average (and maximum) number of outputs for each transition
 	unsigned int vect_norm = 0;//norm of the repetition vector to generate
 	unsigned int real_vect_norm;
-	unsigned int stack_size = 0;
 	int cleanExtraMem = 0;//the transformation from SDF to Free-choice leaves extra empty memory space, the cleaning process is optional because it's time consuming
 	char * filename = NULL;
 	unsigned int nb_regular_arg = 0;
@@ -68,9 +66,6 @@ int main(int argc, char ** argv)
 				return 0;
 			}
 				break;
-			case 's':
-				stack_size = (int)atol(optarg);
-				break;
 			default:
 				break;
 		}
@@ -95,22 +90,7 @@ int main(int argc, char ** argv)
 		printf("Wrong arguments !\n-h to get help\n");
 		return 1;
 	}
-
-
-	/* The structure used to store petri net is heavy in memory (to make the transformation easier)
-	   For a lot of elements inside the petri net the default allocate stack memory must be increased
-	*/
-	if(stack_size!=0)
-	{
-		struct rlimit lim = {stack_size, stack_size};
-
-		if (setrlimit(RLIMIT_STACK, &lim) == -1)
-			return 1;
-
-		printf("Increase stack size to %u\n", stack_size);
-	}
 	
-
 	if(nb_output_node==0)
 		nb_output_node = nb_input_node;
 	

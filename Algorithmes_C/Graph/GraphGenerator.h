@@ -8,8 +8,6 @@
 #include "Tools.h"
 #include "Display.h"
 
-#define GLPK_SIZE 1+100000 //large size requires for graph with nodes between 1000 and 10 000
-
 //create simple directed graph
 pDirectedGraph randomGraph(unsigned int n, int Ki, int Ko);
 pDirectedGraph buildTree(unsigned int n, unsigned int D);
