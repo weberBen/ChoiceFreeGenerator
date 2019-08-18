@@ -577,7 +577,8 @@ void connect(unsigned int u, pDirectedGraph graph, enum colorTag color[], int ar
  * 
  * 
  * *******************************************************************/
-unsigned int * weightsComputation(unsigned int nb_transition, unsigned int repetition_vect_norm)
+unsigned int * weightsComputation(unsigned int * real_vect_norm,
+								  unsigned int nb_transition, unsigned int repetition_vect_norm)
 {
 	/* Fist the function generate an array of n integers, where n is the number of transitions in the Petri net, such as
 		the sum of each element of the array is approximativly equal to the nomr of the T-semiflow.
@@ -593,7 +594,7 @@ unsigned int * weightsComputation(unsigned int nb_transition, unsigned int repet
 	}
 
 	//generate array of random integers with a fixed sum
-	unsigned int * random_weights = randomFixedSum(nb_transition, repetition_vect_norm);
+	unsigned int * random_weights = randomFixedSum(real_vect_norm, nb_transition, repetition_vect_norm);
 
 	//ensure gcm of the array is 1
 	int gcd_val = gcd_array(random_weights, nb_transition);//get gcm of the array
@@ -676,7 +677,8 @@ void normalizationPetriNetwork(pPetri net, unsigned int * repetition_vect)
  * 
  * *******************************************************************/
 
-pPetri _petriTransformation(pDirectedGraph graph, int normalize, unsigned int repetition_vect_norm)
+pPetri _petriTransformation(unsigned int * real_vect_norm,
+							pDirectedGraph graph, int normalize, unsigned int repetition_vect_norm)
 {
 	/* edge <-> place and node <-> transition */
 	pPetri net = petriCreate(graph->nb_edges, graph->nb_nodes);
@@ -685,7 +687,7 @@ pPetri _petriTransformation(pDirectedGraph graph, int normalize, unsigned int re
 	unsigned int * repetition_vect = NULL;
 	if(normalize)
 	{
-		repetition_vect =  weightsComputation(net->nb_tr, repetition_vect_norm);
+		repetition_vect =  weightsComputation(real_vect_norm, net->nb_tr, repetition_vect_norm);
 		lcm_val = lcm_array(repetition_vect, net->nb_tr);
 		if(lcm_val==-1)
 		{
@@ -751,12 +753,14 @@ pPetri _petriTransformation(pDirectedGraph graph, int normalize, unsigned int re
 
 pPetri petriTransformation(pDirectedGraph graph)
 {
-	return _petriTransformation(graph, 0, 0);
+	
+	return _petriTransformation(NULL, graph, 0, 0);
 }
 
-pPetri petriNormalizedTransformation(pDirectedGraph graph, unsigned int repetition_vect_norm)
+pPetri petriNormalizedTransformation(unsigned int * real_vect_norm,
+									 pDirectedGraph graph, unsigned int repetition_vect_norm)
 {
-	return _petriTransformation(graph, 1, repetition_vect_norm);
+	return _petriTransformation(real_vect_norm, graph, 1, repetition_vect_norm);
 }
 
 /**********************************************************************
@@ -1017,7 +1021,9 @@ pPetri _generateFreeChoice(unsigned int nb_transition, unsigned int nb_input_nod
 	pPetri net;
 	if(repetition_vect==NULL)
 	{
-		net = petriNormalizedTransformation(graph, repetition_vect_norm);
+		unsigned int real_vect_norm = 0;
+		net = petriNormalizedTransformation(&real_vect_norm, graph, repetition_vect_norm);
+		printf("\tReal norm of the repetition vector : %d\n", real_vect_norm);
 	}else
 	{
 		net = petriTransformation(graph);

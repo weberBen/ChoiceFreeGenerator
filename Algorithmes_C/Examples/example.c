@@ -25,7 +25,9 @@ int main()
 	petriFree(net1);
 
 	//create random Free-choice from a given repetition vector
-	unsigned int * vect = weightsComputation(nb_transition, vect_norm);
+	unsigned int real_vect_norm = 0;
+	unsigned int * vect = weightsComputation(&real_vect_norm, nb_transition, vect_norm);
+	printf("Real repetition vector norm : %d\n", real_vect_norm);
 	pPetri net2 = generateFreeChoiceWithVector(nb_transition, nb_input_node, nb_output_node, vect, cleanExtraMem);
 	//write Free-choice named "net2" to file "net2.pnml"
 	petriToPnmlFile(net2, "net2", "net2.pnml");

@@ -187,7 +187,8 @@ void petriFree(pPetri p);//only that function must be used to free a petri net
  *********************************************************************/
 
 //Initialization of SDF
-unsigned int * weightsComputation(unsigned int nb_transition, unsigned int repetition_vect_norm);//create random repetition vector (where the gcd of the array is 1)
+unsigned int * weightsComputation(unsigned int * real_vect_norm,
+                                  unsigned int nb_transition, unsigned int repetition_vect_norm);//create random repetition vector (where the gcd of the array is 1)
 
 //generate random Free-choice
 /* The transformation from SDF to Free-choice (used to generate a random Free-choice) leave empty memory space inside the petri structure
