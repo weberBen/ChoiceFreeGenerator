@@ -17,15 +17,16 @@ int main()
 	unsigned int nb_output_node = 3;//average (and maximum) number of outputs for each transition
 	unsigned int vect_norm = 10;//norm of the repetition vector to generate
 	int cleanExtraMem = 0;//the transformation from SDF to Free-choice leaves extra empty memory space, the cleaning process is optional because it's time consuming
+	unsigned int real_vect_norm = 0;
 
 	//create random Free-choice from its repetition vector norm
-	pPetri net1 = generateRandomFreeChoice(nb_transition, nb_input_node, nb_output_node, vect_norm, cleanExtraMem);
+	pPetri net1 = generateRandomFreeChoice(&real_vect_norm, nb_transition, nb_input_node, nb_output_node, vect_norm, cleanExtraMem);
+	printf("Real repetition vector norm : %u\n", real_vect_norm);
 	//write Free-choice named "net1" to file "net1.pnml"
 	petriToPnmlFile(net1, "net1", "net1.pnml");
 	petriFree(net1);
 
 	//create random Free-choice from a given repetition vector
-	unsigned int real_vect_norm = 0;
 	unsigned int * vect = weightsComputation(&real_vect_norm, nb_transition, vect_norm);
 	printf("Real repetition vector norm : %u\n", real_vect_norm);
 	pPetri net2 = generateFreeChoiceWithVector(nb_transition, nb_input_node, nb_output_node, vect, cleanExtraMem);
