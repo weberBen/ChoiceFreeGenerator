@@ -74,8 +74,6 @@ The ```[vect_norm]``` is the desired norm of the repetition vector to get during
 
 **-f**  : ```[filename]```   save the Free-choice to a file to ```[filename]``` as PNML format
 
-**-s**  : ```[stack_size]```   set the new stack size to use
-
 **-h**  : get help
 
 ## Example <a name="MainExample"/>
