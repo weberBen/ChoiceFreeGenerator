@@ -1023,7 +1023,7 @@ pPetri _generateFreeChoice(unsigned int nb_transition, unsigned int nb_input_nod
 	{
 		unsigned int real_vect_norm = 0;
 		net = petriNormalizedTransformation(&real_vect_norm, graph, repetition_vect_norm);
-		printf("\tReal norm of the repetition vector : %d\n", real_vect_norm);
+		printf("\tReal norm of the repetition vector : %u\n", real_vect_norm);
 	}else
 	{
 		net = petriTransformation(graph);
