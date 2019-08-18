@@ -5,6 +5,7 @@ A ramdon generator of living Free-choice
 # Sommaire
 - [Project description](#ProjetcDescription)
 - [Compile sources](#Compile)
+- [Link static library](#Library)
 - [Script](#MainScript)
 	- [Requires](#RequiresMain)
 	- [Description](#DescriptionFunctionsMain)
