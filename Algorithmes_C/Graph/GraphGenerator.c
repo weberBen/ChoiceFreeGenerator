@@ -1016,6 +1016,11 @@ pPetri _generateFreeChoice(unsigned int * real_vect_norm,
 						"for the output (%u) to generate a Free-choice\n", nb_input_node, nb_output_node);
 		return NULL;
 	}
+	if(nb_output_node==1)//then nb_input_node also equal to 1
+	{
+		fprintf(stderr, "Cannot generate strongly connected graph with one input and one output per node\n");
+		return NULL;
+	}
 
 	printf("Generation of a random oriented graph...\n");
 	pDirectedGraph graph = randomGraph(nb_transition, nb_input_node, nb_output_node);

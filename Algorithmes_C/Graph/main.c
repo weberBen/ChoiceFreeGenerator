@@ -128,6 +128,11 @@ int main(int argc, char ** argv)
 	srand(time(NULL));
 	
 	pPetri net = generateRandomFreeChoice(&real_vect_norm, nb_transition, nb_input_node, nb_output_node, vect_norm, cleanExtraMem);
+	if(net==NULL)
+	{
+		printf("Cannot generate a random Free-choice\n");
+		return 1;
+	}
 	//write Free-choice named "net1" to file "net1.pnml"
 	if(filename!=NULL)
 	{	printf("Save generated Free-choice to %s\n", filename);
