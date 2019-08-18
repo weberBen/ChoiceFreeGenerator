@@ -103,6 +103,11 @@ unsigned int real_vect_norm = 0;
 
 //create random Free-choice from its repetition vector norm
 pPetri net1 = generateRandomFreeChoice(&real_vect_norm, nb_transition, nb_input_node, nb_output_node, vect_norm, cleanExtraMem);
+if(net1==NULL)
+{
+	printf("Error during the generation of a random Free-choice\n");
+	return 1;
+}
 printf("Real repetition vector norm : %u\n", real_vect_norm);
 //write Free-choice named "net1" to file "net1.pnml"
 petriToPnmlFile(net1, "net1", "net1.pnml");
@@ -113,8 +118,19 @@ petriFree(net1);
 ```C
 //create random Free-choice from a given repetition vector
 unsigned int * vect = weightsComputation(&real_vect_norm, nb_transition, vect_norm);
+if(vect==NULL)
+{
+	printf("Error during the generation of a random repetition vector\n");
+	return 1;
+}
 printf("Real repetition vector norm : %u\n", real_vect_norm);
 pPetri net2 = generateFreeChoiceWithVector(nb_transition, nb_input_node, nb_output_node, vect, cleanExtraMem);
+if(net2==NULL)
+{
+	printf("Error during the generation of a random Free-choice\n");
+	free(vect);
+	return 1;
+}
 //write Free-choice named "net2" to file "net2.pnml"
 petriToPnmlFile(net2, "net2", "net2.pnml");
 free(vect);
