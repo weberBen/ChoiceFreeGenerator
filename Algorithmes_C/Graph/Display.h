@@ -32,5 +32,4 @@ void petriWrite(pPetri net, int fileDescriptor);
 void petriToPnmlDisplay(pPetri net, char * network_name);
 void petriToPnmlFile(pPetri net, char * network_name, char* filename);
 
-void test(pPetri net);
 #endif

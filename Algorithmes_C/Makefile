@@ -4,12 +4,17 @@ FOLDER_GRAPH = Graph
 EXEC= freeChoiceGenerator
 FOLDER_PY = Py_interface
 EXEC_PY = main_py
+LIB_FOLDER = Library
+EXAMPLES_FOLDER = Examples
+LIB_NAME = freeChoiceGeneratorLib.a
+LIB_PATH = $(LIB_FOLDER)/$(LIB_NAME)
+current_dir = $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 
 OBJDIR=obj
 vpath %.c src
 vpath %.h src
 
-all: main $(EXEC_PY)
+all: main $(EXEC_PY) lib examples
 
 
 #Lib for generating graph
@@ -36,6 +41,13 @@ Python.o : $(FOLDER_PY)/Python.c
 	gcc ${GCC_FLAGS} -I$(FOLDER_GRAPH) -c $(FOLDER_PY)/Python.c $(FOLDER_GRAPH)/*.c
 	#-I -> specify header path (for include)
 
+#Static library
+lib : Array.o Display.o GraphGenerator.o Rand.o Tools.o
+	ar -crs $(LIB_PATH) Array.o Display.o GraphGenerator.o Rand.o Tools.o
+
+#Examples
+examples : lib
+	gcc ${GCC_FLAGS} -o example1 $(EXAMPLES_FOLDER)/example.c -lm -lglpk $(LIB_PATH) -I$(current_dir)$(LIB_FOLDER)
 
 #executables
 	#Graph
@@ -59,4 +71,4 @@ open :
 	geany $(FOLDER_GRAPH)/*c $(FOLDER_GRAPH)/*h
 
 clean:
-	rm -f *.o $(EXEC) $(EXEC_PY) 
+	rm -f *.o $(EXEC) $(EXEC_PY) $(LIB_PATH) example1

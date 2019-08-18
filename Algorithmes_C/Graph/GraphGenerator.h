@@ -21,7 +21,7 @@ void stronglyConnectedGraph(pDirectedGraph graph, int isTree);
 pPetri petriTransformation(pDirectedGraph graph);//no normalization (all the weight set to 0)
 pPetri petriNormalizedTransformation(pDirectedGraph graph, unsigned int repetition_vect_norm);//from the norm of the repetition vector, generate a random vector and used it to normalize the SDF
 
-//Liling SDF
+//Initialization of SDF
 unsigned int * weightsComputation(unsigned int nb_transition, unsigned int repetition_vect_norm);//create random repetition vector (where the gcd of the array is 1)
 void setInitialMarking(pPetri net);//use glpk to create a liviness initial marking
 

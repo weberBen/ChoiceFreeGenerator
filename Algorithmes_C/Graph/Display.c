@@ -782,11 +782,6 @@ void displayPetriNet(pPetri net)
     close(file);
  }
 
-void test(pPetri net)
-{
-	printf("oki");
-}
-
  /**********************************************************************
  * 
  * 

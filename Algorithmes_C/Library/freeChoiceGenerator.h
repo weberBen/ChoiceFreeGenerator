@@ -1,7 +1,16 @@
-#ifndef _STORAGE_H
-#define _STORAGE_H
+#ifndef _FREE_CHOICE_GENERATOR_H
+#define _FREE_CHOICE_GENERATOR_H
 
-#include "Tools.h"
+#include <glpk.h> 
+#include <math.h>
+#include <assert.h>
+#include <unistd.h>
+#include <sys/stat.h>
+#include <string.h>
+#include <errno.h>
+#include <fcntl.h>
+#include <sys/types.h>
+
 
 typedef enum Types {custom_t=-1, uInt_t, petri_t, petriElem_t, petriNode_t, petriLink_t, wrapper_t, array_t, list_t, fixedSizeList_t, directedGraph_t} types;
 
@@ -18,25 +27,7 @@ typedef struct Array
     struct Array * next;
 } array;
 
-
-	// * associated functions * //
-//Array
-pArray createNode(types type, void * data);
-pArray createCustomNode(void (* freeFunction)(void *pData), void * data);
-pArray add(pArray l, types type, void * data);
-pArray addCustom(pArray l, void * data, void (* freeFunction)(void *pData));
-
-unsigned int lengthArray(pArray p);
-
 void freeArray(pArray p);//free all elements in the array
-void freeList(pArray a[], unsigned int n);
-void freeNodeArray(pArray node);
- 
-pArray removeElemArray(pArray previous_elem);
-pArray removeFirstElemArray(pArray * pp);
-pArray removeCustomElemArray(pArray * pp, int (* booleanFunction)(void * data, pArray input_to_compare), void * data);
-void freeType(types type, void (* freeFunction)(void * pData), void * pData);
-pArray getArrayElement(pArray p, void * data, int (* booleanFunction)(void * ref, pArray input_to_compare));
 
 
 /*********************************************************************
@@ -53,108 +44,17 @@ typedef struct Array2
 	struct Array2 * prev;
 } array2;
 
-	// * associated functions * //
-pArray2 createNode2(types type, void * data);
-pArray2 createCustomNode2(void (* freeFunction)(void *pData), void * data);
-pArray2 add2(pArray2 l, types type, void * data);
-pArray2 addCustom2(pArray2 l, void * data, void (* freeFunction)(void *pData));
-
 void freeArray2(pArray2 p);
-void freeNodeArray2(pArray2 node);
-
-pArray2 removeElemArray2(pArray2 * _array, pArray2 elem);
 
 
 /*********************************************************************
- * 								LIST 
+ * 							PETRI NET
  *********************************************************************/
-	// * struct * //
-typedef struct List * pList;
-typedef struct List
-{
-	pArray * data;
-	unsigned int size;
-} list;
-
-	// * associated functions * //
-pList listCreate(pArray * p, unsigned int size);
-void listFree(list * g);
-
-
-/*********************************************************************
- * 						 FIXED SIZE LIST 
- *********************************************************************/
-	// * struct * //
-typedef struct FixedSizeList * pFixedSizeList;
-typedef struct FixedSizeList
-{
-	pArray data;
-	unsigned int size;
-} fixedSizeList;
-//allow to gather an array (with its type and its free function through the node array pArray) and its size
-
-	// * associated functions * //
-pFixedSizeList fixedSizeListCreate(pArray p, unsigned int size);
-void * fixedSizeListGetData(pFixedSizeList p);
-void fixedSizeListFree(pFixedSizeList p);
-
-
-/*********************************************************************
- * 				  UNSIGNED INT TYPE (wrapper class)
- *********************************************************************/
-	// * struct * //
-typedef struct _Int * pInt;
-typedef struct _Int
-{
-	unsigned int data;
-} Int;
-
-	// * associated functions * //
-pInt uIntCreateNode(unsigned int data);
-unsigned int uIntValue(pArray p);
-void uIntFree(pInt p);
-int comparaison(void * ref, pArray compareTo);
-
-
-/*********************************************************************
- * 							DIRECTED GRAPH
- *********************************************************************/
-typedef struct _directedGraph * pDirectedGraph;
-typedef struct _directedGraph
-{
-	pArray * links_list;
-	unsigned int nb_nodes;
-	unsigned int nb_edges;
-} directedGraph;
-
-
-pDirectedGraph directedGraphCreate(unsigned int nb_nodes);
-void directedGraphAddLink(pDirectedGraph graph, unsigned int src_node, unsigned int dest_node);
-void directedGraphFree(pDirectedGraph p);
-
-
-/*********************************************************************
- * 							Petri Type
- *********************************************************************/
-	// * struct * //
-
-/* The following substructure are not meant to be stand alone one 
-   Memory management are made within the global petri structure and not individually 
-*/
 
 #define PETRI_PLACE_TYPE 1
 #define PETRI_TRANSITION_TYPE 0
 #define PETRI_PT_LINK 2
 #define PETRI_TP_LINK 3
-
-#define petri_type_reverse(type) \
-({ __typeof__ (type) _type = (type); \
-(_type==PETRI_PLACE_TYPE) ? PETRI_TRANSITION_TYPE : PETRI_PLACE_TYPE; })
-
-
-#define petri_input_type_link(link_type) \
-({ __typeof__ (link_type) _link_type = (link_type); \
-(_link_type==PETRI_PT_LINK) ? PETRI_PLACE_TYPE : PETRI_TRANSITION_TYPE; })
 
 /*
 	Each element of the petri network will be saved under this structure.
@@ -173,12 +73,6 @@ typedef struct PetriElem
 	int val;//for a place it will be use to store the initial marking
 } petriElem;
 
-pPetriElem petriElemCreate(int type, unsigned int label, int val);
-pPetriElem petriElemCreatePlace(unsigned int label, int val);
-pPetriElem petriElemCreateTransition(unsigned int label);
-void petriElemFree(pPetriElem p);//can be used as stand alone
-
-
 /* A link represent an oriented edge inside the petri net between two elements, with a weight
    Both input and output elements are saved as pointers to the actual element (to update all the references
    of an element once, if a value need to be changed)	
@@ -190,12 +84,6 @@ typedef struct PetriLink
 	pPetriElem output;
 	unsigned int weight;
 } petriLink;
-
-pPetriLink petriLinkCreate(pPetriElem input, pPetriElem output, int weight);
-void petriLinkFree(pPetriLink p);//cannot be used as stand alone
-/* Because the reference of an element will be store in a fixed size array and in multiple links,
-   release memory from a link must not free the memory of the elements inside 
-   (for example a link between two node can be removed without having to remove the nodes)*/
 
 
 /* A node can be a place or a transition inside the petri net for which all the input and output links from and to that
@@ -226,15 +114,8 @@ typedef struct PetriNode
 	pArray output_links;//linked list of petri links (ouputs of the node, then the node is the input inside the link)
 } petriNode;
 
-pPetriNode petriNodeCreate();
-void petriNodeAddInput(pPetriNode node, pArray2 plink_in_array);//take the reference of a link inside the double linked list of links
-void petriNodeAddOutput(pPetriNode node, pArray2 plink_in_array);//take the reference of a link inside the double linked list of links
-void petriNodeRemoveInput(pPetriNode node, pArray2 plink_in_array);//take the reference of a link inside the double linked list of links
-void petriNodeRemoveOutput(pPetriNode node, pArray2 plink_in_array);//take the reference of a link inside the double linked list of links
 pPetriLink petriNodeGetLinkFromArrayNode(pArray node);//from an element of a linked list of a node retrieve the corresponding link
-void petriNodeFree(pPetriNode p);//can not be used as stand alone
-/* The function free the linked lists inside the node but not the elements (the references to the links) strore inside it
-   In other words, after freeing a node all the links include in it will remain in memory (in the double linked list of links)*/
+
 
 /*
 	The petri strcuture is quite heavy in memory because links are store multiple time (as references) to make the manipulation
@@ -299,27 +180,37 @@ void petriClearTransitions(pPetri net);
 
 void petriFree(pPetri p);//only that function must be used to free a petri net
 
-/*********************************************************************
- * 						WRAPPER (used fo pyhton)
- *********************************************************************/
-	// * struct * //
-typedef struct Wrapper * pWrapper;
-typedef struct Wrapper
-{
-	types type;
-	void (*freeFunction)(void * pData);
-	unsigned int id;
-	void * data;
-} wrapper;
 
-	// * associated functions * //
-pWrapper wrapperCreateNode(unsigned int id, types type, void * data);
-pWrapper wrapperCreateCustomNode(unsigned int id, void (* freeFunction)(void * pData), void * data);
-void wrapperFree(pWrapper p);
-void  wrapperAddToList(pArray * pp_list, pWrapper c);
-int wrapperGetId(pArray p);
-pWrapper wrapperGetElem(pArray w_list, unsigned int id);
-void  wrapperRemoveFromList(pArray * pp_list, unsigned int id);
-pArray wrapperFreeList(pArray w_list);
+
+/*********************************************************************
+ * 							GENERATOR
+ *********************************************************************/
+
+//Initialization of SDF
+unsigned int * weightsComputation(unsigned int nb_transition, unsigned int repetition_vect_norm);//create random repetition vector (where the gcd of the array is 1)
+
+//generate random Free-choice
+/* The transformation from SDF to Free-choice (used to generate a random Free-choice) leave empty memory space inside the petri structure
+   If "cleanExtraMemSpace" is set to 0, then these empty space will remain in the petri net after the transformation (somme value of
+   the fixed size arrays inside the petri structure will be set to NULL)
+   Else the petri net will be resized, which can take extra time
+*/
+pPetri generateRandomFreeChoice(unsigned int nb_transition, unsigned int nb_input_node, unsigned int nb_output_node, unsigned int repetition_vect_norm, int cleanExtraMemSpace);//Free-choice from its repetition vector norm
+pPetri generateFreeChoiceWithVector(unsigned int nb_transition, unsigned int nb_input_node, unsigned int nb_output_node, unsigned int * repetition_vect, int cleanExtraMemSpace);//Free-choice from its repetition vector
+
+
+
+/*********************************************************************
+ * 							DIPSLAY
+ *********************************************************************/
+
+void petriToPnmlDisplay(pPetri net, char * network_name);
+void petriToPnmlFile(pPetri net, char * network_name, char* filename);
+
+void displayPetriNet(pPetri net);
+void displayPetriNode(pPetriNode p, unsigned int index);
+void displayPetriLink(pPetriLink p);
+void displayPetriElem(pPetriElem p);
+
 
 #endif 
