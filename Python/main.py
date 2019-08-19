@@ -15,8 +15,9 @@ import GraphDisplay as gd
 numberNode = 5
 numberInputNode = 2
 NumberOutputNode = 2
+rep_vect_norm = numberNode*2
 
-net = c.freeChoice(n=numberNode, Ki=numberInputNode, Ko=NumberOutputNode, rep_vect_norm=10, cleanExtraMemSpace=False)
+net = c.freeChoice(n=numberNode, Ki=numberInputNode, Ko=NumberOutputNode, rep_vect_norm=rep_vect_norm, cleanExtraMemSpace=False)
 f_net = gd.drawPetriNetwork(net.obj, nodeSize=500, widthArraw=1.5)
 f_net.show()
 

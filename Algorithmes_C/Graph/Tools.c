@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <math.h>
 #include <assert.h>
 
 #include "Tools.h"
@@ -200,4 +199,21 @@ int lcm_array(unsigned int * input, unsigned int size)
     return lcm_val; 
 } 
 
+
+
+unsigned int _greater(unsigned int a, unsigned int b)
+{
+	//return index of the greater integer
+	return (a<b)?1:0;
+}
+
+unsigned int min(unsigned int a, unsigned int b)
+{
+	return (_greater(a,b)==1)?a:b;
+}
+
+unsigned int max(unsigned int a, unsigned int b)
+{
+	return (_greater(a,b)==1)?b:a;
+}
 

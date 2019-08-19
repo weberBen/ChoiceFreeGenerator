@@ -1,12 +1,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <getopt.h>
 #include <time.h>
 #include <sys/resource.h>
 #include <string.h>
 
 #include "GraphGenerator.h"
 #include "Display.h"
+#include "Tools.h"
 
 #define NAME "freeChoiceGenerator"
 #define NUMBER_ARGS 3
@@ -36,6 +38,7 @@ void printHelp()
 
 int main(int argc, char ** argv)
 {
+	
 	unsigned int nb_transition = 0;//number of desired transition in the result Free-choice
 	unsigned int nb_input_node = 0;//average (and maximum) number of inputs for each transition
 	unsigned int nb_output_node = 0;//average (and maximum) number of outputs for each transition

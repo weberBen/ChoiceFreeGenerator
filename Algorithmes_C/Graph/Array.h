@@ -147,15 +147,6 @@ void directedGraphFree(pDirectedGraph p);
 #define PETRI_PT_LINK 2
 #define PETRI_TP_LINK 3
 
-#define petri_type_reverse(type) \
-({ __typeof__ (type) _type = (type); \
-(_type==PETRI_PLACE_TYPE) ? PETRI_TRANSITION_TYPE : PETRI_PLACE_TYPE; })
-
-
-#define petri_input_type_link(link_type) \
-({ __typeof__ (link_type) _link_type = (link_type); \
-(_link_type==PETRI_PT_LINK) ? PETRI_PLACE_TYPE : PETRI_TRANSITION_TYPE; })
-
 /*
 	Each element of the petri network will be saved under this structure.
 	It contains :

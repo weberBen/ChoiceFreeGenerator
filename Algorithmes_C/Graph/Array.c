@@ -528,6 +528,16 @@ void directedGraphFree(pDirectedGraph p)
  * 
  *********************************************************************/
 
+static int petri_type_reverse(int type)
+{
+	return (type==PETRI_PLACE_TYPE) ? PETRI_TRANSITION_TYPE : PETRI_PLACE_TYPE;
+}
+
+static int petri_input_type_link(int link_type)
+{
+	return (link_type==PETRI_PT_LINK) ? PETRI_PLACE_TYPE : PETRI_TRANSITION_TYPE;
+}
+
 		 /*********************************************************************				
 		* 						PETRI ELEM FUNCTIONS
 		*********************************************************************/
@@ -968,6 +978,22 @@ void petriRemoveTransition(pPetri net, unsigned int index)
 }
 
 
+static int petriLinkComparaisonInDoubleArray(void * ref, pArray input_to_compare)
+{
+	if(ref==NULL || input_to_compare==NULL)
+		return 0;//false
+	
+	pPetriElem elem = (pPetriElem)ref;
+	pArray2 p_link = (pArray2)(input_to_compare->data);
+
+	if(p_link==NULL)
+		return 0;//false
+	
+	pPetriLink link = (pPetriLink)(p_link->data);
+
+	return (link->output==elem);
+}
+
 pPetriLink _petriGetLink(pPetri net, int input_type, unsigned int input, int output_type, unsigned int output)
 {
 	pPetriNode * nodes_array;
@@ -1003,22 +1029,7 @@ pPetriLink _petriGetLink(pPetri net, int input_type, unsigned int input, int out
 	}
 
 	pPetriNode node = nodes_array[input];
-	int comparaisonFunction(void * ref, pArray input_to_compare)
-	{
-		if(ref==NULL || input_to_compare==NULL)
-			return 0;//false
-		
-		pPetriElem elem = (pPetriElem)ref;
-		pArray2 p_link = (pArray2)(input_to_compare->data);
-
-		if(p_link==NULL)
-			return 0;//false
-		
-		pPetriLink link = (pPetriLink)(p_link->data);
-
-		return (link->output==elem);
-	}
-	pArray elem = getArrayElement(node->output_links, o_elems_array[output] , comparaisonFunction);
+	pArray elem = getArrayElement(node->output_links, o_elems_array[output] , petriLinkComparaisonInDoubleArray);
 	if(elem==NULL)
 		return NULL;
 	

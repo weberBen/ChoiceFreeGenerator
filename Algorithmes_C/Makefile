@@ -1,4 +1,4 @@
-GCC_FLAGS=-Wall -g 
+GCC_FLAGS=-Wall -g -Werror -std=c99 -pedantic-errors
 
 FOLDER_GRAPH = Graph
 EXEC= freeChoiceGenerator

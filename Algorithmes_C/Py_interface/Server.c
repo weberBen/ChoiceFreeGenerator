@@ -1,3 +1,12 @@
+#include <sys/socket.h>
+#include <arpa/inet.h> //inet_addr
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <strings.h>
+#include <stdint.h>
+
 #include "Server.h"
 
 int createSocket(int port)

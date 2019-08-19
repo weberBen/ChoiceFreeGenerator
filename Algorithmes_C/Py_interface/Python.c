@@ -3,8 +3,9 @@
 #include <time.h>
 #include <unistd.h>
 #include <string.h>
+#include <strings.h>
 #include <assert.h>
-#include <unistd.h>
+
 #include "Python.h"
 
 typedef enum Tasks {t_closeServer=-1, t_buildTree = 0, t_stronglyConnectedGraph=1, t_randomGraph=2, t_free=3, t_petri=4, t_freeChoice=5} tasks;
