@@ -16,6 +16,7 @@ pDirectedGraph buildTree(unsigned int n, unsigned int D);
 void stronglyConnectedGraph(pDirectedGraph graph, int isTree);
 
 //convert a strongly connect graph into an SDF
+void normalizationPetriNetwork(pPetri net, unsigned int * repetition_vect);
 pPetri petriTransformation(pDirectedGraph graph);//no normalization (all the weight set to 0)
 pPetri petriNormalizedTransformation(unsigned int * real_vect_norm,
 									 pDirectedGraph graph, unsigned int repetition_vect_norm);//from the norm of the repetition vector, generate a random vector and used it to normalize the SDF

@@ -7,7 +7,9 @@ EXEC_PY = main_py
 LIB_FOLDER = Library
 EXAMPLES_FOLDER = Examples
 LIB_NAME = freeChoiceGeneratorLib.a
+DEV_LIB_NAME = freeChoiceGeneratorDevLib.a
 LIB_PATH = $(LIB_FOLDER)/$(LIB_NAME)
+LIB_DEV_PATH = $(LIB_FOLDER)/$(DEV_LIB_NAME)
 current_dir = $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 
 OBJDIR=obj
@@ -44,6 +46,7 @@ Python.o : $(FOLDER_PY)/Python.c
 #Static library
 lib : Array.o Display.o GraphGenerator.o Rand.o Tools.o
 	ar -crs $(LIB_PATH) Array.o Display.o GraphGenerator.o Rand.o Tools.o
+	ar -crs $(LIB_DEV_PATH) Array.o Display.o GraphGenerator.o Rand.o Tools.o
 
 #Examples
 examples : lib
@@ -71,4 +74,4 @@ open :
 	geany $(FOLDER_GRAPH)/*c $(FOLDER_GRAPH)/*h
 
 clean:
-	rm -f *.o $(EXEC) $(EXEC_PY) $(LIB_PATH) example1
+	rm -f *.o $(EXEC) $(EXEC_PY) $(LIB_PATH) $(LIB_DEV_PATH) example1
