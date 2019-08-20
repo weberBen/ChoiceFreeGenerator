@@ -46,7 +46,7 @@ The needed library, *FreeChoiceGeneratorLib.a*, is saved into *Library* with the
 
 ## Requires <a name="RequiresMain"/>
     - libglpk-dev (version 4.61-1)
-    - gcc (version 4:6.3.0-4)
+    - C99 standard
     
 ## Description <a name="DescriptionFunctionsMain"/>
 
