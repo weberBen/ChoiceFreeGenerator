@@ -7,7 +7,7 @@ Created on Sat Mar 23 17:31:35 2019
 """
 import CFunctions as c
 import GraphDisplay as gd
-
+import matplotlib
 ''' need to compile C source (main_py) '''
 
 #%%
@@ -20,6 +20,7 @@ rep_vect_norm = numberNode*2
 net = c.freeChoice(n=numberNode, Ki=numberInputNode, Ko=NumberOutputNode, rep_vect_norm=rep_vect_norm, cleanExtraMemSpace=False)
 f_net = gd.drawPetriNetwork(net.obj, nodeSize=500, widthArraw=1.5)
 f_net.show()
+#matplotlib.pyplot.savefig('test.png', transparent=True)
 
 c.free(net)
 c.exit()#free all the non-free object
