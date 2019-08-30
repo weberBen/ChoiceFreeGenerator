@@ -39,39 +39,6 @@ void printHelp()
 
 int main(int argc, char ** argv)
 {
-
-
-	//initialize structure
-	pPetri net3 =  petriCreate(3, 4);
-	
-	//add places
-	petriAddPlace(net3, 0, 5);
-	petriAddPlace(net3, 1, 4);
-	petriAddPlace(net3, 2, 8);
-	
-	petriAddTransition(net3, 0);
-	petriAddTransition(net3, 1);
-	petriAddTransition(net3, 2);
-	petriAddTransition(net3, 3);
-
-	
-	petriAddlink(net3, PETRI_PT_LINK, 0, 3, 7);
-	petriAddlink(net3, PETRI_PT_LINK, 1, 3, 7);
-	petriAddlink(net3, PETRI_PT_LINK, 2, 3, 7);
-
-	petriAddlink(net3, PETRI_TP_LINK, 0, 0, 4);
-	petriAddlink(net3, PETRI_TP_LINK, 1, 1, 1);
-	petriAddlink(net3, PETRI_TP_LINK, 2, 2, 2);
-
-
-	displayPetriNet(net3);
-	printf("\n---------------------------------------------------\n");
-	sdfToChoiceFree(net3, 0);
-	displayPetriNet(net3);
-
-	petriFree(net3);
-
-	return 0;
 	unsigned int nb_transition = 0;//number of desired transition in the result Choice-Free
 	unsigned int avg_input_node = 0;//average (and maximum) number of inputs for each transition
 	unsigned int avg_output_node = 0;//average (and maximum) number of outputs for each transition
