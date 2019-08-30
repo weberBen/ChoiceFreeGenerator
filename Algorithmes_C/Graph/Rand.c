@@ -397,20 +397,21 @@ int getRandomInSegment(int start, int end)
  * 
  **********************************************************************/
 
-unsigned int * randomFixedSum(unsigned int * real_sum, unsigned int n, int sum){
+unsigned int * randomFixedSum(unsigned int * real_sum, unsigned int n, unsigned int sum){
 	
 	unsigned int * output = (unsigned int *)malloc(sizeof(unsigned int)*n);
 	assert(output);
 	
 	unsigned int i;
-	int count = 0;
+	unsigned int count = 0;
 	
 	for(i=0; i<n; i++){
 		output[i] = 1 + rand()%(sum-n+1);
 		count+=output[i];
 	}
 	
-	float factor = ((float)sum-n)/((float)count);
+	double factor = ((float)sum-n)/((float)count);
+	
 	*real_sum = 0;
 	for(i=0; i<n; i++){
 		if(i%2)

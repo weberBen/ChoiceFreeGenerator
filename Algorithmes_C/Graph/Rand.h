@@ -65,7 +65,7 @@ int getRandomInSegment(int start, int end);
  * 				get random values with fixed sum
  **********************************************************************/
 
-unsigned int * randomFixedSum(unsigned int * real_sum, unsigned int n, int sum);
+unsigned int * randomFixedSum(unsigned int * real_sum, unsigned int n, unsigned int sum);
 
 /**********************************************************************
  * 				random tools function
