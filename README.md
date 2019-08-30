@@ -1,6 +1,6 @@
-# Creation of a random Free-choice generator
+# Creation of a random Choice-Free generator
 
-A ramdon generator of living Free-choice
+A ramdon generator of living Choice-Free
 
 # Sommaire
 - [Project description](#ProjetcDescription)
@@ -11,7 +11,7 @@ A ramdon generator of living Free-choice
 	- [Description](#DescriptionFunctionsMain)
 	- [Exampe of use](#MainExample)
 - [API](#Api)
-	- [Generate Free-choice](#FreeChoiceApi)
+	- [Generate Choice-Free](#choiceFreeApi)
 	- [Petri Structure](#PetriStructure)
 		- [Definition](#PetriStructDef)
 		- [Example](#PetriStructExample)
@@ -22,11 +22,11 @@ A ramdon generator of living Free-choice
 
 # Project description <a name="ProjetcDescription"/>
 
-A free choice graph is a subclass of petri net where each place has exactly one output and transitions have one input and multiple outputs as shown in the following figure
+A Choice-Free graph is a subclass of petri net where each place has exactly one output as shown in the following figure
 
-<img src="Annexes/Images/FreeChoiceDef.png" width="70%"  align="middle">
+<img src="Annexes/Images/ChoiceFreeDef.png" width="70%"  align="middle">
 
-The generator convert a living and normalized SDF to a Free-choice. That transformation is apply on each transition in the SDF that have more than 1 input as shown below.
+The generator convert a living and normalized SDF to a Choice-Free. That transformation is apply on each transition in the SDF that have more than 1 input as shown below.
 
 <img src="Annexes/Images/SdfTransformation.png" width="70%"  align="middle">
 
@@ -35,12 +35,12 @@ To achieve that goal the SDF is generated from a strongly conected graph where a
 
 # Compile sources <a name="Compile"/>
 
-Execute the Makefile inside *Algorithme_C*. That produces two executables *freeChoiceGenerator* (the generator itself) and *main_py* the script used by Python for the graphical interface. The Python graphical interface scripts are saved under *Python*.
+Execute the Makefile inside *Algorithme_C*. That produces two executables *choiceFreeGenerator* (the generator itself) and *main_py* the script used by Python for the graphical interface. The Python graphical interface scripts are saved under *Python*.
 
 # Link library <a name="Library"/>
-The needed library, *FreeChoiceGeneratorLib.a*, is saved into *Library* with the header file named *freeChoiceGenerator.h*. To link that library to another program :
+The needed library, *choiceFreeGeneratorLib.a*, is saved into *Library* with the header file named *choiceFreeGenerator.h*. To link that library to another program :
 
-```gcc -o example example.c -lm -lglpk /pathToMakeFileFolder/Library/FreeChoiceGeneratorLib.a -I/pathToMakeFileFolder/Library```
+```gcc -o example example.c -lm -lglpk /pathToMakeFileFolder/Library/choiceFreeGeneratorLib.a -I/pathToMakeFileFolder/Library```
 
 # Script <a name="MainScript"/>
 
@@ -52,69 +52,68 @@ The needed library, *FreeChoiceGeneratorLib.a*, is saved into *Library* with the
 
 *NAME*
 
-freeChoiceGenerator - a random generator of living Free-choice
+choiceFreeGenerator - a random generator of living Choice-Free
 
 SYNOPSIS
 
-```freeChoiceGenerator [nb_transition] [nb_input_node] [vect_norm] -OPTIONS```
+```freeChoiceGenerator [nb_transition] [avg_input_node] [vect_norm] -OPTIONS```
 
 *DESCRIPTION*
 
-freeChoiceGenerator allows user to generate random living Free-choice network given the desired number of transitions ```[nb_transition]``` in the final petri network. 
+choiceFreeGenerator allows user to generate random living Choice-Free network given the desired number of transitions ```[nb_transition]``` in the final petri network. 
 
-The generation of the final network is based uppon the one of a strongly connected graph where the number of input ```[nb_input_node]``` and output ```[nb_output_node]``` per node is set by the user (with the following constraint ```[nb_input_node]>=[nb_output_node]```). By default ```[nb_input_node]=[nb_output_node]```.
+The generation of the final network is based uppon the one of a strongly connected graph where the average number of input ```[avg_input_node]``` and output ```[avg_output_node]``` are set by the user (with the following constraint ```[avg_input_node]>=[avg_output_node]```). By default ```[avg_input_node]=[avg_output_node]```.
 
 The ```[vect_norm]``` is the desired norm of the repetition vector to get during the generation of a random one for the SDF
 
 *OPTIONS*
 
-**-o** ```[nb_output_node]```  : set ```[nb_output_node]```
+**-o** ```[avg_output_node]```  : set ```[avg_output_node]```
 
-**-c**  : resize the petri net after the transformation from SDF to Free-choice (can be time consuming)
+**-c**  : resize the petri net after the transformation from SDF to Choice-Free (can be time consuming)
 
-**-f**  : ```[filename]```   save the Free-choice to a file to ```[filename]``` as PNML format
+**-f**  : ```[filename]```   save the Choice-Free to a file to ```[filename]``` as PNML format
 
 **-h**  : get help
 
 ## Example <a name="MainExample"/>
-```freeChoiceGenerator 10 5 20 -f output.pnml``` produce a ramdom Free-choice with 10 transitions in which the norm of the repetiton vector is equal to 20 and then write the net into the file *output.pnml*
+```choiceFreeGenerator 10 5 20 -f output.pnml``` produce a ramdom Choice-Free with 10 transitions, with an average number of input edges for the transitions set to 5, in which the norm of the repetiton vector is equal to 20 and then write the net into the file *output.pnml*
 
 # API <a name="Api"/>
 
 The following example can be found under the direction *Examples*
 
-  ## Create a random Free-choice based on repetition vector norm <a name="FreeChoiceApi"/>
+  ## Create a random Choice-Free based on repetition vector norm <a name="choiceFreeApi"/>
   
 ``` C 
-#include "freeChoiceGenerator.h" //use header file of the static library
+#include "choiceFreeGenerator.h" //use header file of the static library
 ```
 
 ``` C
 srand(time(NULL));
 
-unsigned int nb_transition = 10;//number of desired transition in the result Free-choice
-unsigned int nb_input_node = 3;//average (and maximum) number of inputs for each transition
-unsigned int nb_output_node = 3;//average (and maximum) number of outputs for each transition
+unsigned int nb_transition = 10;//number of desired transition in the result Choice-Free
+unsigned int avg_input_node = 3;//average (and maximum) number of inputs for each transition
+unsigned int avg_output_node = 3;//average (and maximum) number of outputs for each transition
 unsigned int vect_norm = 10;//norm of the repetition vector to generate
-int cleanExtraMem = 0;//the transformation from SDF to Free-choice leaves extra empty memory space, the cleaning process is optional because it's time consuming
+int cleanExtraMem = 0;//the transformation from SDF to Choice-Free leaves extra empty memory space, the cleaning process is optional because it's time consuming
 unsigned int real_vect_norm = 0;
 
-//create random Free-choice from its repetition vector norm
-pPetri net1 = generateRandomFreeChoice(&real_vect_norm, nb_transition, nb_input_node, nb_output_node, vect_norm, cleanExtraMem);
+//create random Choice-Free from its repetition vector norm
+pPetri net1 = generateRandomChoiceFree(&real_vect_norm, nb_transition, avg_input_node, avg_output_node, vect_norm, cleanExtraMem);
 if(net1==NULL)
 {
-	printf("Error during the generation of a random Free-choice\n");
+	printf("Error during the generation of a random Choice-Free\n");
 	return 1;
 }
 printf("Real repetition vector norm : %u\n", real_vect_norm);
-//write Free-choice named "net1" to file "net1.pnml"
+//write Choice-Free named "net1" to file "net1.pnml"
 petriToPnmlFile(net1, "net1", "net1.pnml");
 petriFree(net1);
 ```
-  ## Create a random Free-choice based on repetition vector
+  ## Create a random Choice-Free based on repetition vector
 
 ```C
-//create random Free-choice from a given repetition vector
 unsigned int * vect = weightsComputation(&real_vect_norm, nb_transition, vect_norm);
 if(vect==NULL)
 {
@@ -122,14 +121,14 @@ if(vect==NULL)
 	return 1;
 }
 printf("Real repetition vector norm : %u\n", real_vect_norm);
-pPetri net2 = generateFreeChoiceWithVector(nb_transition, nb_input_node, nb_output_node, vect, cleanExtraMem);
+pPetri net2 = generateChoiceFreeWithVector(nb_transition, avg_input_node, avg_output_node, vect, cleanExtraMem);
 if(net2==NULL)
 {
-	printf("Error during the generation of a random Free-choice\n");
+	printf("Error during the generation of a random Choice-Free\n");
 	free(vect);
 	return 1;
 }
-//write Free-choice named "net2" to file "net2.pnml"
+//write Choice-Free named "net2" to file "net2.pnml"
 petriToPnmlFile(net2, "net2", "net2.pnml");
 free(vect);
 petriFree(net2);
@@ -405,7 +404,7 @@ numberNode = 5
 numberInputNode = 2
 NumberOutputNode = 2
 
-net = c.freeChoice(n=numberNode, Ki=numberInputNode, Ko=NumberOutputNode, rep_vect_norm=10, cleanExtraMemSpace=False)
+net = c.choiceFree(n=numberNode, Ki=numberInputNode, Ko=NumberOutputNode, rep_vect_norm=10, cleanExtraMemSpace=False)
 f_net = gd.drawPetriNetwork(net.obj, nodeSize=500, widthArraw=1.5)
 f_net.show()
 
