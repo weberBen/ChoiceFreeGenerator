@@ -22,7 +22,7 @@ A ramdon generator of living Choice-Free
 
 # Project description <a name="ProjetcDescription"/>
 
-A Choice-Free graph is a subclass of petri net where each place has exactly one output as shown in the following figure
+A marked Choice-Free graph is a subclass of marked petri net where each place has exactly one output as shown in the following figure
 
 <img src="Annexes/Images/choiceFreeDef.png" width="70%"  align="middle">
 
