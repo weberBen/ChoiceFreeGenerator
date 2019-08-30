@@ -26,7 +26,7 @@ A marked Choice-Free graph is a subclass of marked petri net where each place ha
 
 <img src="Annexes/Images/choiceFreeDef.png" width="70%"  align="middle">
 
-The generator convert a living and normalized SDF to a Choice-Free. That transformation is apply on each transition in the SDF that have more than 1 input as shown below.
+The generator convert a living and normalized SDF to a living Choice-Free. That transformation is apply on each transition in the SDF that have more than 1 input as shown below.
 
 <img src="Annexes/Images/SdfTransformation.png" width="70%"  align="middle">
 
