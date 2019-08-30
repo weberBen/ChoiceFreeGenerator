@@ -24,7 +24,7 @@ A ramdon generator of living Choice-Free
 
 A Choice-Free graph is a subclass of petri net where each place has exactly one output as shown in the following figure
 
-<img src="Annexes/Images/ChoiceFreeDef.png" width="70%"  align="middle">
+<img src="Annexes/Images/choiceFreeDef.png" width="70%"  align="middle">
 
 The generator convert a living and normalized SDF to a Choice-Free. That transformation is apply on each transition in the SDF that have more than 1 input as shown below.
 
