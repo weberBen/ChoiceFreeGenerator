@@ -3,7 +3,7 @@
 #include <time.h>
 #include <sys/resource.h>
 
-#include "freeChoiceGenerator.h"
+#include "choiceFreeGenerator.h"
 
 #define NB_SIMULATION 100
 #define SIZE 100
@@ -47,18 +47,18 @@ int main()
 	srand(time(NULL));
 
 	//-----------------------------------------------------------------------------------------------------------------
-	//										GENERATE RANDOM FREE CHOICE 
+	//										GENERATE RANDOM CHOICE-FREE
 	//-----------------------------------------------------------------------------------------------------------------
 
     clock_t start, end;
     double cpu_time_used;
 
-	unsigned int nb_transition = SIZE;//number of desired transition in the result Free-choice
-	unsigned int nb_input_node = IN;//average (and maximum) number of inputs for each transition
-	unsigned int nb_output_node = OUT;//average (and maximum) number of outputs for each transition
+	unsigned int nb_transition = SIZE;//number of desired transition in the result Choice-Free
+	unsigned int avg_input_node = IN;//average (and maximum) number of inputs for each transition
+	unsigned int avg_output_node = OUT;//average (and maximum) number of outputs for each transition
 	unsigned int vect_norm = AVG_RT*nb_transition;//norm of the repetition vector to generate
     unsigned int real_vect_norm = 0;
-	int cleanExtraMem = 0;//the transformation from SDF to Free-choice leaves extra empty memory space, the cleaning process is optional because it's time consuming
+	int cleanExtraMem = 0;//the transformation from SDF to Choice-Free leaves extra empty memory space, the cleaning process is optional because it's time consuming
 
 
     unsigned int * vect;
@@ -78,8 +78,8 @@ int main()
         start = clock();
 
         vect = weightsComputation(&real_vect_norm, nb_transition, vect_norm);
-        net = generateFreeChoiceWithVector(nb_transition, nb_input_node, nb_output_node, vect, cleanExtraMem);
-        //net = generateRandomFreeChoice(&real_vect_norm, nb_transition, nb_input_node, nb_output_node, vect_norm, cleanExtraMem);
+        net = generateChoiceFreeWithVector(nb_transition, avg_input_node, avg_output_node, vect, cleanExtraMem);
+        //net = generateRandomChoiceFree(&real_vect_norm, nb_transition, avg_input_node, avg_output_node, vect_norm, cleanExtraMem);
 
         end = clock();
 

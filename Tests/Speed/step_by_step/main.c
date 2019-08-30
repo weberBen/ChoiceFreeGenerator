@@ -4,7 +4,7 @@
 #include <sys/resource.h>
 #include <limits.h>
 
-#include "freeChoiceGeneratorDev.h"
+#include "choiceFreeGeneratorDev.h"
 
 #define NB_SIMULATION 100
 #define SIZE 100
@@ -43,17 +43,17 @@ int main()
 	srand(time(NULL));
 
 	//-----------------------------------------------------------------------------------------------------------------
-	//										GENERATE RANDOM FREE CHOICE 
+	//										GENERATE RANDOM CHOICE-FREE 
 	//-----------------------------------------------------------------------------------------------------------------
 
     clock_t start, end;
     double cpu_time_used;
 
 
-	unsigned int nb_transition = SIZE;//number of desired transition in the result Free-choice
+	unsigned int nb_transition = SIZE;//number of desired transition in the result choice-free
 	//unsigned int nb_input_node = IN;//average (and maximum) number of inputs for each transition
-    unsigned int nb_input_node = IN;//average (and maximum) number of outputs for each transition
-	unsigned int nb_output_node = OUT;//average (and maximum) number of outputs for each transition
+    unsigned int avg_input_node = IN;//average (and maximum) number of outputs for each transition
+	unsigned int avg_output_node = OUT;//average (and maximum) number of outputs for each transition
     unsigned int vect_norm = AVG*SIZE;
     int cleanExtraMemSpace = 0;
     unsigned int real_vect_norm;
@@ -61,7 +61,7 @@ int main()
 
     double avg[NB_STEP], tmp_avg[NB_STEP];
     char * label[NB_STEP] = {"avg_random_graph", "avg_strongly_connected", "avg_SDF_conversion", "avg_weight", "avg_normalization",
-                             "avg_init_marking", "avg_FreeChoice_transformation", "avg_free"};
+                             "avg_init_marking", "avg_ChoiceFree_transformation", "avg_free"};
 
     int k, i;
 
@@ -72,7 +72,7 @@ int main()
 
         printf("Generation of a random oriented graph...\n");
         start = clock();
-        pDirectedGraph graph = randomGraph(nb_transition, nb_input_node, nb_output_node);
+        pDirectedGraph graph = randomOrientedGraph(nb_transition, avg_input_node, avg_output_node);
         end = clock();
 
         cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
@@ -132,7 +132,7 @@ int main()
 
         printf("Conversion to Free-choice...\n");
         start = clock();
-        sdfToFreeChoice(net, cleanExtraMemSpace);
+        sdfToChoiceFree(net, cleanExtraMemSpace);
         end = clock();
 
         cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;

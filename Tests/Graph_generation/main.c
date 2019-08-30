@@ -4,10 +4,10 @@
 #include <sys/resource.h>
 #include <limits.h>
 
-#include "freeChoiceGeneratorDev.h"
+#include "choiceFreeGeneratorDev.h"
 
-#define NB_SIMULATION 100
-#define SIZE 1000
+#define NB_SIMULATION 1
+#define SIZE 10000
 #define OUT 500
 #define NUM_OVER 2
 #define TREE 0
@@ -136,7 +136,7 @@ int main()
             stronglyConnectedGraph(graph, 1);
         }else
         {
-            graph = randomGraph(nb_nodes, nb_output_node, nb_output_node);
+            graph = randomOrientedGraph(nb_nodes, nb_output_node, nb_output_node);
             stronglyConnectedGraph(graph, 0);
         }
         tmpArray = getNumInputs(graph);

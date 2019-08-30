@@ -2,7 +2,7 @@ GCC_FLAGS=-Wall -g -Werror -std=c99 -pedantic-errors
 
 path_to_source_folder = ../..
 LIB_FOLDER = Library
-LIB_NAME = freeChoiceGeneratorDevLib.a
+LIB_NAME = choiceFreeGeneratorDevLib.a
 LIB_PATH = $(LIB_FOLDER)/$(LIB_NAME)
 current_dir = $(path_to_source_folder)/Algorithmes_C/
 

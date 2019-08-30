@@ -5,10 +5,10 @@
 #include <limits.h>
 #include <math.h>
 
-#include "freeChoiceGeneratorDev.h"
+#include "choiceFreeGeneratorDev.h"
 
 #define NB_SIMULATION 100
-#define SIZE 1000
+#define SIZE 100
 #define NORM 5*SIZE
 #define FUNCTION 3
 
@@ -32,7 +32,7 @@ int getRandomInSegment(int start, int end)
 }
 
 
-unsigned int * randomFixedSum1(unsigned int n, int sum)
+unsigned int * randomFixedSum1(unsigned int n, unsigned int sum)
 {
 	unsigned int * output = (unsigned int *)malloc(sizeof(unsigned int)*n);
 	assert(output);
@@ -53,13 +53,13 @@ unsigned int * randomFixedSum1(unsigned int n, int sum)
 
 
 
-unsigned int * randomFixedSum2(unsigned int n, int sum)
+unsigned int * randomFixedSum2(unsigned int n, unsigned int sum)
 {
 	unsigned int * output = (unsigned int *)malloc(sizeof(unsigned int)*n);
 	assert(output);
 
 	unsigned int i;
-	int count =0;
+	unsigned int count =0;
 
 	for(i=0; i<n; i++)
 	{
@@ -67,7 +67,7 @@ unsigned int * randomFixedSum2(unsigned int n, int sum)
 		count+=output[i];
 	}
 
-	float factor = ((float)sum)/((float)count);
+	double factor = ((float)sum)/((float)count);
 
 	for(i=0; i<n; i++)
 	{
@@ -77,20 +77,20 @@ unsigned int * randomFixedSum2(unsigned int n, int sum)
 	return output;
 }
 
-unsigned int * randomFixedSum3(unsigned int n, int sum){
+unsigned int * randomFixedSum3(unsigned int n, unsigned int sum){
 	
 	unsigned int * output = (unsigned int *)malloc(sizeof(unsigned int)*n);
 	assert(output);
 	
 	unsigned int i;
-	int count = 0;
+	unsigned int count = 0;
 	
 	for(i=0; i<n; i++){
 		output[i] = 1 + rand()%(sum-n+1);
 		count+=output[i];
 	}
 	
-	float factor = ((float)sum-n)/((float)count);
+	double factor = ((float)sum-n)/((float)count);
 	
     for(i=0; i<n; i++){
 		if(i%2)
@@ -122,7 +122,7 @@ int main()
 {
 	srand(time(NULL));
     
-    unsigned int avg[NORM];
+    unsigned int * avg = (unsigned int *)malloc(sizeof(unsigned int)*NORM);
     unsigned int * tmp;
     double avg_sum, tmp_sum;
     
@@ -158,5 +158,6 @@ int main()
 
     fprintf(stderr, "avg_real_sum=%lf  | desired_sum=%u\n", 1.*avg_sum/NB_SIMULATION, NORM);
 
+	free(avg);
 	return 0;
 }
