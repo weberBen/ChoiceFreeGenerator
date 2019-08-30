@@ -6,9 +6,9 @@
 
 #include "choiceFreeGeneratorDev.h"
 
-#define NB_SIMULATION 1
-#define SIZE 10000
-#define OUT 500
+#define NB_SIMULATION 100
+#define SIZE 100
+#define OUT 5
 #define NUM_OVER 2
 #define TREE 0
 
