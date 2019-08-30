@@ -65,7 +65,7 @@ void directedGraphFree(pDirectedGraph p);
  * 							GRAPH
  *********************************************************************/
 
-pDirectedGraph randomGraph(unsigned int n, int Ki, int Ko);
+pDirectedGraph randomOrientedGraph(unsigned int n, unsigned int avg_input,  unsigned int avg_output);
 pDirectedGraph buildTree(unsigned int n, unsigned int D);
 //get strongly connect graph from a directed graph
 void stronglyConnectedGraph(pDirectedGraph graph, int isTree);
@@ -219,18 +219,18 @@ unsigned int * weightsComputation(unsigned int * real_vect_norm,
                                   unsigned int nb_transition, unsigned int repetition_vect_norm);//create random repetition vector (where the gcd of the array is 1)
 void setInitialMarking(pPetri net);//use glpk to create a liviness initial marking
 
-//SDF to Free-choice transformation
-void sdfToFreeChoice(pPetri net, int resizeNetAfter);
+//SDF to Choice-Free transformation
+void sdfToChoiceFree(pPetri net, int resizeNetAfter);
 
-//generate random Free-choice
-/* The transformation from SDF to Free-choice (used to generate a random Free-choice) leave empty memory space inside the petri structure
+//generate random Choice-Free
+/* The transformation from SDF to Choice-Free (used to generate a random Choice-Free) leave empty memory space inside the petri structure
    If "cleanExtraMemSpace" is set to 0, then these empty space will remain in the petri net after the transformation (somme value of
    the fixed size arrays inside the petri structure will be set to NULL)
    Else the petri net will be resized, which can take extra time
 */
-pPetri generateRandomFreeChoice(unsigned int * real_vect_norm, 
+pPetri generateRandomChoiceFree(unsigned int * real_vect_norm, 
 								unsigned int nb_transition, unsigned int nb_input_node, unsigned int nb_output_node, unsigned int repetition_vect_norm, int cleanExtraMemSpace);//Free-choice from its repetition vector norm
-pPetri generateFreeChoiceWithVector(unsigned int nb_transition, unsigned int nb_input_node, unsigned int nb_output_node, unsigned int * repetition_vect, int cleanExtraMemSpace);//Free-choice from its repetition vector
+pPetri generateChoiceFreeWithVector(unsigned int nb_transition, unsigned int nb_input_node, unsigned int nb_output_node, unsigned int * repetition_vect, int cleanExtraMemSpace);//Free-choice from its repetition vector
 
 
 

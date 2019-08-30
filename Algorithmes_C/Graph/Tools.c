@@ -216,4 +216,3 @@ unsigned int max(unsigned int a, unsigned int b)
 {
 	return (_greater(a,b)==1)?b:a;
 }
-

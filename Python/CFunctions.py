@@ -10,7 +10,7 @@ import SocketCommunication as sc
 
 #%%
 _id = 0
-srv = sc.Server()
+srv = sc.Server(port=1436, buffersize=512, start=False)
 '''  
 Run main_py at port x with a buffersize of l
 srv = sc.Server(x, l)

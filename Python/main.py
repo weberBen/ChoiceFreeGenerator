@@ -12,6 +12,18 @@ import matplotlib
 
 #%%
 
+numberNode = 10
+numberInputNode = 2
+NumberOutputNode = 2
+graph2 = c.randomGraph(numberNode,numberInputNode,NumberOutputNode)
+Xgraph2 = gd.toNetworkxGraph(graph2.obj)
+
+f1 = gd.plotGraph(Xgraph2, nodeSize=200, widthArraw=1.5)
+
+c.free(graph2);
+c.exit()
+
+'''
 numberNode = 5
 numberInputNode = 2
 NumberOutputNode = 2
@@ -24,7 +36,7 @@ f_net.show()
 
 c.free(net)
 c.exit()#free all the non-free object
-
+'''
 
 '''
 numberNode = 10

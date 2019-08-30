@@ -2,36 +2,36 @@
 #include <stdlib.h>
 #include <time.h>
 
-#include "freeChoiceGenerator.h"
+#include "choiceFreeGenerator.h"
 
 int main()
 {
 	srand(time(NULL));
 
 	//-----------------------------------------------------------------------------------------------------------------
-	//										GENERATE RANDOM FREE CHOICE 
+	//										GENERATE RANDOM CHOICE-FREE
 	//-----------------------------------------------------------------------------------------------------------------
 
-	unsigned int nb_transition = 10;//number of desired transition in the result Free-choice
-	unsigned int nb_input_node = 3;//average (and maximum) number of inputs for each transition
-	unsigned int nb_output_node = 3;//average (and maximum) number of outputs for each transition
+	unsigned int nb_transition = 10;//number of desired transition in the result Choice-Free
+	unsigned int avg_input_node = 3;//average (and maximum) number of inputs for each transition
+	unsigned int avg_output_node = 3;//average (and maximum) number of outputs for each transition
 	unsigned int vect_norm = 10;//norm of the repetition vector to generate
-	int cleanExtraMem = 0;//the transformation from SDF to Free-choice leaves extra empty memory space, the cleaning process is optional because it's time consuming
+	int cleanExtraMem = 0;//the transformation from SDF to Choice-Free leaves extra empty memory space, the cleaning process is optional because it's time consuming
 	unsigned int real_vect_norm = 0;
 
-	//create random Free-choice from its repetition vector norm
-	pPetri net1 = generateRandomFreeChoice(&real_vect_norm, nb_transition, nb_input_node, nb_output_node, vect_norm, cleanExtraMem);
+	//create random Choice-Free from its repetition vector norm
+	pPetri net1 = generateRandomChoiceFree(&real_vect_norm, nb_transition, avg_input_node, avg_output_node, vect_norm, cleanExtraMem);
 	if(net1==NULL)
 	{
-		printf("Error during the generation of a random Free-choice\n");
+		printf("Error during the generation of a random Choice-Free\n");
 		return 1;
 	}
 	printf("Real repetition vector norm : %u\n", real_vect_norm);
-	//write Free-choice named "net1" to file "net1.pnml"
+	//write Choice-Free named "net1" to file "net1.pnml"
 	petriToPnmlFile(net1, "net1", "net1.pnml");
 	petriFree(net1);
 
-	//create random Free-choice from a given repetition vector
+	//create random Choice-Free from a given repetition vector
 	unsigned int * vect = weightsComputation(&real_vect_norm, nb_transition, vect_norm);
 	if(vect==NULL)
 	{
@@ -39,14 +39,14 @@ int main()
 		return 1;
 	}
 	printf("Real repetition vector norm : %u\n", real_vect_norm);
-	pPetri net2 = generateFreeChoiceWithVector(nb_transition, nb_input_node, nb_output_node, vect, cleanExtraMem);
+	pPetri net2 = generateChoiceFreeWithVector(nb_transition, avg_input_node, avg_output_node, vect, cleanExtraMem);
 	if(net2==NULL)
 	{
-		printf("Error during the generation of a random Free-choice\n");
+		printf("Error during the generation of a random Choice-Free\n");
 		free(vect);
 		return 1;
 	}
-	//write Free-choice named "net2" to file "net2.pnml"
+	//write Choice-Free named "net2" to file "net2.pnml"
 	petriToPnmlFile(net2, "net2", "net2.pnml");
 	free(vect);
 	petriFree(net2);

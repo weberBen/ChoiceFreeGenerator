@@ -1,13 +1,13 @@
 GCC_FLAGS=-Wall -g -Werror -std=c99 -pedantic-errors
 
 FOLDER_GRAPH = Graph
-EXEC= freeChoiceGenerator
+EXEC= choiceFreeGenerator
 FOLDER_PY = Py_interface
 EXEC_PY = main_py
 LIB_FOLDER = Library
 EXAMPLES_FOLDER = Examples
-LIB_NAME = freeChoiceGeneratorLib.a
-DEV_LIB_NAME = freeChoiceGeneratorDevLib.a
+LIB_NAME = choiceFreeGeneratorLib.a
+DEV_LIB_NAME = choiceFreeGeneratorDevLib.a
 LIB_PATH = $(LIB_FOLDER)/$(LIB_NAME)
 LIB_DEV_PATH = $(LIB_FOLDER)/$(DEV_LIB_NAME)
 current_dir = $(dir $(abspath $(lastword $(MAKEFILE_LIST))))

@@ -117,7 +117,7 @@ def createRequest(task, n=None, D=None, wrapperId=None, isTree=None, newWrapperI
 #%%
 class Server:
 
-    def __init__(self, port=None, buffersize=512):
+    def __init__(self, port=None, buffersize=512, start=True):
         if(port is None):
             self.PORT = Server.findFreePort()
         else :
@@ -128,7 +128,8 @@ class Server:
         self.NAME_MAIN_SERVER_C = Directories.NAME_MAIN_SERVER_C
         
         #start C server
-        self.openCServerSide()
+        if start :
+            self.openCServerSide()
     
     @staticmethod
     def findFreePort():

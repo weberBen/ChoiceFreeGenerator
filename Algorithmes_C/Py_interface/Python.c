@@ -8,7 +8,7 @@
 
 #include "Python.h"
 
-typedef enum Tasks {t_closeServer=-1, t_buildTree = 0, t_stronglyConnectedGraph=1, t_randomGraph=2, t_free=3, t_petri=4, t_freeChoice=5} tasks;
+typedef enum Tasks {t_closeServer=-1, t_buildTree = 0, t_stronglyConnectedGraph=1, t_randomGraph=2, t_free=3, t_petri=4, t_choiceFree=5} tasks;
 
 typedef struct Request 
 {
@@ -82,7 +82,7 @@ static void sendResponse(request * req, char * buff, int BUFFSIZE, unsigned int 
 		{
 			printf("Creation d'un graphe aleatoirement\n");
 			
-			pDirectedGraph graph1 = randomGraph(req->n, req->Ki, req->Ko);//create graph
+			pDirectedGraph graph1 = randomOrientedGraph(req->n, req->Ki, req->Ko);//create graph
 			wrapperAddToList(&_list, wrapperCreateNode(req->wrapperId, directedGraph_t, (void *)graph1));
 			
 			listToString(&s,graph1->links_list, req->n);//convert the tree into a strings
@@ -114,12 +114,12 @@ static void sendResponse(request * req, char * buff, int BUFFSIZE, unsigned int 
 			return ;
 		}
 			break;
-		case t_freeChoice:
+		case t_choiceFree:
 		{
-			printf("Creation d'un Free-choice aleatoirement\n");
+			printf("Creation d'un Choice-Free aleatoirement\n");
 			
 			unsigned int real_rep_vect_norm;
-			pPetri graph1 = generateRandomFreeChoice(&real_rep_vect_norm, req->n, req->Ki, req->Ko, req->rep_vect_norm, req->cleanExtraMemSpace);//create graph
+			pPetri graph1 = generateRandomChoiceFree(&real_rep_vect_norm, req->n, req->Ki, req->Ko, req->rep_vect_norm, req->cleanExtraMemSpace);//create graph
 			wrapperAddToList(&_list, wrapperCreateNode(req->wrapperId, petri_t, (void *)graph1));
 			
 			petriWrite(graph1, csock);//write petri net to the socket

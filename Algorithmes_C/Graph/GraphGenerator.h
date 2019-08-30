@@ -9,7 +9,7 @@
 #include "Display.h"
 
 //create simple directed graph
-pDirectedGraph randomGraph(unsigned int n, int Ki, int Ko);
+pDirectedGraph randomOrientedGraph(unsigned int n, unsigned int avg_input,  unsigned int avg_output);
 pDirectedGraph buildTree(unsigned int n, unsigned int D);
 
 //get strongly connect graph from a directed graph
@@ -27,7 +27,7 @@ unsigned int * weightsComputation(unsigned int * real_vect_norm,
 void setInitialMarking(pPetri net);//use glpk to create a liviness initial marking
 
 //SDF to Free-choice transformation
-void sdfToFreeChoice(pPetri net, int resizeNetAfter);
+void sdfToChoiceFree(pPetri net, int resizeNetAfter);
 
 //generate random Free-choice
 /* The transformation from SDF to Free-choice (used to generate a random Free-choice) leave empty memory space inside the petri structure
@@ -35,8 +35,8 @@ void sdfToFreeChoice(pPetri net, int resizeNetAfter);
    the fixed size arrays inside the petri structure will be set to NULL)
    Else the petri net will be resized, which can take extra time
 */
-pPetri generateRandomFreeChoice(unsigned int * real_vect_norm, 
+pPetri generateRandomChoiceFree(unsigned int * real_vect_norm, 
 								unsigned int nb_transition, unsigned int nb_input_node, unsigned int nb_output_node, unsigned int repetition_vect_norm, int cleanExtraMemSpace);//Free-choice from its repetition vector norm
-pPetri generateFreeChoiceWithVector(unsigned int nb_transition, unsigned int nb_input_node, unsigned int nb_output_node, unsigned int * repetition_vect, int cleanExtraMemSpace);//Free-choice from its repetition vector
+pPetri generateChoiceFreeWithVector(unsigned int nb_transition, unsigned int nb_input_node, unsigned int nb_output_node, unsigned int * repetition_vect, int cleanExtraMemSpace);//Free-choice from its repetition vector
 
 #endif 
