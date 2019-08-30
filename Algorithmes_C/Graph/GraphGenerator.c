@@ -948,25 +948,26 @@ void setInitialMarking(pPetri net)
 	 int i_weight;
 	 int m0;
 	 pPetriNode node, input_node_pl;
-	 pPetriLink link_pt, link_tr;
+	 pPetriLink link_pt, link_tr, init_link;
 	 pPetriElem input_pl, init_input_pl;
 	 unsigned int id_tr;
 	 pArray p, cursor;
+	 unsigned int weight;
 
 	 for(i=0; i<net->nb_tr; i++)
 	 {
 		node = net->transitions[i];
 		if(node==NULL)
 			continue; 
-		if(node->nb_inputs<=1)
+		if(node->nb_inputs<2)
 			continue;
 		
 
 		p = node->input_links;
 
-		//manage the first place
-		link_pt = petriNodeGetLinkFromArrayNode(p);
-		init_input_pl = link_pt->input;
+		//select the first place to gather all the other transitions for the transformation
+		init_link = petriNodeGetLinkFromArrayNode(p);
+		init_input_pl = init_link->input;
 		if(init_input_pl->type!=PETRI_PLACE_TYPE)
 		{
 			fprintf(stderr, "The petri net does not follow the standards (link Transition-Transition founded)\n");
@@ -974,11 +975,10 @@ void setInitialMarking(pPetri net)
 		}
 
 
-		link_pt->weight = (node->nb_inputs)*(link_pt->weight);//set weight of the place-transition link
 		m0 = init_input_pl->val;//initialize initial marking
+		weight = init_link->weight;
 
 		p = p->next;
-
 		//apply the transformation on the other nodes
 		while(p)
 		{
@@ -986,7 +986,17 @@ void setInitialMarking(pPetri net)
 			   we could not check the following element in the array based on that reference (because it will no longer exist).
 			   Thus we save the reference to the next element before the removal of the current one
 			 */
+			
+			//merge random number of places for the current node
+			if(rand()&1)//modulo(2)
+			{
+				p = p->next;
+				continue;
+			}
+
+
 			cursor = p->next;
+
 			
 			link_pt = petriNodeGetLinkFromArrayNode(p);
 			input_pl = link_pt->input;
@@ -997,6 +1007,7 @@ void setInitialMarking(pPetri net)
 			}
 
 			m0 += input_pl->val;//get initial marking of the input node
+			weight += link_pt->weight;
 			
 			//get weight of the links
 			input_node_pl = net->places[input_pl->label];//get input node from the current transition
@@ -1019,6 +1030,7 @@ void setInitialMarking(pPetri net)
 		}
 
 		init_input_pl->val = m0;//set final initial marking
+		init_link->weight = weight;//set weight of the place-transition link
 	 }
 
 	 if(resizeNetAfter)

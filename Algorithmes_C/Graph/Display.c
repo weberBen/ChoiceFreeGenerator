@@ -468,7 +468,7 @@ void displayPetriNode(pPetriNode p, unsigned int index)
 {
     if(p==NULL)
 	{
-		printf("Node[NULL]");
+		printf("Node %d : [NULL]\n", index);
 		return;
 	}
     
