@@ -83,12 +83,15 @@ static unsigned int _id = 0;//count of the id
 
 static void freeContainer(pArray p)
 {
-	if(p==NULL || p->data==NULL)
+	if(p==NULL)
 		return;
 	
-	container * c = (container *)(p->data);
-	freeArray(c->data);//free linked list of value between start and end
-	free(c);//free the wrapper
+	if(p->data!=NULL)
+	{
+		container * c = (container *)(p->data);
+		freeArray(c->data);//free linked list of value between start and end
+		free(c);//free the wrapper
+	}
 	free(p);//free the element of linked list of wrapper
 }
 
@@ -121,7 +124,7 @@ static void freeStaticArray(unsigned int id)
 		cursor = cursor->next;
 	}
 	
-	if(c_id==-1 || cursor==NULL)
+	if(cursor==NULL)
 	{
 		return;
 	}
@@ -250,7 +253,7 @@ int randArray(unsigned int id)
 		c->data = temp;
 	}else
 	{
-		free(removeElemArray(p_cursor));//free the element removed from the array
+		freeNodeArray(removeElemArray(p_cursor));//free the element removed from the array
 	}
 	c->size = c->size -1;//decrease the size of the linkes list of values
 	
@@ -403,6 +406,7 @@ unsigned int * randomFixedSum(unsigned int * real_sum, unsigned int n, unsigned 
 	assert(output);
 	
 	unsigned int i;
+	int odd;
 	unsigned int count = 0;
 	
 	for(i=0; i<n; i++){
@@ -413,12 +417,94 @@ unsigned int * randomFixedSum(unsigned int * real_sum, unsigned int n, unsigned 
 	double factor = ((float)sum-n)/((float)count);
 	
 	*real_sum = 0;
+	odd = 0;
 	for(i=0; i<n; i++){
-		if(i%2)
-		    output[i]= ceil(output[i]*factor)+1;
+		if(!odd)
+		{
+		    output[i] = ceil(output[i]*factor) + 1;
+			odd = 1;
+		}
 		else
-		    output[i]= floor(output[i]*factor)+1;
+		{
+		    output[i] = floor(output[i]*factor) + 1;
+			odd = 0;
+		}
 
+		(*real_sum)+=output[i];
+	}
+	
+	return output;
+}
+
+
+
+unsigned int * randomFixedSumBounded(unsigned int * real_sum, unsigned int n, unsigned int sum, unsigned int min, unsigned int max)
+{
+	*real_sum = 0;
+	if(n*max<sum)
+	{
+		fprintf(stderr, "Cannot generate a random array of %u integers with a sum fixed to %u and a maximum set to %u (%u*%u<%u)\n",n, sum, max, n, max, sum);
+		return NULL;
+	}else if (n*min>sum)
+	{
+		fprintf(stderr, "Cannot generate a random array of %u integers with a sum fixed to %u and a minimum set to %u (%u*%u>%u)\n",n, sum, min, n, min, sum);
+		return NULL;
+	}
+	
+	
+	unsigned int * output = (unsigned int *)malloc(sizeof(unsigned int)*n);
+	assert(output);
+	
+
+	unsigned int i;
+	int odd;
+
+
+	double init_val = (float)sum/(float)n;
+	if(init_val<min)
+		init_val=min;
+
+	
+	odd=0;
+	for(i=0; i<n; i++)
+	{
+		if(!odd)
+		{
+			output[i] = ceil(init_val);
+			odd=1;
+		}else
+		{
+			output[i] = floor(init_val);
+			odd=0;
+		}
+		
+	}
+
+	unsigned int val;
+	unsigned int index;
+
+	for(i=0; i<n; i++)
+	{
+		index = rand()%n;
+
+		if(output[i]==min)
+			continue;
+		
+		if(output[index]>=0.7*max)
+			continue;
+		
+
+		val = rand()%(output[i]-min);
+		
+		if(output[index] + val>max)
+			val = max - output[index];
+
+		output[index]+=val;
+		output[i]-=val;
+	}
+
+	for(i=0; i<n; i++)
+	{
 		(*real_sum)+=output[i];
 	}
 	
@@ -436,4 +522,37 @@ unsigned int * randomFixedSum(unsigned int * real_sum, unsigned int n, unsigned 
 double randf(double start, double end)
 {
 	return start + ((double)rand())/((double)RAND_MAX)*(end-start);
+}
+
+
+
+/**********************************************************************
+ * 
+ * 							RANDOM PARTITION
+ * 
+ **********************************************************************/
+
+
+unsigned int * randomPartition(unsigned int tot_nb_elem_set, unsigned int nb_elem_partition)
+{
+	if(tot_nb_elem_set==0 || nb_elem_partition==0)
+		return NULL;
+	
+	unsigned int * output = (unsigned int *)malloc(sizeof(unsigned int)*nb_elem_partition);
+	assert(output);
+
+	int i;
+	unsigned int r = randIni(0,tot_nb_elem_set);
+	
+	for(i=0; i<nb_elem_partition; i++)
+	{
+		output[i] = randArray(r);
+	}
+
+	randEnd(r);
+
+
+	sortUintArray(output, nb_elem_partition);//sort array
+
+	return output;
 }

@@ -7,10 +7,12 @@
 
 #include "choiceFreeGeneratorDev.h"
 
-#define NB_SIMULATION 100
+#define NB_SIMULATION 1
 #define SIZE 100
-#define NORM 5*SIZE
-#define FUNCTION 3
+#define NORM 4950
+#define MIN 1
+#define MAX 50
+#define FUNCTION 4
 
 void initializeuIntArray(unsigned int * array, unsigned int size, unsigned int val)
 {
@@ -90,14 +92,72 @@ unsigned int * randomFixedSum3(unsigned int n, unsigned int sum){
 		count+=output[i];
 	}
 	
-	double factor = ((float)sum-n)/((float)count);
+	double factor = ((float)sum)/((float)count);
 	
     for(i=0; i<n; i++){
 		if(i%2)
-		    output[i]= ceil(output[i]*factor)+1;
+		    output[i]= ceil(output[i]*factor) + 1;
 		else
-		    output[i]= floor(output[i]*factor)+1;
+		    output[i]= floor(output[i]*factor) + 1;
 
+	}
+	
+	return output;
+}
+
+
+unsigned int * randomFixedSum4(unsigned int n, unsigned int sum, unsigned int min, unsigned int max)
+{
+	
+	unsigned int * output = (unsigned int *)malloc(sizeof(unsigned int)*n);
+	assert(output);
+	
+
+	unsigned int i;
+	int odd;
+
+	double init_val = 1.*sum/n;
+	if(init_val<min)
+		init_val=min;
+
+	
+	odd=0;
+	for(i=0; i<n; i++)
+	{
+		if(!odd)
+		{
+			output[i] = ceil(init_val);
+			odd=1;
+		}else
+		{
+			output[i] = floor(init_val);
+			odd=0;
+		}
+		
+	}
+
+
+	unsigned int val;
+	unsigned int index;
+
+	for(i=0; i<n; i++)
+	{
+		index = rand()%n;
+
+		if(output[i]==min)
+			continue;
+		
+		if(output[index]>=0.7*max)
+			continue;
+		
+
+		val = rand()%(output[i]-min);
+		
+		if(output[index] + val>max)
+			val = max - output[index];
+
+		output[index]+=val;
+		output[i]-=val;
 	}
 	
 	return output;
@@ -137,8 +197,11 @@ int main()
            tmp = randomFixedSum1(SIZE, NORM);
         else if(FUNCTION==2)
             tmp = randomFixedSum2(SIZE, NORM);
-        else
+        else if(FUNCTION==3)
             tmp = randomFixedSum3(SIZE, NORM);
+		else	
+			tmp = randomFixedSum4(SIZE, NORM, MIN, MAX);
+		
 
         for(i=0; i<SIZE; i++)
         {
@@ -154,6 +217,7 @@ int main()
         if(avg[i]==0)
             continue;
         fprintf(stderr, "( %u , %lf )\n", i, 1.*avg[i]/NB_SIMULATION);
+
     }
 
     fprintf(stderr, "avg_real_sum=%lf  | desired_sum=%u\n", 1.*avg_sum/NB_SIMULATION, NORM);

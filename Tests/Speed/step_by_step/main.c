@@ -8,8 +8,7 @@
 
 #define NB_SIMULATION 100
 #define SIZE 100
-#define IN 3
-#define OUT 3
+#define DENSITY 0.5
 #define AVG 5
 #define NB_STEP 8
 
@@ -52,8 +51,7 @@ int main()
 
 	unsigned int nb_transition = SIZE;//number of desired transition in the result choice-free
 	//unsigned int nb_input_node = IN;//average (and maximum) number of inputs for each transition
-    unsigned int avg_input_node = IN;//average (and maximum) number of outputs for each transition
-	unsigned int avg_output_node = OUT;//average (and maximum) number of outputs for each transition
+    double density = DENSITY;
     unsigned int vect_norm = AVG*SIZE;
     int cleanExtraMemSpace = 0;
     unsigned int real_vect_norm;
@@ -72,7 +70,7 @@ int main()
 
         printf("Generation of a random oriented graph...\n");
         start = clock();
-        pDirectedGraph graph = randomOrientedGraph(nb_transition, avg_input_node, avg_output_node);
+        pDirectedGraph graph = randomOrientedGraph(nb_transition, density);
         end = clock();
 
         cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;

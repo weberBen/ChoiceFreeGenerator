@@ -6,9 +6,10 @@
 
 #include "choiceFreeGeneratorDev.h"
 
-#define NB_SIMULATION 100
+#define NB_SIMULATION 1
 #define SIZE 100
-#define OUT 5
+#define D 80
+#define DENSITY 0.5
 #define NUM_OVER 2
 #define TREE 0
 
@@ -41,6 +42,32 @@ unsigned int * getNumInputs(pDirectedGraph graph)
             output[val]++;
             p = p->next;
         }
+    }
+
+    return output;
+}
+
+
+unsigned int * getNumOutputs(pDirectedGraph graph)
+{
+    unsigned int * output = (unsigned int *)malloc(sizeof(unsigned int)*graph->nb_nodes);
+    initializeuIntArray(output, graph->nb_nodes, 0);
+
+
+    int i;
+    int count;
+    pArray p;
+
+    for(i=0; i<graph->nb_nodes; i++)
+    {
+        count=0;
+        p = graph->links_list[i];
+        while(p)
+        {
+            count++;
+            p = p->next;
+        }
+        output[i]=count;
     }
 
     return output;
@@ -113,17 +140,17 @@ int main()
 
 	unsigned int nb_nodes = SIZE;//number of desired transition in the result Free-choice
 	//unsigned int nb_input_node = IN;//average (and maximum) number of inputs for each transition
-	unsigned int nb_output_node = OUT;//average (and maximum) number of outputs for each transition
 
     pDirectedGraph graph;
 
 
     int k;
     unsigned int max_input, tmp_max_input, num_over, min_input, tmp_min_input;
-    double avg_input, tmp_avg_input, avg_num_over;
-    unsigned int * tmpArray;
+    double avg_input, avg_output, tmp_avg_input, tmp_avg_output, avg_num_over;
+    unsigned int * tmpArray, * tmpArray2;
 
     avg_input = 0;
+    avg_output = 0;
     max_input = 0;
     min_input = UINT_MAX;
     avg_num_over = 0;
@@ -132,17 +159,22 @@ int main()
         
         if(TREE)
         {
-            graph = buildTree(nb_nodes, nb_output_node);
+            graph = buildTree(nb_nodes, D);
             stronglyConnectedGraph(graph, 1);
         }else
         {
-            graph = randomOrientedGraph(nb_nodes, nb_output_node, nb_output_node);
+            graph = randomOrientedGraph(nb_nodes, DENSITY);
+            fprintf(stderr, "nb_edges=%u\n", graph->nb_edges);
             stronglyConnectedGraph(graph, 0);
         }
         tmpArray = getNumInputs(graph);
+        tmpArray2 = getNumOutputs(graph);
 
         tmp_avg_input = avgArray(tmpArray, graph->nb_nodes);
         avg_input+=tmp_avg_input;
+
+        tmp_avg_output = avgArray(tmpArray2, graph->nb_nodes);
+        avg_output+=tmp_avg_output;
 
         tmp_max_input = maxArray(tmpArray, graph->nb_nodes);
         if(tmp_max_input>max_input)
@@ -158,14 +190,15 @@ int main()
 
         fprintf(stderr, "\n-------------------\n");
         fprintf(stderr, "\nGeneration : %u/%u\n", k, NB_SIMULATION);
-        fprintf(stderr, "avg_input=%lf   |  max_input=%u   |  min_input=%u  |  num_over %u=%u", tmp_avg_input, tmp_max_input, tmp_min_input,  NUM_OVER, num_over);
+        fprintf(stderr, "avg_input=%lf   |  avg_output=%lf   |  max_input=%u   |  min_input=%u  |  num_over %u=%u", tmp_avg_input, tmp_avg_output, tmp_max_input, tmp_min_input,  NUM_OVER, num_over);
         fprintf(stderr, "\n-------------------\n");
 
         directedGraphFree(graph); 
         free(tmpArray); 
+        free(tmpArray2);
     }
 	
-    fprintf(stderr, "\navg_input=%lf   |   max_input=%u   |   min_input=%u   | avg_num_over %u=%lf  | pourcent num_over = %lf\n",avg_input/NB_SIMULATION, max_input, min_input, 
+    fprintf(stderr, "\navg_input=%lf   |  avg_output=%lf   |   max_input=%u   |   min_input=%u   | avg_num_over %u=%lf  | pourcent num_over = %lf\n",avg_input/NB_SIMULATION, avg_output/NB_SIMULATION, max_input, min_input, 
                                                                                                                         NUM_OVER, avg_num_over/NB_SIMULATION, avg_num_over/NB_SIMULATION/SIZE*100);
 
 	return 0;

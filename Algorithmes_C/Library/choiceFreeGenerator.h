@@ -197,8 +197,8 @@ unsigned int * weightsComputation(unsigned int * real_vect_norm,
    Else the petri net will be resized, which can take extra time
 */
 pPetri generateRandomChoiceFree(unsigned int * real_vect_norm, 
-								unsigned int nb_transition, unsigned int nb_input_node, unsigned int nb_output_node, unsigned int repetition_vect_norm, int cleanExtraMemSpace);//Free-choice from its repetition vector norm
-pPetri generateChoiceFreeWithVector(unsigned int nb_transition, unsigned int nb_input_node, unsigned int nb_output_node, unsigned int * repetition_vect, int cleanExtraMemSpace);//Free-choice from its repetition vector
+								unsigned int nb_transition, double density, unsigned int repetition_vect_norm, int cleanExtraMemSpace);//Free-choice from its repetition vector norm
+pPetri generateChoiceFreeWithVector(unsigned int nb_transition, double density, unsigned int * repetition_vect, int cleanExtraMemSpace);//Free-choice from its repetition vector
 
 
 

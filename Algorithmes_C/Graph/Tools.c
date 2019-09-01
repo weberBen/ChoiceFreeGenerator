@@ -216,3 +216,16 @@ unsigned int max(unsigned int a, unsigned int b)
 {
 	return (_greater(a,b)==1)?b:a;
 }
+
+
+static int cmpUnisgnedIntFuncForSorting (const void * a, const void * b) 
+{
+   return ( *(unsigned int*)a - *(unsigned int*)b );
+}
+
+unsigned int * sortUintArray(unsigned int * input, unsigned int size)
+{
+	qsort(input, size, sizeof(unsigned int), cmpUnisgnedIntFuncForSorting);
+	
+	return input;
+}

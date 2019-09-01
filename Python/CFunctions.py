@@ -11,6 +11,8 @@ import SocketCommunication as sc
 #%%
 _id = 0
 srv = sc.Server()
+#srv = sc.Server(port=14367, buffersize=512, start=False)
+#to start C code in an external terminal and connect python to it
 '''  
 Run main_py at port x with a buffersize of l
 srv = sc.Server(x, l)
@@ -63,9 +65,9 @@ def stronglyConnectedGraph(graph, isTree=False):
     return graph
 
 #%%
-def randomGraph(n, Ki, Ko):
+def randomGraph(n, density):
     id = getnewId()
-    request = sc.createRequest(task = sc.Task.t_randomGraph, n=n, wrapperId = id, Ki=Ki, Ko=Ko)
+    request = sc.createRequest(task = sc.Task.t_randomGraph, n=n, wrapperId = id, density=density)
     response =  srv.getResponse(request)
     return Graph(id, gd.parseGraph(response))
 #%%
@@ -83,7 +85,7 @@ def petriTransformation(graph):
     return Graph(id, gd.parsePetriNetwork(response))
 
 #%%
-def freeChoice(n, Ki, Ko, rep_vect_norm, cleanExtraMemSpace=False):
+def freeChoice(n, density, rep_vect_norm, cleanExtraMemSpace=False):
     memClean=None
     if(cleanExtraMemSpace==True):
         memClean = 1
@@ -91,7 +93,7 @@ def freeChoice(n, Ki, Ko, rep_vect_norm, cleanExtraMemSpace=False):
         memClean = 0
     
     id = getnewId()
-    request = sc.createRequest(task = sc.Task.t_freeChoice, n=n, wrapperId = id, Ki=Ki, Ko=Ko, rep_vect_norm=rep_vect_norm, cleanExtraMemSpace=memClean)
+    request = sc.createRequest(task = sc.Task.t_freeChoice, n=n, wrapperId = id, density=density, rep_vect_norm=rep_vect_norm, cleanExtraMemSpace=memClean)
     response =  srv.getResponse(request)
     return Graph(id, gd.parsePetriNetwork(response))
 

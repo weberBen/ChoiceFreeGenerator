@@ -20,14 +20,13 @@ void randEnd(unsigned int id);
 	do
 	{
 		res = randArray(r1);
-		printf("unique value between 0 and 4 : %d\n", res);
+		printf("unique value between 0 and 3 : %d\n", res);
 	}while(res!=-1);
 
 	randEnd(r1);
- * 
- * 
- * 
-	unsigned int r1 = randIni(0,4);
+ 
+	
+	r1 = randIni(0,4);
 	unsigned int r2 = randIni(12,24);		
 
 	int res1, res2;
@@ -35,8 +34,8 @@ void randEnd(unsigned int id);
 	{
 		res1 = randArray(r1);
 		res2 = randArray(r2);
-		printf("\nunique value between 0 and 4 : %d\n", res1);
-		printf("unique value between 12 and 24 : %d\n", res2);
+		printf("\nunique value between 0 and 3 : %d\n", res1);
+		printf("unique value between 12 and 23 : %d\n", res2);
 	}while(res1!=-1 && res2!=-1);
 
 	randEnd(r1); //or randEnd(r2), and then, randEnd(r1)
@@ -66,10 +65,18 @@ int getRandomInSegment(int start, int end);
  **********************************************************************/
 
 unsigned int * randomFixedSum(unsigned int * real_sum, unsigned int n, unsigned int sum);
+unsigned int * randomFixedSumBounded(unsigned int * real_sum, unsigned int n, unsigned int sum, unsigned int min, unsigned int max);
 
 /**********************************************************************
  * 				random tools function
  **********************************************************************/
 double randf(double start, double end);
+
+
+/**********************************************************************
+ * 				random partition of set
+ **********************************************************************/
+
+unsigned int * randomPartition(unsigned int tot_nb_elem_set, unsigned int nb_elem_partition);//return index of element inside the new partition
 
 #endif

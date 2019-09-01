@@ -46,15 +46,14 @@ class Request(ctypes.Structure):
                 ("D", ctypes.c_uint),
                 ("wrapperId", ctypes.c_uint),
                 ("newWrapperId", ctypes.c_uint),
-                ("Ki", ctypes.c_int),
-                ("Ko", ctypes.c_int),
+                ("density", ctypes.c_double),
                 ("isTree", ctypes.c_uint),
                 ("rep_vect_norm", ctypes.c_uint),
                 ("cleanExtraMemSpace", ctypes.c_int)
                ]
     ''' must be at the same order than the field of the c structure'''
     
-def createRequest(task, n=None, D=None, wrapperId=None, isTree=None, newWrapperId=None, Ki=None, Ko=None, rep_vect_norm=None,
+def createRequest(task, n=None, D=None, wrapperId=None, isTree=None, newWrapperId=None, density=None, rep_vect_norm=None,
                   cleanExtraMemSpace=None):
     '''create request with the correct format for the arguments'''
     frame = inspect.currentframe()
@@ -91,16 +90,11 @@ def createRequest(task, n=None, D=None, wrapperId=None, isTree=None, newWrapperI
                 newWrapperId = ctypes.c_uint(0)
             else :
                 newWrapperId = ctypes.c_uint(value)
-        elif(name_args=="Ki"):
+        elif(name_args=="density"):
             if(value is None):
-                Ki = ctypes.c_int(-1)
+                density = ctypes.c_double(0)
             else :
-                Ki = ctypes.c_int(value)
-        elif(name_args=="Ko"):
-            if(value is None):
-                Ko = ctypes.c_int(-1)
-            else :
-                Ko = ctypes.c_int(value)
+                density = ctypes.c_double(value)
         elif(name_args=="rep_vect_norm"):
             if(value is None):
                 rep_vect_norm = ctypes.c_uint(0)
@@ -112,7 +106,7 @@ def createRequest(task, n=None, D=None, wrapperId=None, isTree=None, newWrapperI
             else :
                 cleanExtraMemSpace = ctypes.c_int(value)
     
-    return Request(task, n, D, wrapperId, newWrapperId, Ki, Ko, isTree, rep_vect_norm, cleanExtraMemSpace)
+    return Request(task, n, D, wrapperId, newWrapperId, density, isTree, rep_vect_norm, cleanExtraMemSpace)
 
 #%%
 class Server:

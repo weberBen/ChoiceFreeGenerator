@@ -13,12 +13,11 @@ import matplotlib
 #%%
 
 
-numberNode = 5
-numberInputNode = 3
-NumberOutputNode = 3
+numberNode = 10
+density = 0.3
 rep_vect_norm = numberNode*2
 
-net = c.freeChoice(n=numberNode, Ki=numberInputNode, Ko=NumberOutputNode, rep_vect_norm=rep_vect_norm, cleanExtraMemSpace=False)
+net = c.freeChoice(n=numberNode, density=density, rep_vect_norm=rep_vect_norm, cleanExtraMemSpace=False)
 f_net = gd.drawPetriNetwork(net.obj, nodeSize=500, widthArraw=1.5)
 f_net.show()
 #matplotlib.pyplot.savefig('test.png', transparent=True)
@@ -26,6 +25,20 @@ f_net.show()
 c.free(net)
 c.exit()#free all the non-free object
 
+
+'''
+numberNode = 10
+density = 0.5
+graph2 = c.randomGraph(numberNode,density)
+Xgraph2 = gd.toNetworkxGraph(graph2.obj)
+
+f1 = gd.plotGraph(Xgraph2, nodeSize=200, widthArraw=1.5)
+f1.show()
+
+
+c.free(graph2)
+c.exit()#free all the non-free object
+'''
 
 '''
 numberNode = 10
@@ -42,9 +55,8 @@ c.free(graph1)
 
 '''
 numberNode = 5
-numberInputNode = 2
-NumberOutputNode = 2
-graph2 = c.randomGraph(numberNode,numberInputNode,NumberOutputNode)
+density = 0.5
+graph2 = c.randomGraph(numberNode,density)
 graph2 = c.stronglyConnectedGraph(graph2, isTree=False)
 Xgraph2 = gd.toNetworkxGraph(graph2.obj)
 

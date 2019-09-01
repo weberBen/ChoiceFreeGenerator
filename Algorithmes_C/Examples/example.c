@@ -13,14 +13,13 @@ int main()
 	//-----------------------------------------------------------------------------------------------------------------
 
 	unsigned int nb_transition = 10;//number of desired transition in the result Choice-Free
-	unsigned int avg_input_node = 3;//average (and maximum) number of inputs for each transition
-	unsigned int avg_output_node = 3;//average (and maximum) number of outputs for each transition
+	double density = 0.5;//average (and maximum) number of inputs for each transition
 	unsigned int vect_norm = 10;//norm of the repetition vector to generate
 	int cleanExtraMem = 0;//the transformation from SDF to Choice-Free leaves extra empty memory space, the cleaning process is optional because it's time consuming
 	unsigned int real_vect_norm = 0;
 
 	//create random Choice-Free from its repetition vector norm
-	pPetri net1 = generateRandomChoiceFree(&real_vect_norm, nb_transition, avg_input_node, avg_output_node, vect_norm, cleanExtraMem);
+	pPetri net1 = generateRandomChoiceFree(&real_vect_norm, nb_transition, density, vect_norm, cleanExtraMem);
 	if(net1==NULL)
 	{
 		printf("Error during the generation of a random Choice-Free\n");
@@ -39,7 +38,7 @@ int main()
 		return 1;
 	}
 	printf("Real repetition vector norm : %u\n", real_vect_norm);
-	pPetri net2 = generateChoiceFreeWithVector(nb_transition, avg_input_node, avg_output_node, vect, cleanExtraMem);
+	pPetri net2 = generateChoiceFreeWithVector(nb_transition, density, vect, cleanExtraMem);
 	if(net2==NULL)
 	{
 		printf("Error during the generation of a random Choice-Free\n");

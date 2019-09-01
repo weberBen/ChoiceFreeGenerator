@@ -65,7 +65,7 @@ void directedGraphFree(pDirectedGraph p);
  * 							GRAPH
  *********************************************************************/
 
-pDirectedGraph randomOrientedGraph(unsigned int n, unsigned int avg_input,  unsigned int avg_output);
+pDirectedGraph randomOrientedGraph(unsigned int n, double density);
 pDirectedGraph buildTree(unsigned int n, unsigned int D);
 //get strongly connect graph from a directed graph
 void stronglyConnectedGraph(pDirectedGraph graph, int isTree);
@@ -229,8 +229,8 @@ void sdfToChoiceFree(pPetri net, int resizeNetAfter);
    Else the petri net will be resized, which can take extra time
 */
 pPetri generateRandomChoiceFree(unsigned int * real_vect_norm, 
-								unsigned int nb_transition, unsigned int nb_input_node, unsigned int nb_output_node, unsigned int repetition_vect_norm, int cleanExtraMemSpace);//Free-choice from its repetition vector norm
-pPetri generateChoiceFreeWithVector(unsigned int nb_transition, unsigned int nb_input_node, unsigned int nb_output_node, unsigned int * repetition_vect, int cleanExtraMemSpace);//Free-choice from its repetition vector
+								unsigned int nb_transition, double density, unsigned int repetition_vect_norm, int cleanExtraMemSpace);//Free-choice from its repetition vector norm
+pPetri generateChoiceFreeWithVector(unsigned int nb_transition, double density, unsigned int * repetition_vect, int cleanExtraMemSpace);//Free-choice from its repetition vector
 
 
 

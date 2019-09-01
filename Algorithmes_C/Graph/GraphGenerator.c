@@ -56,7 +56,7 @@
 	return output;
  }
  
-pDirectedGraph randomOrientedGraph(unsigned int n, unsigned int avg_input,  unsigned int avg_output)
+pDirectedGraph randomOrientedGraph(unsigned int n, double density)
  {
 	 /* Build a random graph with a given number of node. For each node 
 	  * Ki represent the number of input node for each node and Ko the number of
@@ -65,21 +65,75 @@ pDirectedGraph randomOrientedGraph(unsigned int n, unsigned int avg_input,  unsi
 	  * If the number of input or output does not need to be set, then set the value to -1
 	  * 
 	 */
+
 	 
 	 /*****************************************************************
 	  * 					CHECK PARAMETERS
 	  ****************************************************************/
-	 if(avg_input==0 || avg_output==0)
+	 if(density==0 || density>1)
 	 {
-		 fprintf(stderr, "Cannot generate random graph with an average number of input or output set to 0\n");
-		 return NULL;
-	 }
-	 if(avg_output<avg_input)
-	 {
-		 fprintf(stderr, "Cannot generate random graph with an average number of output smaller than the average number of input\n");
+		 fprintf(stderr, "Cannot generate random connected graph with density out of ]0, 1]\n");
 		 return NULL;
 	 }
 	 
+
+
+	 unsigned int i;
+	 unsigned int real_sum_i, real_sum_o;
+	 /*****************************************************************
+	  * 					SET DEGREES FOR NODES
+	  ****************************************************************/
+
+	 unsigned int nb_edges = ceil(density*n*(n-1));
+	 if(nb_edges<n)
+	 	nb_edges = n;
+	 else if(nb_edges>n*(n-1))
+	 	nb_edges = n*(n-1);
+
+	 unsigned int * input_degrees = randomFixedSumBounded(&real_sum_i, n, nb_edges, 1, (n-1));
+	 assert(input_degrees);
+	 unsigned int * output_degrees = randomFixedSumBounded(&real_sum_o, n, nb_edges, 1, (n-1));
+	 assert(output_degrees);
+
+
+	 unsigned int * tmp;
+	 unsigned int diff;
+	 if(real_sum_i<real_sum_o)
+	 {
+	 	tmp = input_degrees;
+		diff = real_sum_o - real_sum_i;
+	 }
+	 else
+	 {
+	 	tmp = output_degrees;
+		diff = real_sum_i - real_sum_o;
+	 }
+	
+	 unsigned int val;
+
+	 for(i=0; i<n; i++)
+	 {
+		 val = (n-1) - tmp[i];
+		 if(val>diff)
+		 {
+			 tmp[i] = (n-1);
+			 break;
+		 }else
+		 {
+			 tmp[i]+= diff - val;
+			 diff-=val;
+		 }
+
+		 if(diff==0)
+		 	break;
+	 }
+
+	 if(diff!=0)
+	 {
+		 fprintf(stderr, "cannot generate a coherant input and output degree for each node\n");
+		 return NULL;
+	 }
+	
 	 unsigned int sum;
 	 unsigned int nb_input, nb_output;
 	 /*****************************************************************
@@ -165,11 +219,10 @@ pDirectedGraph randomOrientedGraph(unsigned int n, unsigned int avg_input,  unsi
 	 assert(temp_proba_i);
 	 
 	 //set to 1 all the probability for input and output
-	 unsigned int i;
 	 for(i=0; i<n; i++)
 	 {
-		 proba_o[i] = avg_output;//represent the probability multiplied by Ko (p=1=Ko/Ko =>Ko*p=Ko)
-		 proba_i[i] = avg_input;//represent the probability multiplied by Ki (p=1=Ki/Ki =>Ki*p=Ki)
+		 proba_o[i] = input_degrees[i];//represent the probability multiplied by Ko (p=1=Ko/Ko =>Ko*p=Ko)
+		 proba_i[i] = input_degrees[i];//represent the probability multiplied by Ki (p=1=Ki/Ki =>Ki*p=Ki)
 	 }
 	
 	 /* Since we will use a temporarily mask over the real probability, we set the 
@@ -177,11 +230,6 @@ pDirectedGraph randomOrientedGraph(unsigned int n, unsigned int avg_input,  unsi
 	 */
 	 int idRandVertexI = randCumulProbaIni(temp_proba_i, n);
 	 int idRandVertexO = randCumulProbaIni(temp_proba_o, n);
-	
-	 //set number of input and output for each node
-	 unsigned int tmp;
-	 unsigned int * inputs = randomFixedSum(&tmp, n, n*avg_input);//at least each node has 1 input
-	 unsigned int * outputs = randomFixedSum(&tmp, n, n*avg_output);//at least each node has 1 output
 	 
 	 /*****************************************************************
 	  * 				CREATION OF THE RELATION
@@ -230,8 +278,8 @@ pDirectedGraph randomOrientedGraph(unsigned int n, unsigned int avg_input,  unsi
 		 
 
 		 //set number of input and output
-		 nb_input = inputs[vertex];
-		 nb_output = outputs[vertex];
+		 nb_input = input_degrees[vertex];
+		 nb_output = output_degrees[vertex];
 
 		 sum = nb_input + nb_output;
 
@@ -303,9 +351,9 @@ pDirectedGraph randomOrientedGraph(unsigned int n, unsigned int avg_input,  unsi
 	 //stop the random cumulative probability generator
 	 randCumulProbaEnd(idRandVertexO);
 	 randCumulProbaEnd(idRandVertexI);
-	 
-	 free(inputs);
-	 free(outputs);
+
+	 free(input_degrees);
+	 free(output_degrees);
 	 
 	 pDirectedGraph graph = matrixIntoList(network, n);//convert the network matrix into a list of list of children
 	 free(network);
@@ -944,7 +992,7 @@ void setInitialMarking(pPetri net)
 
  void sdfToChoiceFree(pPetri net, int resizeNetAfter)
  {
-	 int i;
+	 int i, index_place, index_parition_array;
 	 int i_weight;
 	 int m0;
 	 pPetriNode node, input_node_pl;
@@ -953,6 +1001,9 @@ void setInitialMarking(pPetri net)
 	 unsigned int id_tr;
 	 pArray p, cursor;
 	 unsigned int weight;
+	 unsigned int parition_size, set_size;
+	 unsigned int * partition;
+
 
 	 for(i=0; i<net->nb_tr; i++)
 	 {
@@ -974,27 +1025,48 @@ void setInitialMarking(pPetri net)
 			return ;
 		}
 
-
 		m0 = init_input_pl->val;//initialize initial marking
 		weight = init_link->weight;
 
+		//create a random partition of the places to choose which places will be merged
+		set_size = node->nb_inputs-1;
+		parition_size = 1 + rand()%(set_size);
+		partition = randomPartition(set_size, parition_size);//sorted array of index in the link list of input places to merge
+		/*
+			If the current node contains 5 places nammed p4, p7, p42, p8, p2 in the linked list of inputs
+			Then the first place, p4, will be used to merge other places into one
+			Then we generate a random array of sorted integer between 0 and the number of resting places to potentially merge, here 5-1=4.
+			Let's say we got the following partition [0, 2]. Then the place at the index 0 (after the first place p1) in the link list will
+			be merge with the first place. In other words, p7 will be merge with p1. Then p8 will be merge with p1.
+		*/
+
+
 		p = p->next;
 		//apply the transformation on the other nodes
+		index_place = 0;//index of the place inside the link list of inputs of the current node (start after the first element in the list)
+		index_parition_array = 0;//current index of the array
 		while(p)
 		{
+		
+			//merge places randomly
+			if(index_parition_array>=parition_size)//no more places to merge
+				break;
+			if(partition[index_parition_array]!=index_place)//current will place not be merged
+			{
+				p = p->next;
+				index_place++;
+				continue;
+			}else//current place will be merge
+			{
+				index_parition_array++;//because the partition is sorted, we can wait to find the index of the place inside the link list at the current position in the partition, and only after checking the next position
+				index_place++;
+			}
+			
+
 			/* Because at the end of the loop the element referenced by the pointer on array, p, will be removed
 			   we could not check the following element in the array based on that reference (because it will no longer exist).
 			   Thus we save the reference to the next element before the removal of the current one
 			 */
-			
-			//merge random number of places for the current node
-			if(rand()&1)//modulo(2)
-			{
-				p = p->next;
-				continue;
-			}
-
-
 			cursor = p->next;
 
 			
@@ -1029,9 +1101,12 @@ void setInitialMarking(pPetri net)
 			p = cursor;
 		}
 
+		free(partition);
+
 		init_input_pl->val = m0;//set final initial marking
 		init_link->weight = weight;//set weight of the place-transition link
 	 }
+
 
 	 if(resizeNetAfter)
 	 	petriClearPlaces(net);//optionnal (can be remove to optimize computation time)
@@ -1040,27 +1115,21 @@ void setInitialMarking(pPetri net)
 
 
 pPetri _generateChoiceFree(unsigned int * real_vect_norm, 
-						   unsigned int nb_transition, unsigned int nb_input_node, unsigned int nb_output_node, unsigned int repetition_vect_norm, unsigned int * repetition_vect, int cleanExtraMemSpace)
+						   unsigned int nb_transition, double density, unsigned int repetition_vect_norm, unsigned int * repetition_vect, int cleanExtraMemSpace)
 {
 	if(nb_transition<2)
 	{
 		fprintf(stderr, "The number of transitions must be superior or equal to 2\n");
 		return NULL;
 	}
-	if(nb_input_node>nb_output_node)
+	if(density==0 || density>1)
 	{
-		fprintf(stderr, "The number of input per node (%u) cannot be greater than the one " \
-						"for the output (%u) to generate a Choice-Free\n", nb_input_node, nb_output_node);
-		return NULL;
-	}
-	if(nb_output_node==1)//then nb_input_node also equal to 1
-	{
-		fprintf(stderr, "Cannot generate strongly connected graph with one input and one output per node\n");
+		fprintf(stderr, "density must me greater than 0 and smaller or equal to 1\n");
 		return NULL;
 	}
 
 	printf("Generation of a random oriented graph...\n");
-	pDirectedGraph graph = randomOrientedGraph(nb_transition, nb_input_node, nb_output_node);
+	pDirectedGraph graph = randomOrientedGraph(nb_transition, density);
 	
 	printf("Conversion to strongly connected graph...\n");
 	stronglyConnectedGraph(graph, 0);
@@ -1089,7 +1158,7 @@ pPetri _generateChoiceFree(unsigned int * real_vect_norm,
 
 
 pPetri generateRandomChoiceFree(unsigned int * real_vect_norm, 
-								unsigned int nb_transition, unsigned int nb_input_node, unsigned int nb_output_node, unsigned int repetition_vect_norm, int cleanExtraMemSpace)
+								unsigned int nb_transition, double density, unsigned int repetition_vect_norm, int cleanExtraMemSpace)
 {
 	if(repetition_vect_norm<nb_transition)
 	{
@@ -1097,16 +1166,16 @@ pPetri generateRandomChoiceFree(unsigned int * real_vect_norm,
 						"Number of transitions : %u   | Vector nomr : %u\n", nb_transition, repetition_vect_norm);
 		return NULL;
 	}
-	return _generateChoiceFree(real_vect_norm, nb_transition, nb_input_node, nb_output_node, repetition_vect_norm, NULL, cleanExtraMemSpace);
+	return _generateChoiceFree(real_vect_norm, nb_transition, density, repetition_vect_norm, NULL, cleanExtraMemSpace);
 }
 
 
-pPetri generateChoiceFreeWithVector(unsigned int nb_transition, unsigned int nb_input_node, unsigned int nb_output_node, unsigned int * repetition_vect, int cleanExtraMemSpace)
+pPetri generateChoiceFreeWithVector(unsigned int nb_transition, double density, unsigned int * repetition_vect, int cleanExtraMemSpace)
 {
 	if(repetition_vect==NULL)
 	{
 		fprintf(stderr, "cannot generate a normalized SDF from a NULL repetition vector\n");
 		return NULL;
 	}
-	return _generateChoiceFree(NULL, nb_transition, nb_input_node, nb_output_node, 0, repetition_vect, cleanExtraMemSpace);
+	return _generateChoiceFree(NULL, nb_transition, density, 0, repetition_vect, cleanExtraMemSpace);
 }

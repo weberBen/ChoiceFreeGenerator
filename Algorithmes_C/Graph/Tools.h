@@ -24,5 +24,6 @@ int lcm(unsigned int x, unsigned int y);
 int lcm_array(unsigned int * input, unsigned int size);
 unsigned int min(unsigned int a, unsigned int b);
 unsigned int max(unsigned int a, unsigned int b);
+unsigned int * sortUintArray(unsigned int * input, unsigned int size);
 
 #endif 

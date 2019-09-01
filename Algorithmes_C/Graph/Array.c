@@ -201,11 +201,11 @@ pArray removeElemArray(pArray previous_elem)
 	if(previous_elem==NULL)
 		return NULL;
 	
-	pArray cursor = previous_elem->next;//element to remove
-	previous_elem->next = cursor->next;
-	cursor->next=NULL;
+	pArray elem = previous_elem->next;
+	previous_elem->next = elem->next;
+	elem->next=NULL;
 	
-	return cursor;
+	return elem;
 }
 
 pArray removeFirstElemArray(pArray * pp)
