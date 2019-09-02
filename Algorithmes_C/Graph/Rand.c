@@ -385,6 +385,7 @@ int randCumulProba(unsigned int id)
 
 int getRandomInSegment(int start, int end)
 {
+	//return random integer betwwen start (included) and end (included)
 	int m = end-start+1;
 	
 	if(m==0)
@@ -533,7 +534,7 @@ double randf(double start, double end)
  **********************************************************************/
 
 
-unsigned int * randomPartition(unsigned int tot_nb_elem_set, unsigned int nb_elem_partition)
+unsigned int * randomSubSet(unsigned int tot_nb_elem_set, unsigned int nb_elem_partition)
 {
 	if(tot_nb_elem_set==0 || nb_elem_partition==0)
 		return NULL;
@@ -556,3 +557,75 @@ unsigned int * randomPartition(unsigned int tot_nb_elem_set, unsigned int nb_ele
 
 	return output;
 }
+
+
+pPartitionSet randomPartitions(unsigned int tot_nb_elem_set, unsigned int nb_partitions)
+{
+	if(tot_nb_elem_set==0 || nb_partitions==0)
+		return NULL;
+	if(nb_partitions>tot_nb_elem_set)
+		return NULL;
+	
+	unsigned int ** partitions = (unsigned int **)malloc(sizeof(unsigned int *)*nb_partitions);
+	assert(partitions);
+	unsigned int * size_partitions = (unsigned int *)malloc(sizeof(unsigned int)*nb_partitions);
+	assert(size_partitions);
+
+	int i, k;
+	unsigned int size;
+	unsigned int resting_nb_elem_set;
+	unsigned int * partition;
+
+	
+	resting_nb_elem_set = tot_nb_elem_set;
+	for(i=0; i<nb_partitions-1; i++)
+	{
+		//set partition size
+		size = getRandomInSegment(1, resting_nb_elem_set - (nb_partitions - (i+1)));//each partition must have at least 1 element inside
+		resting_nb_elem_set-= size;
+
+		size_partitions[i] = size;
+
+		//set partition array
+		partition = (unsigned int *)malloc(sizeof(unsigned int)*size);
+		assert(partition);
+		partitions[i] = partition;
+	}
+	//set size for the last element (fill with all the resting element in the set)
+	size = resting_nb_elem_set;
+	size_partitions[i] = size;
+
+	partition = (unsigned int *)malloc(sizeof(unsigned int)*size);
+	assert(partition);
+	partitions[i] = partition;
+	
+
+
+	//fill each partition
+	unsigned int r = randIni(0, tot_nb_elem_set);
+	
+	for(i=0; i<tot_nb_elem_set; i++)
+	{
+		for(k=0; k<nb_partitions; k++)
+		{
+			if(i>=size_partitions[k])
+				continue;
+
+			unsigned int val = randArray(r);
+			insertInUintSortedArray(partitions[k], size_partitions[k], i, val);
+		}
+	}
+
+	randEnd(r);
+
+	pPartitionSet output = partitionSetCreate(nb_partitions);
+	output->nb_partitions = nb_partitions;
+	output->partitions =  partitions;
+	output->size_partitions = size_partitions;
+
+	//sortUintArray(output, nb_elem_partition);//sort array
+
+	return output;
+}
+
+

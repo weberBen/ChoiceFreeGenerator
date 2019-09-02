@@ -46,6 +46,15 @@
 		p[i] =  value;
 	}
  }
+
+ void initializeUintArray(unsigned int p[], unsigned int size, unsigned int value)
+ {
+	unsigned int i;
+	for(i=0; i<size; i++)
+	{
+		p[i] =  value;
+	}
+ }
  
  void initializeList(void * p[], unsigned int size)
  {
@@ -57,6 +66,43 @@
 	}
  }
  
+
+ void insertInUintSortedArray(unsigned int * input, unsigned int size, unsigned int nb_elem, unsigned int elem)
+ {
+	 if(input==NULL || size==0 || nb_elem>=size)
+	 	return;
+
+	unsigned int i, k;
+
+	i = 0;
+	while(i<nb_elem && elem>=input[i])
+		i++;
+	
+	if(i==size)
+	{
+		fprintf(stderr, "Cannot insert element %u in array\n", elem);
+		return;
+	}
+	
+	if(i==nb_elem)
+	{
+		input[i] = elem;
+	}else
+	{
+		unsigned int val = input[i];
+		input[i] = elem;
+		
+		unsigned int temp;
+
+		for(k=i+1; k<nb_elem; k++)
+		{
+			temp = input[k];
+			input[k] = val;
+			val = temp;
+		}
+		input[k] = val;
+	}
+ }
 
  
 /**********************************************************************

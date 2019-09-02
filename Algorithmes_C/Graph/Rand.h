@@ -77,6 +77,8 @@ double randf(double start, double end);
  * 				random partition of set
  **********************************************************************/
 
-unsigned int * randomPartition(unsigned int tot_nb_elem_set, unsigned int nb_elem_partition);//return index of element inside the new partition
+unsigned int * randomSubSet(unsigned int tot_nb_elem_set, unsigned int nb_elem_partition);//return index of element inside the new partition
+pPartitionSet randomPartitions(unsigned int tot_nb_elem_set, unsigned int nb_partitions);
+
 
 #endif

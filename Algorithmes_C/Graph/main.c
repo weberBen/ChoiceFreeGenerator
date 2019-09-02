@@ -37,6 +37,42 @@ void printHelp()
 
 int main(int argc, char ** argv)
 {
+
+	srand(time(NULL));
+	//generate more places and transitions that needed to have "random" index for the places and transitions of the transformation
+	unsigned int nb_pl_transfo = 5;
+	unsigned int nb_pl_tot = 2*nb_pl_transfo;
+	unsigned int weight = 7;
+	unsigned int end_tr = nb_pl_tot;
+	pPetri net1 =  petriCreate(nb_pl_tot, nb_pl_tot+1);
+
+	int i;
+
+	unsigned int r1 = randIni(0,nb_pl_tot);
+	unsigned int id_pl, id_tr;
+
+	petriAddTransition(net1, end_tr);
+	for(i=0; i<nb_pl_transfo; i++)
+	{
+		id_pl = randArray(r1);
+		petriAddPlace(net1, id_pl, rand()%10);
+		id_tr = randArray(r1);
+		petriAddTransition(net1, id_tr);
+
+		petriAddlink(net1, PETRI_TP_LINK, id_tr, id_pl, rand()%10);
+		petriAddlink(net1, PETRI_PT_LINK, id_pl, end_tr, weight);
+	}
+	randEnd(r1);
+
+	displayPetriNet(net1);
+
+	sdfToChoiceFree(net1, 0);
+
+	displayPetriNet(net1);
+
+	petriFree(net1);
+
+	return 0;
 	unsigned int nb_transition = 0;//number of desired transition in the result Choice-Free
 	double density = 0;//average (and maximum) number of inputs for each transition
 	unsigned int vect_norm = 0;//norm of the repetition vector to generate

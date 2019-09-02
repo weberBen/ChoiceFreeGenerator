@@ -990,21 +990,30 @@ void setInitialMarking(pPetri net)
  * 
  * *******************************************************************/
 
- void sdfToChoiceFree(pPetri net, int resizeNetAfter)
+
+void sdfToChoiceFree(pPetri net, int resizeNetAfter)
  {
-	 int i, index_place, index_parition_array;
+	 int i, k, index_place;
 	 int i_weight;
-	 int m0;
+
+
 	 pPetriNode node, input_node_pl;
-	 pPetriLink link_pt, link_tr, init_link;
+	 pPetriLink link_tr, init_link, link;
 	 pPetriElem input_pl, init_input_pl;
-	 unsigned int id_tr;
 	 pArray p, cursor;
-	 unsigned int weight;
-	 unsigned int parition_size, set_size;
+	 unsigned int id_tr;
+
+
 	 unsigned int * partition;
+	 unsigned int * index_array;
+	 pPetriLink * link_array;
+	 unsigned int size_partition, index_partition, nb_partition;
+	 unsigned int elem_partition;
+	 pPartitionSet partition_set;
 
 
+
+	 //loop to find all the transition with multiple inputs
 	 for(i=0; i<net->nb_tr; i++)
 	 {
 		node = net->transitions[i];
@@ -1012,106 +1021,107 @@ void setInitialMarking(pPetri net)
 			continue; 
 		if(node->nb_inputs<2)
 			continue;
-		
 
 		p = node->input_links;
 
-		//select the first place to gather all the other transitions for the transformation
-		init_link = petriNodeGetLinkFromArrayNode(p);
-		init_input_pl = init_link->input;
-		if(init_input_pl->type!=PETRI_PLACE_TYPE)
-		{
-			fprintf(stderr, "The petri net does not follow the standards (link Transition-Transition founded)\n");
-			return ;
-		}
-
-		m0 = init_input_pl->val;//initialize initial marking
-		weight = init_link->weight;
-
-		//create a random partition of the places to choose which places will be merged
-		set_size = node->nb_inputs-1;
-		parition_size = 1 + rand()%(set_size);
-		partition = randomPartition(set_size, parition_size);//sorted array of index in the link list of input places to merge
-		/*
-			If the current node contains 5 places nammed p4, p7, p42, p8, p2 in the linked list of inputs
-			Then the first place, p4, will be used to merge other places into one
-			Then we generate a random array of sorted integer between 0 and the number of resting places to potentially merge, here 5-1=4.
-			Let's say we got the following partition [0, 2]. Then the place at the index 0 (after the first place p1) in the link list will
-			be merge with the first place. In other words, p7 will be merge with p1. Then p8 will be merge with p1.
+		/* To merge places together, we generate a random number of partition for which the union is equal to the initial set
+		of index. Inside the loop through all places connected to the current transition, places are indexed from 0 to the number of places nb_pl - 1
+		The set {0, ..., nb_pl-1} is then used to generate random partitions.
+		For each generated partition, all the place that match the index inside it will be merge with the first place of the partition.
+		For example, if the partition is {2, 4, 5}, then the places at the position 4 and 5 in the looop will be merge with the place at the position 2.
+			All the partition are sorted from the smallest to the greatest element.
 		*/
 
+		//generate total partition to merge places together
+		nb_partition = getRandomInSegment(1, node->nb_inputs);//get random number of partition
+		if(nb_partition==node->nb_inputs)//nothing to do (each place in the partition will not be merge with other places)
+			continue;
+		
+		partition_set = randomPartitions(node->nb_inputs, nb_partition);
+		//for each partition we save the current index of the place that need to be merge
+		index_array = (unsigned int *)malloc(sizeof(unsigned int)*partition_set->nb_partitions);
+		initializeUintArray(index_array, partition_set->nb_partitions, 0);
 
-		p = p->next;
-		//apply the transformation on the other nodes
-		index_place = 0;//index of the place inside the link list of inputs of the current node (start after the first element in the list)
-		index_parition_array = 0;//current index of the array
+		//save initial link (that contains the initila place that will be used to merge the others places of the partition) for each partition
+		link_array = (pPetriLink *)malloc(sizeof(pPetriLink)*partition_set->nb_partitions);
+
+
+		//merging porcess
+		index_place = 0;//index of the place inside the loop
 		while(p)
 		{
-		
-			//merge places randomly
-			if(index_parition_array>=parition_size)//no more places to merge
-				break;
-			if(partition[index_parition_array]!=index_place)//current will place not be merged
-			{
-				p = p->next;
-				index_place++;
-				continue;
-			}else//current place will be merge
-			{
-				index_parition_array++;//because the partition is sorted, we can wait to find the index of the place inside the link list at the current position in the partition, and only after checking the next position
-				index_place++;
-			}
-			
-
+			cursor = p->next;
 			/* Because at the end of the loop the element referenced by the pointer on array, p, will be removed
 			   we could not check the following element in the array based on that reference (because it will no longer exist).
 			   Thus we save the reference to the next element before the removal of the current one
 			 */
-			cursor = p->next;
 
-			
-			link_pt = petriNodeGetLinkFromArrayNode(p);
-			input_pl = link_pt->input;
-			if(input_pl->type!=PETRI_PLACE_TYPE)
+			//check in which partition the current index of the place belong to
+			for(k=0; k<partition_set->nb_partitions; k++)
 			{
-				fprintf(stderr, "The petri net does not follow the standards (link Transition-Transition founded)\n");
-				return ;
-			}
+				partition = partition_set->partitions[k];
+				size_partition = partition_set->size_partitions[k];
+				index_partition = index_array[k];
 
-			m0 += input_pl->val;//get initial marking of the input node
-			weight += link_pt->weight;
+				if(size_partition==1)//nothing to do
+					continue;
+				if(index_partition>=size_partition)//no more places to merge inside the partition
+					continue;
+				
+				elem_partition  = partition[index_partition];
+
+				if(elem_partition!=index_place)//the current index of the place is not part of the partition
+					continue;
+				
+				
+				//first element inside the partition (need to save the initial link that will be used to merge the other places of the partition)
+				if(index_partition==0)//first place used to merge with all the other in the partition
+				{
+					link_array[k] = petriNodeGetLinkFromArrayNode(p);
+				}else//place to merge with the first one in the partition
+				{
+					//retrieve initial link of the partition
+					init_link = link_array[k];
+					init_input_pl = init_link->input;//initial place that is used to merge all the other ones of the partition
+
+					//curent place to merge
+					link = petriNodeGetLinkFromArrayNode(p);
+					input_pl = link->input;
+
+					//update initial marking and weight of the merged place
+					init_input_pl->val+=input_pl->val;//initial marking
+					init_link->weight+=link->weight;//weight
+
+					//update relation in the network
+					input_node_pl = net->places[input_pl->label];
+					link_tr = petriNodeGetLinkFromArrayNode(input_node_pl->input_links);//get the only transition from the input node
+					id_tr = link_tr->input->label;//get id of the transition that have the current place to merge as an output
+					i_weight = link_tr->weight;//get weight of the output link
+
+					petriRemovePlace(net, input_pl->label);//remove place to merge
+					//after the removal the link betwwen the input place and its transition does not exists anymore (link_tr does reference nothing)
+					petriAddlink(net, PETRI_TP_LINK, id_tr, init_input_pl->label, i_weight);//add new link between the transition that had the place to merge as an output with the merged place
+				}
+				
+
+				index_array[k]++;//update index of the array for the partition
+			}
 			
-			//get weight of the links
-			input_node_pl = net->places[input_pl->label];//get input node from the current transition
-			if(input_node_pl->nb_inputs!=1)
-			{
-				fprintf(stderr, "The petri net is not correct for the transformation from SDF to Choice-free\n");
-				return ;
-			}
-
-			link_tr = petriNodeGetLinkFromArrayNode(input_node_pl->input_links);//get the only transition from the input node
-			id_tr = link_tr->input->label;
-			i_weight = link_tr->weight;
-
-			petriRemovePlace(net, input_pl->label);
-			//after the removal the link betwwen the input place and its transition does not exists anymore (link_tr does reference nothing)
-			petriAddlink(net, PETRI_TP_LINK, id_tr, init_input_pl->label, i_weight);
-
 			
 			p = cursor;
-		}
+			index_place++;
+		}//end loop through input places of the current transition
 
-		free(partition);
-
-		init_input_pl->val = m0;//set final initial marking
-		init_link->weight = weight;//set weight of the place-transition link
-	 }
+		//free memory
+		free(link_array);
+		free(index_array);
+		partitionSetFree(partition_set);
+	 }//end loop through the transitions
 
 
 	 if(resizeNetAfter)
 	 	petriClearPlaces(net);//optionnal (can be remove to optimize computation time)
  }
-
 
 
 pPetri _generateChoiceFree(unsigned int * real_vect_norm, 

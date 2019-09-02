@@ -1400,3 +1400,41 @@ pArray wrapperFreeList(pArray w_list)
 	freeArray(w_list);
 	return NULL;
 }
+
+
+ /*********************************************************************
+ * 
+ * 					
+ * 						PARTITION FUNCTIONS
+ * 
+ * 
+ *********************************************************************/
+
+pPartitionSet partitionSetCreate(unsigned int nb_partitions)
+{
+	pPartitionSet output = (pPartitionSet)malloc(sizeof(partitionSet));
+	assert(output);
+
+
+	output->nb_partitions = nb_partitions;
+	output->partitions = NULL;
+	output->size_partitions =  NULL;
+
+	return output;
+}
+
+void partitionSetFree(pPartitionSet p)
+{
+	if(p==NULL)
+		return;
+	
+	int i;
+	for(i=0; i<p->nb_partitions; i++)
+	{
+		free(p->partitions[i]);
+	}
+
+	free(p->partitions);
+	free(p->size_partitions);
+	free(p);
+}

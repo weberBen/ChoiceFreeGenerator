@@ -313,4 +313,20 @@ pWrapper wrapperGetElem(pArray w_list, unsigned int id);
 void  wrapperRemoveFromList(pArray * pp_list, unsigned int id);
 pArray wrapperFreeList(pArray w_list);
 
+
+
+/*********************************************************************
+ * 						PARTITIONS OF SET
+ *********************************************************************/
+typedef struct partitionSet * pPartitionSet;
+typedef struct partitionSet
+{
+	unsigned int nb_partitions;
+	unsigned int ** partitions;
+	unsigned int * size_partitions;
+} partitionSet;
+
+pPartitionSet partitionSetCreate(unsigned int nb_partitions);
+void partitionSetFree(pPartitionSet p);
+
 #endif 

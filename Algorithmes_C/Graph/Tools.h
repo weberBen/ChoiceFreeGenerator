@@ -7,7 +7,9 @@
 double * copyFloatArray(double p[], unsigned int size);
 void initializeFloatArray(double p[], unsigned int size, double value);
 void initializeIntArray(int p[], unsigned int size, int value);
+ void initializeUintArray(unsigned int p[], unsigned int size, unsigned int value);
 void initializeList(void * p[], unsigned int n);
+void insertInSortedArray(unsigned int * input, unsigned int size, unsigned int elem);
 
 unsigned int getNumberOfDigit(int num);
 
@@ -25,5 +27,6 @@ int lcm_array(unsigned int * input, unsigned int size);
 unsigned int min(unsigned int a, unsigned int b);
 unsigned int max(unsigned int a, unsigned int b);
 unsigned int * sortUintArray(unsigned int * input, unsigned int size);
+void insertInUintSortedArray(unsigned int * input, unsigned int size, unsigned int nb_elem, unsigned int elem);
 
 #endif 

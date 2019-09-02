@@ -114,6 +114,29 @@ void displaySimpeNodeArray2(pArray2 p)
  }
 
 
+ void displayPartitionSet(pPartitionSet p)
+ {
+	 printf("----------- PARTITION SET ------------------\n");
+
+	 if(p==NULL)
+	 {
+		 printf("[NULL]\n");
+	 }else
+	 {
+		printf("Nb_partition = %u\n", p->nb_partitions);
+
+		unsigned int i;
+		for(i=0; i<p->nb_partitions; i++)
+		{
+			printf("\t* Parition %u : \n", i+1);
+			printf("\t");
+			displayMatrix((int*)(p->partitions[i]), 1, p->size_partitions[i]);
+		}
+	 }
+
+	 printf("--------------------------------------------\n");
+ }
+
 
  /**********************************************************************
  * 

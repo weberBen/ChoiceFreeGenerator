@@ -20,6 +20,7 @@ void displayPetriNet(pPetri net);
 void displayPetriNode(pPetriNode p, unsigned int index);
 void displayPetriLink(pPetriLink p);
 void displayPetriElem(pPetriElem p);
+void displayPartitionSet(pPartitionSet p);
 
 //python functions
 unsigned int arrayToString(char ** output, pArray p);
