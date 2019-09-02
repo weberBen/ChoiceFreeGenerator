@@ -15,7 +15,6 @@ void randEnd(unsigned int id);
  * 
 	unsigned int r1 = randIni(0,4);
 	
-
 	int res;
 	do
 	{
