@@ -78,9 +78,9 @@ The ```[vect_norm]``` is the desired norm of the repetition vector to get during
 **--help**  : get help
 
 ## Example <a name="MainExample"/>
-```./choiceFreeGenerator 10 0.5 20 -f output.pnml``` produce a ramdom Choice-Free with 10 transitions, with density of 0.5 and in which the norm of the repetiton vector is equal to 20. The output is saved into the file *output.pnml*
+```./choiceFreeGenerator 10 0.5 20 -f output.pnml``` produces a ramdom Choice-Free with 10 transitions, with a density of 0.5 and in which the norm of the repetiton vector is equal to 20. The output is saved into the file *output.pnml*
 
-```./choiceFreeGenerator 10 0.5 20 -f output.pnml --sdf``` produce a ramdom SDF with 10 transitions, with density of 0.5 and in which the norm of the repetiton vector is equal to 20. The output is saved into the file *output.pnml*
+```./choiceFreeGenerator 10 0.5 20 -f output.pnml --sdf``` produces a ramdom SDF with 10 transitions, with a density of 0.5 and in which the norm of the repetiton vector is equal to 20. The output is saved into the file *output.pnml*
 
 # API <a name="Api"/>
 
