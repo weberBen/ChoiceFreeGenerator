@@ -12,9 +12,8 @@ import matplotlib
 
 #%%
 
-
 numberNode = 10
-density = 0.3
+density = 0.5
 rep_vect_norm = numberNode*2
 
 net = c.freeChoice(n=numberNode, density=density, rep_vect_norm=rep_vect_norm, cleanExtraMemSpace=False)

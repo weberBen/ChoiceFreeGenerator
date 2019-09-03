@@ -70,7 +70,7 @@ int main()
 
         printf("Generation of a random oriented graph...\n");
         start = clock();
-        pDirectedGraph graph = randomOrientedGraph(nb_transition, density);
+        pDirectedGraph graph = randomConnectedGraph(nb_transition, density);
         end = clock();
 
         cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;

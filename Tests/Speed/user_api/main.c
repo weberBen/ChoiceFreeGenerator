@@ -6,8 +6,8 @@
 #include "choiceFreeGenerator.h"
 
 #define NB_SIMULATION 100
-#define SIZE 100
-#define DENSITY 0.5
+#define SIZE 1000
+#define DENSITY 0.005
 #define AVG_RT 5
 
 int getMax(unsigned int * array, unsigned int size)

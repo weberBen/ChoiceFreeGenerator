@@ -32,27 +32,41 @@ void printHelp()
 			"OPTIONS\n" \
 			"\t" "-c   " "resize the petri net after the transformation from SDF to Choice-Free (can be time consuming)" "\n" \
 			"\t" "-f [filename]   " "save the Choice-Free to a file to [filename] as PNML format" "\n" \
-			"\t" "-h   " "get help" "\n");
+			"\t" "--sdf  " "produce a SDF as output" "\n" \
+			"\t" "--help  " "get help" "\n");
 }
+
+static struct option long_options[] =
+{
+    {"help", no_argument, NULL, 'h'},
+    {"sdf", no_argument, NULL, 's'},
+    {NULL, 0, NULL, 0}
+};
+
 
 int main(int argc, char ** argv)
 {
+
 	unsigned int nb_transition = 0;//number of desired transition in the result Choice-Free
 	double density = 0;//average (and maximum) number of inputs for each transition
 	unsigned int vect_norm = 0;//norm of the repetition vector to generate
 	unsigned int real_vect_norm;
 	int cleanExtraMem = 0;//the transformation from SDF to Choice-Free leaves extra empty memory space, the cleaning process is optional because it's time consuming
+	int SDF = 0;
 	char * filename = NULL;
 	unsigned int nb_regular_arg = 0;
 	int c;
 
-    while((c = getopt(argc, argv, "cf:s:h")) != -1) 
+    while ((c = getopt_long(argc, argv, "cf:sh", long_options, NULL)) != -1)
 	{
 		// Option argument
 		switch (c) 
 		{
 			case 'c': 
 				cleanExtraMem = 1;
+				break;
+			case 's':
+				SDF = 1;
 				break;
 			case 'f':
 				filename = optarg;
@@ -84,7 +98,7 @@ int main(int argc, char ** argv)
 
 	if(nb_regular_arg != NUMBER_ARGS)
 	{
-		printf("Wrong arguments !\n-h to get help\n");
+		printf("Wrong arguments !\n--help to get help\n");
 		return 1;
 	}
 	
@@ -95,12 +109,13 @@ int main(int argc, char ** argv)
 		   "\t" "[density] = %lf \n" \
 		   "\t" "[vect_norm] = %u \n" \
 		   "\t" "[cleanExtraMem] = %s \n" \
-		   , nb_transition, density, vect_norm, (cleanExtraMem)?"yes":"no");
+		   "\t" "[SDF] = %s \n" \
+		   , nb_transition, density, vect_norm, (cleanExtraMem)?"yes":"no", (SDF)?"yes":"no");
 	
 	//create Choice-Free
 	srand(time(NULL));
 	
-	pPetri net = generateRandomChoiceFree(&real_vect_norm, nb_transition, density, vect_norm, cleanExtraMem);
+	pPetri net = generateRandomChoiceFree(&real_vect_norm, nb_transition, density, vect_norm, SDF, cleanExtraMem);
 	if(net==NULL)
 	{
 		printf("Cannot generate a random Choice-Free\n");

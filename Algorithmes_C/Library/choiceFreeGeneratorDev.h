@@ -65,7 +65,7 @@ void directedGraphFree(pDirectedGraph p);
  * 							GRAPH
  *********************************************************************/
 
-pDirectedGraph randomOrientedGraph(unsigned int n, double density);
+pDirectedGraph randomConnectedGraph(unsigned int n, double density);
 pDirectedGraph buildTree(unsigned int n, unsigned int D);
 //get strongly connect graph from a directed graph
 void stronglyConnectedGraph(pDirectedGraph graph, int isTree);

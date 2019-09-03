@@ -395,6 +395,33 @@ int getRandomInSegment(int start, int end)
 }
 
 
+int getRandomDispersionAroundAvgUint(unsigned avg, double dispersion, unsigned int min, unsigned int max)
+{
+	if(min>=avg)
+		return min;
+	
+	unsigned int low_bound, up_bound;
+	unsigned int temp;
+	temp = floor(avg*dispersion);
+
+	
+	if(temp>=avg-min)
+	{
+		low_bound = min;
+	}
+	else
+		low_bound = avg - temp;
+
+
+	up_bound = avg + temp;
+	if(up_bound>max)
+		up_bound = max;
+	
+
+	return getRandomInSegment(low_bound, up_bound);
+}
+
+
 /**********************************************************************
  * 
  * 					RANDOM NUMBERS WITH FIXED SUM
@@ -431,81 +458,6 @@ unsigned int * randomFixedSum(unsigned int * real_sum, unsigned int n, unsigned 
 			odd = 0;
 		}
 
-		(*real_sum)+=output[i];
-	}
-	
-	return output;
-}
-
-
-
-unsigned int * randomFixedSumBounded(unsigned int * real_sum, unsigned int n, unsigned int sum, unsigned int min, unsigned int max)
-{
-	*real_sum = 0;
-	if(n*max<sum)
-	{
-		fprintf(stderr, "Cannot generate a random array of %u integers with a sum fixed to %u and a maximum set to %u (%u*%u<%u)\n",n, sum, max, n, max, sum);
-		return NULL;
-	}else if (n*min>sum)
-	{
-		fprintf(stderr, "Cannot generate a random array of %u integers with a sum fixed to %u and a minimum set to %u (%u*%u>%u)\n",n, sum, min, n, min, sum);
-		return NULL;
-	}
-	
-	
-	unsigned int * output = (unsigned int *)malloc(sizeof(unsigned int)*n);
-	assert(output);
-	
-
-	unsigned int i;
-	int odd;
-
-
-	double init_val = (float)sum/(float)n;
-	if(init_val<min)
-		init_val=min;
-
-	
-	odd=0;
-	for(i=0; i<n; i++)
-	{
-		if(!odd)
-		{
-			output[i] = ceil(init_val);
-			odd=1;
-		}else
-		{
-			output[i] = floor(init_val);
-			odd=0;
-		}
-		
-	}
-
-	unsigned int val;
-	unsigned int index;
-
-	for(i=0; i<n; i++)
-	{
-		index = rand()%n;
-
-		if(output[i]==min)
-			continue;
-		
-		if(output[index]>=0.7*max)
-			continue;
-		
-
-		val = rand()%(output[i]-min);
-		
-		if(output[index] + val>max)
-			val = max - output[index];
-
-		output[index]+=val;
-		output[i]-=val;
-	}
-
-	for(i=0; i<n; i++)
-	{
 		(*real_sum)+=output[i];
 	}
 	

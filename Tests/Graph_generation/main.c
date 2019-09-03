@@ -163,7 +163,7 @@ int main()
             stronglyConnectedGraph(graph, 1);
         }else
         {
-            graph = randomOrientedGraph(nb_nodes, DENSITY);
+            graph = randomConnectedGraph(nb_nodes, DENSITY);
             fprintf(stderr, "nb_edges=%u\n", graph->nb_edges);
             stronglyConnectedGraph(graph, 0);
         }

@@ -58,13 +58,13 @@ void randCumulProbaChangeData(unsigned int id, double * proba, unsigned int size
  * 				get random value between two integer
  **********************************************************************/
 int getRandomInSegment(int start, int end);
+int getRandomDispersionAroundAvgUint(unsigned avg, double dispersion, unsigned int min, unsigned int max);
 
 /**********************************************************************
  * 				get random values with fixed sum
  **********************************************************************/
 
 unsigned int * randomFixedSum(unsigned int * real_sum, unsigned int n, unsigned int sum);
-unsigned int * randomFixedSumBounded(unsigned int * real_sum, unsigned int n, unsigned int sum, unsigned int min, unsigned int max);
 
 /**********************************************************************
  * 				random tools function

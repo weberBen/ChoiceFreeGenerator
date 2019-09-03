@@ -81,7 +81,7 @@ static void sendResponse(request * req, char * buff, int BUFFSIZE, unsigned int 
 		{
 			printf("Creation d'un graphe aleatoirement\n");
 			
-			pDirectedGraph graph1 = randomOrientedGraph(req->n, req->density);//create graph
+			pDirectedGraph graph1 = randomConnectedGraph(req->n, req->density);//create graph
 			wrapperAddToList(&_list, wrapperCreateNode(req->wrapperId, directedGraph_t, (void *)graph1));
 			
 			listToString(&s,graph1->links_list, req->n);//convert the tree into a strings
@@ -118,7 +118,7 @@ static void sendResponse(request * req, char * buff, int BUFFSIZE, unsigned int 
 			printf("Creation d'un Choice-Free aleatoirement\n");
 			
 			unsigned int real_rep_vect_norm;
-			pPetri graph1 = generateRandomChoiceFree(&real_rep_vect_norm, req->n, req->density, req->rep_vect_norm, req->cleanExtraMemSpace);//create graph
+			pPetri graph1 = generateRandomChoiceFree(&real_rep_vect_norm, req->n, req->density, req->rep_vect_norm, 0, req->cleanExtraMemSpace);//create graph
 			wrapperAddToList(&_list, wrapperCreateNode(req->wrapperId, petri_t, (void *)graph1));
 			
 			petriWrite(graph1, csock);//write petri net to the socket
