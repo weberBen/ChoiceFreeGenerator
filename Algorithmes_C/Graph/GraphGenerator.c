@@ -146,11 +146,10 @@ void connectedGraph(int network[], unsigned int size)
  
  pDirectedGraph randomConnectedGraph(unsigned int n, double density)
  {
-	 /* Build a random graph with a given number of node. For each node 
-	  * Ki represent the number of input node for each node and Ko the number of
-	  * output node for each node. The function then construct as much as possible a graph
-	  * that follow these constraint of input and ouput for a node
-	  * If the number of input or output does not need to be set, then set the value to -1
+	 /* 
+	  * Build a random connected graph with a given number of node. 
+	  * At least all node have 1 input and 1 output
+	  * Density is define as the ration of the number of edges by the multiplication of the number of node and the number of node -1
 	  * 
 	 */
 	 
@@ -210,8 +209,8 @@ void connectedGraph(int network[], unsigned int size)
 	  ****************************************************************/
 	  
 	 /* To randomly pick a node we associate a probability for each node
-	  * to be picked as an output and as an input. At the begining, each
-	  * node as the same probability to be picked (probability of 1 = Ki/Ki = Ko/Ko)
+	  * to be picked as an output (the total number of output per node is Ko) and as an input (the total number of output per node is Ki). 
+	  * At the begining, each node as the same probability to be picked (probability of 1 = Ki/Ki = Ko/Ko)
 	  * Then if a node is select as an output for another its probability to be picked
 	  * next time decrease ((1-Ki)/Ki). When the probability is 0, then the node does not 
 	  * need any ohter node as input or as output or both.
