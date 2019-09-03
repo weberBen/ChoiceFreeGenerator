@@ -17,9 +17,10 @@ int main()
 	unsigned int vect_norm = 10;//norm of the repetition vector to generate
 	int cleanExtraMem = 0;//the transformation from SDF to Choice-Free leaves extra empty memory space, the cleaning process is optional because it's time consuming
 	unsigned int real_vect_norm = 0;
+	int SDF = 0;
 
 	//create random Choice-Free from its repetition vector norm
-	pPetri net1 = generateRandomChoiceFree(&real_vect_norm, nb_transition, density, vect_norm, cleanExtraMem);
+	pPetri net1 = generateRandomChoiceFree(&real_vect_norm, nb_transition, density, vect_norm, SDF, cleanExtraMem);
 	if(net1==NULL)
 	{
 		printf("Error during the generation of a random Choice-Free\n");
@@ -38,7 +39,7 @@ int main()
 		return 1;
 	}
 	printf("Real repetition vector norm : %u\n", real_vect_norm);
-	pPetri net2 = generateChoiceFreeWithVector(nb_transition, density, vect, cleanExtraMem);
+	pPetri net2 = generateChoiceFreeWithVector(nb_transition, density, vect, SDF, cleanExtraMem);
 	if(net2==NULL)
 	{
 		printf("Error during the generation of a random Choice-Free\n");
