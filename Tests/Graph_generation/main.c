@@ -134,12 +134,9 @@ int main()
 {
 	srand(time(NULL));
 
-	//-----------------------------------------------------------------------------------------------------------------
-	//										GENERATE RANDOM FREE CHOICE 
-	//-----------------------------------------------------------------------------------------------------------------
-
-	unsigned int nb_nodes = SIZE;//number of desired transition in the result Free-choice
-	//unsigned int nb_input_node = IN;//average (and maximum) number of inputs for each transition
+	
+	unsigned int nb_nodes = SIZE;
+	//unsigned int nb_input_node = IN;
 
     pDirectedGraph graph;
 

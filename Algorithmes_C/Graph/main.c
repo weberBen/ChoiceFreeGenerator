@@ -26,7 +26,7 @@ void printHelp()
 			"\t" NAME " allows user to generate random living Choice-Free network given the desired number of transitions [nb_transition] " "\n" \
 			"\t" "in the final petri network." "\n" \
 			"\t" "The generation of the final network is based uppon the one of a strongly connected " \
-				 "graph whith a density of [density]." "\n" \
+				 "graph whith a density of [density] in ]0, 1]." "\n" \
 			"\t" "The [vect_norm] is the desired norm of the repetition vector to get during the generation of a random one for the SDF\n" "\n" \
 			"\n" \
 			"OPTIONS\n" \

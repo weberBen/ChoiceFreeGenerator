@@ -13,7 +13,7 @@ int main()
 	//-----------------------------------------------------------------------------------------------------------------
 
 	unsigned int nb_transition = 10;//number of desired transition in the result Choice-Free
-	double density = 0.5;//average (and maximum) number of inputs for each transition
+	double density = 0.5;//density of the graph
 	unsigned int vect_norm = 10;//norm of the repetition vector to generate
 	int cleanExtraMem = 0;//the transformation from SDF to Choice-Free leaves extra empty memory space, the cleaning process is optional because it's time consuming
 	unsigned int real_vect_norm = 0;

@@ -8,6 +8,7 @@
 #define NB_SIMULATION 100
 #define SIZE 1000
 #define DENSITY 0.005
+#define SDF 0
 #define AVG_RT 5
 
 int getMax(unsigned int * array, unsigned int size)
@@ -45,10 +46,6 @@ int main()
 {
 	srand(time(NULL));
 
-	//-----------------------------------------------------------------------------------------------------------------
-	//										GENERATE RANDOM CHOICE-FREE
-	//-----------------------------------------------------------------------------------------------------------------
-
     clock_t start, end;
     double cpu_time_used;
 
@@ -76,7 +73,7 @@ int main()
         start = clock();
 
         vect = weightsComputation(&real_vect_norm, nb_transition, vect_norm);
-        net = generateChoiceFreeWithVector(nb_transition, density, vect, cleanExtraMem);
+        net = generateChoiceFreeWithVector(nb_transition, density, vect, SDF, cleanExtraMem);
         //net = generateRandomChoiceFree(&real_vect_norm, nb_transition, avg_input_node, avg_output_node, vect_norm, cleanExtraMem);
 
         end = clock();

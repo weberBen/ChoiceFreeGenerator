@@ -41,16 +41,12 @@ int main()
 {
 	srand(time(NULL));
 
-	//-----------------------------------------------------------------------------------------------------------------
-	//										GENERATE RANDOM CHOICE-FREE 
-	//-----------------------------------------------------------------------------------------------------------------
-
     clock_t start, end;
     double cpu_time_used;
 
 
-	unsigned int nb_transition = SIZE;//number of desired transition in the result choice-free
-	//unsigned int nb_input_node = IN;//average (and maximum) number of inputs for each transition
+	unsigned int nb_transition = SIZE;
+
     double density = DENSITY;
     unsigned int vect_norm = AVG*SIZE;
     int cleanExtraMemSpace = 0;
