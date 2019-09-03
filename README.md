@@ -56,28 +56,31 @@ choiceFreeGenerator - a random generator of living Choice-Free
 
 SYNOPSIS
 
-```freeChoiceGenerator [nb_transition] [avg_input_node] [vect_norm] -OPTIONS```
+```freeChoiceGenerator [nb_transition] [density] [vect_norm] -OPTIONS```
 
 *DESCRIPTION*
 
 choiceFreeGenerator allows user to generate random living Choice-Free network given the desired number of transitions ```[nb_transition]``` in the final petri network. 
 
-The generation of the final network is based uppon the one of a strongly connected graph where the average number of input ```[avg_input_node]``` and output ```[avg_output_node]``` are set by the user (with the following constraint ```[avg_input_node]>=[avg_output_node]```). By default ```[avg_input_node]=[avg_output_node]```.
+The generation of the final network is based uppon the one of a strongly connected graph with a density set to [density] in ]0, 1].
 
 The ```[vect_norm]``` is the desired norm of the repetition vector to get during the generation of a random one for the SDF
 
 *OPTIONS*
 
-**-o** ```[avg_output_node]```  : set ```[avg_output_node]```
 
 **-c**  : resize the petri net after the transformation from SDF to Choice-Free (can be time consuming)
 
 **-f**  : ```[filename]```   save the Choice-Free to a file to ```[filename]``` as PNML format
 
-**-h**  : get help
+**--sdf**  : get an SDF as output of the generator
+
+**--help**  : get help
 
 ## Example <a name="MainExample"/>
-```choiceFreeGenerator 10 5 20 -f output.pnml``` produce a ramdom Choice-Free with 10 transitions, with an average number of input edges for the transitions set to 5, in which the norm of the repetiton vector is equal to 20 and then write the net into the file *output.pnml*
+```./choiceFreeGenerator 10 0.5 20 -f output.pnml``` produce a ramdom Choice-Free with 10 transitions, with density of 0.5 and in which the norm of the repetiton vector is equal to 20. The output is saved into the file *output.pnml*
+
+```./choiceFreeGenerator 10 0.5 20 -f output.pnml --sdf``` produce a ramdom SDF with 10 transitions, with density of 0.5 and in which the norm of the repetiton vector is equal to 20. The output is saved into the file *output.pnml*
 
 # API <a name="Api"/>
 
@@ -93,14 +96,13 @@ The following example can be found under the direction *Examples*
 srand(time(NULL));
 
 unsigned int nb_transition = 10;//number of desired transition in the result Choice-Free
-unsigned int avg_input_node = 3;//average (and maximum) number of inputs for each transition
-unsigned int avg_output_node = 3;//average (and maximum) number of outputs for each transition
+double density = 0.5;//density of the graph
 unsigned int vect_norm = 10;//norm of the repetition vector to generate
 int cleanExtraMem = 0;//the transformation from SDF to Choice-Free leaves extra empty memory space, the cleaning process is optional because it's time consuming
 unsigned int real_vect_norm = 0;
 
 //create random Choice-Free from its repetition vector norm
-pPetri net1 = generateRandomChoiceFree(&real_vect_norm, nb_transition, avg_input_node, avg_output_node, vect_norm, cleanExtraMem);
+pPetri net1 = generateRandomChoiceFree(&real_vect_norm, nb_transition, density, vect_norm, cleanExtraMem);
 if(net1==NULL)
 {
 	printf("Error during the generation of a random Choice-Free\n");
@@ -121,7 +123,7 @@ if(vect==NULL)
 	return 1;
 }
 printf("Real repetition vector norm : %u\n", real_vect_norm);
-pPetri net2 = generateChoiceFreeWithVector(nb_transition, avg_input_node, avg_output_node, vect, cleanExtraMem);
+pPetri net2 = generateChoiceFreeWithVector(nb_transition, density, vect, cleanExtraMem);
 if(net2==NULL)
 {
 	printf("Error during the generation of a random Choice-Free\n");
@@ -385,7 +387,8 @@ The module *SocketCommunication* contains all the needed classes and functions t
     - *createRequest* (function) create a new request while formatting the arguments into the correct ctypes
   For example, to create a new request use the command ```request = createRequest(task = Task.f_createStronglyConnectedGraph, n=n, D=D)``` with n, D specific arguments
   - *Server* (class) the main class that starts the server at the begining and then sends the needed request and return the response as string
-  For example, to start the server side use ```src=Server(port=5112, buffersize=512)``` or ```src=Server()``` to fill automatically the arguments. Port is the communication port (which can be found automatically if not specified) and buffersize is the size of the buffer used between the clent and the server to transmit data.
+  For example, to start the C server side from Python use ```src=Server(port=5112, buffersize=512, start=True)``` or ```src=Server()``` to fill automatically the arguments. Port is the communication port (which can be found automatically if not specified) and buffersize is the size of the buffer used between the clent and the server to transmit data.
+  To start the C server side from an external terminal, start the server and in Python use ```src=Server(port=5112, buffersize=512, start=False)```.
   Be aware of the closing of the server : at the end of the script the server need to be closed. For that purpose,use the command *srv.close()*
  
 The module *GraphDisplay* takes the formatted response of the server and convert it into a usable graph.
@@ -401,10 +404,10 @@ import GraphDisplay as gd
 #%%
 
 numberNode = 5
-numberInputNode = 2
+density = 0.5
 NumberOutputNode = 2
 
-net = c.choiceFree(n=numberNode, Ki=numberInputNode, Ko=NumberOutputNode, rep_vect_norm=10, cleanExtraMemSpace=False)
+net = c.choiceFree(n=numberNode, density=density, rep_vect_norm=10, cleanExtraMemSpace=False)
 f_net = gd.drawPetriNetwork(net.obj, nodeSize=500, widthArraw=1.5)
 f_net.show()
 
