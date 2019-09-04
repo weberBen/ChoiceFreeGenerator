@@ -6,12 +6,12 @@
 
 #include "choiceFreeGeneratorDev.h"
 
-#define NB_SIMULATION 1
+#define NB_SIMULATION 100
 #define SIZE 100
-#define D 80
-#define DENSITY 0.5
+#define D 4
+#define DENSITY 1
 #define NUM_OVER 2
-#define TREE 0
+#define TREE 1
 
 void initializeuIntArray(unsigned int * array, unsigned int size, unsigned int val)
 {
