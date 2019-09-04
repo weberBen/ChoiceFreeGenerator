@@ -22,7 +22,7 @@ f_net.show()
 #matplotlib.pyplot.savefig('test.png', transparent=True)
 
 c.free(net)
-c.exit()#free all the non-free object
+c.exit()#free all the non-free object'''
 
 
 '''

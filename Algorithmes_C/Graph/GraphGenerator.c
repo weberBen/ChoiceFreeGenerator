@@ -274,8 +274,8 @@ void connectedGraph(int network[], unsigned int size)
 	 for(i=0; i<n; i++)
 	 {
 		 //make sure all the node have at least one input and one ouput
-		 proba_o[i] = max_input_degree+1;//represent the probability multiplied by Ko (p=1=Ko/Ko =>Ko*p=Ko)
-		 proba_i[i] = max_output_degree+1;//represent the probability multiplied by Ki (p=1=Ki/Ki =>Ki*p=Ki)
+		 proba_o[i] = max_input_degree;//represent the probability multiplied by Ko (p=1=Ko/Ko =>Ko*p=Ko)
+		 proba_i[i] = max_output_degree;//represent the probability multiplied by Ki (p=1=Ki/Ki =>Ki*p=Ki)
 	 }
 	
 	 /* Since we will use a temporarily mask over the real probability, we set the 
@@ -332,7 +332,7 @@ void connectedGraph(int network[], unsigned int size)
 		 
 
 		 //set number of input and output
-		 if(current_nb_edges>=nb_edges-n)
+		 if(current_nb_edges>=nb_edges-(n-vertex))
 		 {//at least each node have 1 input and 1 output 
 			nb_input = 1;
 			nb_output = 1;

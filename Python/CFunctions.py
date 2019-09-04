@@ -10,8 +10,8 @@ import SocketCommunication as sc
 
 #%%
 _id = 0
-srv = sc.Server()
-#srv = sc.Server(port=1436, buffersize=512, start=False)
+#srv = sc.Server()
+srv = sc.Server(port=1436, buffersize=512, start=False)
 #to start C code in an external terminal and connect python to it
 '''  
 Run main_py at port x with a buffersize of l

@@ -399,6 +399,8 @@ int getRandomDispersionAroundAvgUint(unsigned avg, double dispersion, unsigned i
 {
 	if(min>=avg)
 		return min;
+	if(max<min)
+		return min;
 	
 	unsigned int low_bound, up_bound;
 	unsigned int temp;
