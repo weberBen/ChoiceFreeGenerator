@@ -1199,7 +1199,7 @@ pPetri _generateChoiceFree(unsigned int * real_vect_norm,
 	}
 	if(density==0 || density>1)
 	{
-		fprintf(stderr, "density must me greater than 0 and smaller or equal to 1\n");
+		fprintf(stderr, "density must be in ]0, 1]\n");
 		return NULL;
 	}
 
