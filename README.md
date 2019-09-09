@@ -26,12 +26,12 @@ A marked Choice-Free graph is a subclass of marked petri net where each place ha
 
 <img src="Annexes/Images/choiceFreeDef.png" width="70%"  align="middle">
 
-The generator convert a living and normalized SDF to a living Choice-Free. That transformation is apply on each transition in the SDF that have more than 1 input as shown below.
+The generator converts a living and normalized SDF to a living Choice-Free. That transformation is apply on each transition for the SDF that have more than 1 input as shown below.
 
 <img src="Annexes/Images/SdfTransformation.png" width="70%"  align="middle">
 
-Then the process gather all the places to have a unique input into the transition.
-To achieve that goal the SDF is generated from a strongly conected graph where a node is converted into a transition and an edge into a place. To ensure that there is enough transitions with multiple inputs (thus, for the directed graph that implies to have multiple inputs per node) user have to select the number of desired input for the strongly connected graph (and can also select the number of outputs which need to be at least equal to the number of input to ensure that there no transition (no node in the graph) without any input.
+Then the generator gathers the places according to random generated partitions.
+To achieve that goal the SDF is generated from a strongly conected graph where a node is converted into a transition and an edge into a place.
 
 # Compile sources <a name="Compile"/>
 
@@ -62,7 +62,7 @@ SYNOPSIS
 
 choiceFreeGenerator allows user to generate random living Choice-Free network given the desired number of transitions ```[nb_transition]``` in the final petri network. 
 
-The generation of the final network is based uppon the one of a strongly connected graph with a density set to [density] in ]0, 1].
+The generation of the final network is based uppon the one of a strongly connected graph with a density set to ```[density]``` in ]0, 1].
 
 The ```[vect_norm]``` is the desired norm of the repetition vector to get during the generation of a random one for the SDF
 
@@ -254,7 +254,7 @@ typedef struct Petri
  
   ## Creation of a Petri net <a name="PetriStructExample"/>
   
- A simple tutorial to understand how the structure used to save Free-choice works
+ A simple tutorial to understand how to use the structure for Petri net.
  
  ```C
 unsigned int nb_place = 5;
